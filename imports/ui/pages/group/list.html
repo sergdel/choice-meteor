@@ -1,0 +1,177 @@
+<template name="groupList">
+    <h1>Groups
+        <!--a class="btn btn-primary btn-lg" href="{{pathFor 'groupNew'}}"><div class="fa fa-plus"></div></a-->
+    </h1>
+    {{>searchGroupListForm}}
+    {{#if group.count}}
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+        <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
+        <div class="table-responsive">
+            <table class="table table-draggable">
+                <thead>
+                <tr>
+                    <th id="external-link"></th>
+                    <th id="id"><a href="#" class="orderBy" data-order="id"
+                                                  data-direction="1">ID</a> {{{orderBy
+                            'id'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="name"><a href="#" class="orderBy" data-order="name"
+                                                data-direction="-1">Name</a> {{{orderBy
+                            'name'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="nationality"><a href="#" class="orderBy" data-order="nationality"
+                                                   data-direction="-1">Nationality</a> {{{orderBy
+                            'nationality'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="dates"><a href="#" class="orderBy"
+                                                     data-order="dates"
+                                                     data-direction="-1">Dates</a> {{{orderBy
+                            'dates'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="nights"><a href="#" class="orderBy"
+                                                     data-order="nights"
+                                                     data-direction="-1">Nights</a> {{{orderBy
+                            'nights'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="ages"><a href="#" class="orderBy"
+                                             data-order="ages"
+                                             data-direction="-1">Ages</a> {{{orderBy
+                            'ages'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="city"><a href="#" class="orderBy" data-order="city"
+                                             data-direction="-1">City</a> {{{orderBy
+                            'city'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="location"><a href="#" class="orderBy" data-order="location"
+                                              data-direction="-1">Location</a> {{{orderBy
+                            'location'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="guestsHome"><a href="#" class="orderBy" data-order="guestsHome"
+                                            data-direction="-1">Guests/home</a> {{{orderBy
+                            'guestsHome'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="status"><a href="#" class="orderBy" data-order="status"
+                                              data-direction="-1">Status</a> {{{orderBy
+                            'status'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="students"><a href="#" class="orderBy" data-order="students"
+                                          data-direction="-1">Students</a> {{{orderBy
+                            'students'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="adults"><a href="#" class="orderBy" data-order="adults"
+                                           data-direction="-1">Adults</a> {{{orderBy
+                            'adults'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="placed"><a href="#" class="orderBy" data-order="placed"
+                                                   data-direction="-1">Placed</a> {{{orderBy
+                            'placed'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="availablePlacements"><a href="#" class="orderBy"
+                                                      data-order="availablePlacements"
+                                                      data-direction="-1">Available Placements</a> {{{orderBy
+                            'availablePlacements'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                {{#transition in="fadeInLeftBig" out="fadeOutRightBig"}}
+                    {{#each group}}
+                        <tr>
+                            <td><a href="{{pathFor 'groupEdit' groupId=_id}}"
+                                   class="btn btn-default btn-xs" target="_blank">
+                                <i class="fa fa-external-link"></i>
+                            </a></td>
+                            <td class="zoom">{{id}} </td>
+                            <td class="zoom">{{name}}</td>
+                            <td class="zoom">{{nationality}}</td>
+                            <td class="zoom">{{dates}}</td>
+                            <td class="zoom">{{nights}}</td>
+                            <td class="zoom">{{ages}}</td>
+                            <td class="zoom">{{city}}</td>
+                            <td class="zoom">{{location}}</td>
+                            <td class="zoom">{{guestsHome}}</td>
+                            <td class="zoom">{{status}}</td>
+                            <td class="zoom">{{students}}</td>
+                            <td class="zoom">{{adults}}</td>
+                            <td class="zoom">{{placed}}</td>
+                            <td class="zoom">{{availablePlacements}}</td>
+                        </tr>
+                    {{/each}}
+                {{/transition}}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+    {{else}}
+        {{#if Template.subscriptionsReady }}
+            <div class="row text-center">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <br><br>
+                    There is not families with this criteria
+                </div>
+            </div>
+        {{else}}
+            <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
+        {{/if}}
+    {{/if}}
+    {{#if Template.subscriptionsReady }}
+        {{#if showMoreLink}}
+            <a class="btn btn-block btn-default showMore" href="{{showMoreLink}}">Show more</a>
+        {{/if}}
+    {{/if}}
+
+</template>
+
+

@@ -1,0 +1,16 @@
+{
+  "name": "choicehomestay",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "bootstrap": "^3.3.7",
+    "dropbox": "^2.4.0",
+    "json2csv": "^3.7.1",
+    "lodash": "^4.16.5",
+    "meteor-node-stubs": "~0.2.0",
+    "moment": "^2.15.2"
+  }
+}

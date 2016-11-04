@@ -1,0 +1,105 @@
+<template name="blueCardList">
+    <h1>Family
+        <!--a class="btn btn-primary btn-lg" href="{{pathFor 'blueCardNew'}}"><div class="fa fa-plus"></div></a-->
+    </h1>
+    {{>searchBlueCardListForm}}
+    {{#if blueCard.count}}
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+        <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
+        <div class="table-responsive">
+            <table class="table table-draggable">
+                <thead>
+                <tr>
+                    <th id="external-link"></th>
+                    <th id="expiryDate"><a href="#" class="orderBy" data-order="expiryDate"
+                                           data-direction="-1">Expiry Date</a> {{{orderBy
+                            'expiryDate'}}}
+                        <br>
+
+                    </th>
+                    <th id="firstName"><a href="#" class="orderBy" data-order="firstName"
+                                          data-direction="1">First
+                        Name</a> {{{orderBy
+                            'firstName'}}}
+                        <br>
+
+                    </th>
+                    <th id="surname"><a href="#" class="orderBy" data-order="surname"
+                                        data-direction="-1">Surname</a> {{{orderBy
+                            'surname'}}}
+                        <br>
+
+                    </th>
+                    <th id="dateOfBirth"><a href="#" class="orderBy" data-order="cdateOfBirth"
+                                            data-direction="-1">Date of Birth</a> {{{orderBy
+                            'dateOfBirth'}}}
+                        <br>
+
+                    </th>
+                    <th id="number"><a href="#" class="orderBy"
+                                       data-order="number"
+                                       data-direction="-1">Number</a> {{{orderBy
+                            'number'}}}
+                        <br>
+
+                    </th>
+
+
+                    <th id="status"><a href="#" class="orderBy" data-order="status"
+                                       data-direction="-1">Status</a> {{{orderBy
+                            'status'}}}
+                        <br>
+
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#transition in="fadeInLeftBig" out="fadeOutRightBig"}}
+                    {{#each blueCard}}
+                        <tr>
+                            <td><a href="{{pathFor 'familyEdit' familyId=familyId}}#{{type}}"
+                                   class="btn btn-default btn-xs" target="_blank">
+                                <i class="fa fa-external-link"></i>
+                            </a></td>
+                            <td class="zoom">{{showDate expiryDate}} {{showFrom expiryDate}}</td>
+                            <td class="zoom">{{firstName}} </td>
+                            <td class="zoom">{{surname}}</td>
+                            <td class="zoom">{{showDate dateOfBirth}}</td>
+                            <td class="zoom">{{number}}</td>
+                            <td class="zoom">{{status}}</td>
+                        </tr>
+                    {{/each}}
+                {{/transition}}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+    {{else}}
+        {{#if Template.subscriptionsReady }}
+            <div class="row text-center">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <br><br>
+                    There is not families with this criteria
+                </div>
+            </div>
+        {{else}}
+            {{>loading}}
+        {{/if}}
+    {{/if}}
+    {{#if Template.subscriptionsReady }}
+        {{#if showMoreLink}}
+            <a class="btn btn-block btn-default showMore" href="{{showMoreLink}}">Show more</a>
+        {{/if}}
+    {{/if}}
+
+</template>
+
+

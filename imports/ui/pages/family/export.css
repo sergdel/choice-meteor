@@ -1,0 +1,37 @@
+.exportFields .row .fixedHeight {
+    height: 250px;
+
+}
+.exportFields i.fa {
+    cursor: hand !important;
+}
+.connectedSortable {
+    overflow: auto;
+    border: 1px solid #ebebeb;
+    height: 250px;
+}
+
+.ui-state-default {
+    border: 1px solid #b6b6b6;
+    list-style: none;
+    margin: 3px;
+}
+
+.exportFields ul {
+    padding: 4px;
+}
+
+.exportFields li {
+    cursor: move;
+}
+#showedList li i.fa, #hiddenList li i.fa{
+    display: none;
+
+}
+#showedList li i.fa-arrow-circle-o-left {
+    display: none;
+}
+
+#hiddenList li i.fa-arrow-circle-o-right{
+    display: none;
+}

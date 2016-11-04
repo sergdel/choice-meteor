@@ -1,0 +1,8 @@
+{
+  "galaxy.meteor.com": {
+    "env": {
+      "MONGO_URL": "mongodb://choice:2020Vision@ds139817.mlab.com:39817/choice",
+      "ROOT_URL": "http://dev.choicehomestay.com.au"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<template name="afSelectMultiCheckboxCombo">
+    <div class="af-checkbox-group" {{dsk}}>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                {{#if selected}}
+                    <i class="fa fa-check-square-o"></i>
+                {{else}}
+                    <i class="fa fa-square-o"></i>
+                {{/if}} {{label}}
+
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                {{#each this.items}}
+                    <li>
+                        <p><input type="checkbox" value="{{this.value}}" {{atts}} /> {{this.label}}</p>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</template>

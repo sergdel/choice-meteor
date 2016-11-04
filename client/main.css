@@ -1,0 +1,76 @@
+.table-wrapper table{
+    position: relative;
+}
+.table-wrapper{
+    position: relative;
+}
+.table-wrapper>div{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.table-wrapper.loading{
+    height: 100%;
+    margin: 100% auto;
+}
+
+
+/*
+ * dragtable
+ *
+ * @Version 2.0.15
+ *
+ * default css
+ *
+ */
+/*##### the dragtable stuff #####*/
+.center-loading{
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: .5;
+}
+
+
+.dragtable-sortable {
+    list-style-type: none; margin: 0; padding: 0; -moz-user-select: none;
+}
+.dragtable-sortable li {
+    margin: 0; padding: 0; float: left; font-size: 1em; background: white;
+}
+
+.dragtable-sortable th, .dragtable-sortable td{
+    border-left: 0px;
+}
+
+.dragtable-sortable li:first-child th, .dragtable-sortable li:first-child td {
+    border-left: 1px solid #CCC;
+}
+
+.ui-sortable-helper {
+    opacity: 0.7;filter: alpha(opacity=70);
+}
+.ui-sortable-placeholder {
+    -moz-box-shadow: 4px 5px 4px #C6C6C6 inset;
+    -webkit-box-shadow: 4px 5px 4px #C6C6C6 inset;
+    box-shadow: 4px 5px 4px #C6C6C6 inset;
+    border-bottom: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    visibility: visible !important;
+    background: #EFEFEF !important;
+    visibility: visible !important;
+}
+.ui-sortable-placeholder * {
+    opacity: 0.0; visibility: hidden;
+}
+
+.dragtable-drag-handle{
+    width: 100%;
+}
+.table-draggable{
+    margin-bottom: 0;
+}
+
+

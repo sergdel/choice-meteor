@@ -1,0 +1,83 @@
+<template name="layout">
+    {{#unless subsReady}}
+        {{>loading}}
+    {{else}}
+        <nav class="navbar navbar-default ">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-logo" href="#"><img src="/img/choice-home-stays-logo.png"></a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        {{#unless currentUser }}
+                            <li><a href="{{pathFor 'atSignIn'}}">Login</a></li>
+                            <!--li class="navbar-btn">
+                                    <button class="btn btn-primary goto" data-link="{{pathFor 'atSignUp'}}">Registrate
+                                    </button>
+                                </li-->
+                        {{else}}
+                            {{#if isInRole 'admin,staff' }}
+                                <li><a href="{{pathFor 'familyList'}}">Families</a></li>
+                                <li><a href="{{pathFor 'blueCardList'}}">Blue Card</a></li>
+                            {{/if}}
+                            {{#if isInRole 'admin' }}
+                                <li><a href="{{pathFor 'staffList'}}">Staff</a></li>
+                                <li><a href="{{pathFor 'auditList'}}">Log</a></li>
+                            {{/if}}
+                            {{#if isInRole 'family' }}
+                                <!--li><a href="{{pathFor 'userProfile' familyId=currentUser._id }}">Profile</a></li-->
+                            {{/if}}
+                            <li><a href="http://choicehomestay.com" class="logout">Close session</a></li>
+                            <!--li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">Settings<span
+                                        class="caret"></span></a>
+                                <ul class="dropdown-menu">
+
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" class="logout">Close session</a></li>
+                                </ul>
+                            </li-->
+                        {{/unless}}
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+        <section>
+            <div class="container-fluid">
+
+                {{> Template.dynamic template=yield}}
+
+            </div>
+        </section>
+        <footer class="inverse">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+                    </div>
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-right">
+                    </div>
+                </div>
+
+            </div>
+        </footer>
+    {{/unless}}
+</template>

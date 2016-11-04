@@ -1,0 +1,225 @@
+<template name="familyList">
+    <h1>Families
+        <!--a class="btn btn-primary btn-lg" href="{{pathFor 'familyNew'}}"><div class="fa fa-plus"></div></a-->
+    </h1>
+    {{>searchFamilyListForm}}
+    {{#if family.count}}
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+        <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
+        <div class="table-responsive">
+            <table class="table table-draggable">
+                <thead>
+                <tr>
+                    <th id="external-link"></th>
+                    <th id="parents0firstName"><a href="#" class="orderBy" data-order="parents.0.firstName"
+                                                  data-direction="1">First
+                        Name</a> {{{orderBy
+                            'parents.0.firstName'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="parents0surname"><a href="#" class="orderBy" data-order="parents.0.surname"
+                                                data-direction="-1">Surname</a> {{{orderBy
+                            'parents.0.surname'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="contactaddresscity"><a href="#" class="orderBy" data-order="contact.address.city"
+                                                   data-direction="-1">City</a> {{{orderBy
+                            'contact.address.city'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+                    <th id="contactaddresssuburb"><a href="#" class="orderBy"
+                                                     data-order="contact.address.suburb"
+                                                     data-direction="-1">Suburb</a> {{{orderBy
+                            'contact.address.suburb'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="blueCardStatus"><a href="#" class="orderBy"
+                                                     data-order="blueCardStatus"
+                                                     data-direction="-1">Blue Card</a> {{{orderBy
+                            'blueCardStatus'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="office.score"><a href="#" class="orderBy"
+                                             data-order="office.score"
+                                             data-direction="-1">Score</a> {{{orderBy
+                            'office.score'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="parentsCount"><a href="#" class="orderBy" data-order="parentsCount"
+                                             data-direction="-1">Parents</a> {{{orderBy
+                            'parentsCount'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="childrenCount"><a href="#" class="orderBy" data-order="childrenCount"
+                                              data-direction="-1">Children</a> {{{orderBy
+                            'childrenCount'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="guestsCount"><a href="#" class="orderBy" data-order="guestsCount"
+                                            data-direction="-1">Guest</a> {{{orderBy
+                            'guestsCount'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="bedroomsCount"><a href="#" class="orderBy" data-order="bedroomsCount"
+                                              data-direction="-1">Bedrooms</a> {{{orderBy
+                            'bedroomsCount'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="bedsCount"><a href="#" class="orderBy" data-order="bedsCount"
+                                          data-direction="-1">Beds</a> {{{orderBy
+                            'bedsCount'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="officetags"><a href="#" class="orderBy" data-order="office.tags"
+                                           data-direction="-1">Tags</a> {{{orderBy
+                            'office.tags'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="officefamilyStatus"><a href="#" class="orderBy" data-order="office.familyStatus"
+                                                   data-direction="-1">Status</a> {{{orderBy
+                            'office.familyStatus'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+
+                    <th id="officefamilySubStatus"><a href="#" class="orderBy"
+                                                      data-order="office.familySubStatus"
+                                                      data-direction="-1">Substatus</a> {{{orderBy
+                            'office.familySubStatus'}}}
+                        <br>
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                    </th>
+
+                    <th id="otherpreferredGender"><a href="#" class="orderBy"
+                                                     data-order="other.preferredGender"
+                                                     data-direction="-1">Preferred Gender</a> {{{orderBy
+                            'other.preferredGender'}}}
+                        <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+
+                    </th>
+
+
+                    {{#if isInRole 'admin'}}
+                        <th><a href="#" class="orderBy" data-order="emails.address"
+                               data-direction="-1">Email</a> {{{orderBy
+                                'emails.address'}}}
+                            <br>
+                            <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                        </th>
+                        <th><a href="#" class="orderBy"
+                               data-order="parents.mobilePhone"
+                               data-direction="-1">Mobile</a> {{{orderBy
+                                'parents.mobilePhone'}}}
+                            <br>
+                            <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                        </th>
+                        <th><a href="#" class="orderBy"
+                               data-order="contact.homePhone"
+                               data-direction="-1">home</a> {{{orderBy
+                                'contact.homePhone'}}}
+                            <br>
+                            <div class="fa fa-arrows-h dragtable-drag-handle"></div>
+                        </th>
+                    {{/if}}
+
+                    {{#if hasAddress}}
+                        <th>Distance
+                            <div class="fa fa-caret-up"></div>
+                        </th>
+                    {{/if}}
+
+                </tr>
+                </thead>
+                <tbody>
+                {{#transition in="fadeInLeftBig" out="fadeOutRightBig"}}
+                    {{#each family}}
+                        <tr>
+                            <td><a href="{{pathFor 'familyEdit' familyId=_id}}"
+                                   class="btn btn-default btn-xs" target="_blank">
+                                <i class="fa fa-external-link"></i>
+                            </a></td>
+                            <td class="zoom">{{parents.[0].firstName}} </td>
+                            <td class="zoom">{{parents.[0].surname}}</td>
+                            <td class="zoom">{{contact.address.city}}</td>
+                            <td class="zoom">{{contact.address.suburb}}</td>
+                            <td class="zoom">{{blueCardStatus}}</td>
+                            <td class="zoom">{{office.score}}</td>
+                            <td class="zoom">{{parentsCount}}</td>
+                            <td class="zoom">{{childrenCount}}</td>
+                            <td class="zoom">{{guestsCount}}</td>
+                            <td class="zoom">{{bedroomsCount}}</td>
+                            <td class="zoom">{{bedsCount}}</td>
+                            <td class="zoom">{{office.tags}}</td>
+                            <td class="zoom">{{familyStatus
+                                    office.familyStatus}}</td>
+                            <td class="zoom">{{office.familySubStatus}}</td>
+                            <td class="zoom">{{other.preferredGender}}</td>
+                            {{#if isInRole 'admin'}}
+                                <td class="zoom">{{emails.[0].address}}</td>
+                                <td class="zoom">{{parents.[0].mobilePhone}}</td>
+                                <td class="zoom">{{contact.homePhone }}</td>
+                            {{/if}}
+                            {{#if hasAddress}}
+                                {{distance}}
+                            {{/if}}
+                        </tr>
+                    {{/each}}
+                {{/transition}}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <small>Showing {{showing}} from {{total}}</small>
+            </div>
+        </div>
+    {{else}}
+        {{#if Template.subscriptionsReady }}
+            <div class="row text-center">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <br><br>
+                    There is not families with this criteria
+                </div>
+            </div>
+        {{else}}
+            <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
+        {{/if}}
+    {{/if}}
+    {{#if Template.subscriptionsReady }}
+        {{#if showMoreLink}}
+            <a class="btn btn-block btn-default showMore" href="{{showMoreLink}}">Show more</a>
+        {{/if}}
+    {{/if}}
+
+</template>
+
+

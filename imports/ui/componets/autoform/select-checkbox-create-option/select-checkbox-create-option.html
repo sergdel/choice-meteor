@@ -1,0 +1,9 @@
+<template name="afCheckboxCreateOption">
+  <div class="af-checkbox-group" {{dsk}}>
+    {{#each this.items}}
+      <div><label><input type="checkbox" value="{{this.value}}" {{atts}} /> {{this.label}}</label></div>
+    {{/each}}
+      <button class="btn btn-default addAnother" type="button"><i class="fa fa-plus"></i>Add another</button>
+
+  </div>
+</template>

@@ -1,0 +1,7 @@
+<template name="familyNew">
+    <h1>Family New
+        <a class="btn btn-primary btn-lg" href="{{pathFor 'familyList'}}"><i class="fa fa-list"></i></a>
+    </h1>
+    {{>familyForm formType="method" formMethod="familyNew" resetOnSuccess=true
+            familyStatusOptions=familyStatusOptions}}
+</template>

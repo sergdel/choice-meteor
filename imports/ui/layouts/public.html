@@ -1,0 +1,84 @@
+<template name="public">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-logo" href="#"><img src="/img/choice-home-stays-logo.png"></a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="{{pathFor 'information'}}">Imformation</a></li>
+                    <li><a href="#">Photos</a></li>
+                    {{#if logged}}
+                        <li><a href="{{pathFor 'familyList'}}">Private</a></li>
+                    {{else}}
+                        <li><a href="{{pathFor 'sign-in'}}">Sign In</a></li>
+                    {{/if}}
+
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <div class="content">
+        {{> Template.dynamic template=yield}}
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class=" col-lg-3 col-md-6 ">
+                    <h3>Contact</h3>
+                    <table class=" ">
+                        <tbody>
+                        <tr>
+                            <td><strong><i class="fa fa-map-marker"></i> Address:</strong></td>
+                            <td>1 Como Cres<br>Southport QLD 4215<br>Australia</td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fa fa-edit"></i> Postal:</strong></td>
+                            <td>PO Box 298<br>Helensvale, QLD 4212<br>Australia</td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fa fa-file-text"></i> ACN:</strong></td>
+                            <td>142 098 600</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class=" col-md-3 col-md-6 ">
+
+                </div>
+                <div class=" col-md-3 col-md-6 ">
+                    <h3>Participating Schools</h3>
+                    <p>
+                        We arrange homestay for students visiting Gold Coast and Brisbane schools including:
+                    </p>
+                    <ul>
+                        <li>Gold Coast Christian College</li>
+                        <li>St. Stephen's College</li>
+                        <li>Hillcrest Christian College</li>
+                        <li>Groves Christian College</li>
+                        <li>Livingstone Christian College</li>
+                        <li>Griffith University</li>
+                        <li>Many public state schools</li>
+                        <li>Many English language colleges</li>
+                    </ul>
+                </div>
+                <div class=" col-md-3  col-md-6 ">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,33 @@
+<template name="afArrayField_clean">
+
+    <h3>
+
+        {{afFieldLabelText name=this.atts.name}}
+
+    </h3>
+    {{#if afFieldIsInvalid name=this.atts.name}}
+        <div class="has-error">
+            <span class="help-block">{{{afFieldMessage name=this.atts.name}}}</span>
+        </div>
+    {{/if}}
+
+            {{#afEachArrayItem name=this.atts.name minCount=this.atts.minCount maxCount=this.atts.maxCount template="clean" }}
+                <div class="form-group">
+                    {{> afQuickField name=this.name label=false options=afOptionsFromSchema template="clean" }}
+
+                    {{#if afArrayFieldHasMoreThanMinimum name=../atts.name minCount=../atts.minCount
+                          maxCount=../atts.maxCount}}
+                        <button type="button" class="btn btn-danger btn-block autoform-remove-item"><i class="fa fa-trash"></i></button>
+                    {{/if}}
+                    <hr>
+                </div>
+            {{/afEachArrayItem}}
+    {{#if afArrayFieldHasLessThanMaximum name=this.atts.name minCount=this.atts.minCount
+          maxCount=this.atts.maxCount}}
+        <button type="button" class="btn btn-default autoform-add-item btn-block"
+                data-autoform-field="{{this.atts.name}}" data-autoform-minCount="{{this.atts.minCount}}"
+                data-autoform-maxCount="{{this.atts.maxCount}}"><i class="fa fa-plus"></i> Add {{afFieldLabelText name=this.atts.name}}</button>
+
+    {{/if}}
+
+</template>

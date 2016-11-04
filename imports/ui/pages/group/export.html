@@ -1,0 +1,44 @@
+<template name="exportCVS">
+    <form id="exportCVS"></form>
+    <div class="exportFields">
+        <div class="row fixedHeight">
+            <div class="col-xs-6">
+                <b>Fields for export</b>:
+
+                <ul id="showedList" class="connectedSortable">
+                    {{#each showedList}}
+                        <li class="ui-state-default" data-value="{{label}}={{value}}">
+                            {{label}}
+                            <i class="fa fa-arrow-circle-o-left pull-right"></i>
+                            <i class="fa fa-arrow-circle-o-right  pull-right"></i>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="col-xs-6">
+                <b> Hidden fields </b>:
+                <ul id="hiddenList" class="connectedSortable">
+                    {{#each hiddenList}}
+                        <li class="ui-state-default" data-value="{{label}}={{value}}">
+                            {{label}}
+                            <i class="fa fa-arrow-circle-o-left  pull-right"></i>
+                            <i class="fa fa-arrow-circle-o-right  pull-right"></i>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-xs-6">
+                <button class="btn btn-xs btn-default moveToRight " type="button">Move all <i
+                        class="fa fa-arrow-right"></i></button>
+            </div>
+            <div class="col-xs-6 text-right">
+                <button class="btn btn-xs btn-default moveToLeft " type="button"><i
+                        class="fa fa-arrow-left"></i> Move all
+                </button>
+            </div>
+        </div>
+
+    </div>
+</template>

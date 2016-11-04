@@ -1,0 +1,7 @@
+
+.panel-title a.collapsed .panel-hide{
+    display: none;
+}
+.panel-title a:not(.collapsed) .panel-show{
+    display: none;
+}

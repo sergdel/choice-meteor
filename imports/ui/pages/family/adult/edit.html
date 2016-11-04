@@ -1,0 +1,88 @@
+<template name="adultEdit">
+    <h1></h1>
+    <p>
+        <b>Choice Homestay</b> is now placing adult guests with our Gold Coast homestay families. We view this as a
+        lovely way
+        to
+        connect and share more perspective
+        with today’s decision makers as well as the decision makers of tomorrow.
+    </p>
+    <p>
+        We will have adult guests visiting most days of the year, visiting for 2 nights each with these itinerary
+        requirements:
+    </p>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Transport requirements</th>
+            <th>Family time requirements</th>
+            <th>Meal requirements</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <th>Day 1 (Arrival)</th>
+            <td>
+                <ol>
+                    <li>Pickup guests @ 3pm</li>
+                </ol>
+            </td>
+            <td>Share evening activities together</td>
+            <td>Dinner only</td>
+        </tr>
+        <tr>
+            <th>Day 2 (Full day)</th>
+            <td>
+                <ol>
+                    <li>Dropoff guests @ 9am</li>
+                    <li>Pickup guests @ 6pm</li>
+                </ol>
+            </td>
+            <td>Share evening together, after their group dinner elsewhere</td>
+            <td>Breakfast only</td>
+        </tr>
+        <tr>
+            <th>Day 3 (Leave)</th>
+            <td>
+                <ol>
+                    <li>Dropoff guests at times varying from 4am to 9am</li>
+                </ol>
+            </td>
+            <td></td>
+            <td>Breakfast only</td>
+        </tr>
+        <tr>
+            <th>Other requirements:</th>
+            <td colspan="3">
+                <ul>
+                    <li>2-share homestay (2 guests / home), sharing a room or with individual rooms</li>
+                    <li>A clean & tidy bedroom, and a comfortable bed each and fresh linen (no bunk beds)</li>
+                    <li>Free WIFI internet access</li>
+                    <li>No other guests of the same nationality staying in the house during their visit</li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>The pay for hosting these guests is $100/night total, which is $30/night more than full board student groups.</p>
+    <p> If you wish to welcome adult guests to your home then please complete this form and we will contact you soon:</p>
+
+
+
+    {{#autoForm schema=familySchema doc=family id="adultEdit"  type="method-update"
+                meteormethod="adultEdit" resetOnSuccess=false template="clean" omitFields=omitFields }}
+        {{>afQuickField name="adult" template="clean"}}
+        <div class="alert alert-success alert-dismissible" role="alert" style="display: none">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            <strong>Thank you</strong>, we will contact you soon to discuss this opportunity further with you.
+        </div>
+        <button class="btn btn-block btn-primary btn-lg hideAfterSave" data-original="{{#if adultGroupFirstTime}}Apply{{else}}Save{{/if}}"
+                data-begin="Sending <i class='fa fa-spinner fa-spin fa-fw'></i>" data-end="{{#if adultGroupFirstTime}}Applied{{else}}Saved{{/if}}">{{#if adultGroupFirstTime}}Apply{{else}}Save{{/if}}
+        </button>
+    {{/autoForm}}
+    <br><br><br>
+</template>
