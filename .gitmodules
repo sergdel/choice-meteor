@@ -1,0 +1,24 @@
+[submodule "packages/meteor-auditlog"]
+	path = packages/meteor-auditlog
+	url = https://github.com/cesarve77/meteor-auditlog.git
+[submodule "packages/meteor-autoform"]
+	path = packages/meteor-autoform
+	url = https://github.com/cesarve77/meteor-autoform.git
+[submodule "packages/meteor-autoform-file"]
+	path = packages/meteor-autoform-file
+	url = https://github.com/cesarve77/meteor-autoform-file.git
+[submodule "packages/meteor-autoform-googleplace"]
+	path = packages/meteor-autoform-googleplace
+	url = https://github.com/cesarve77/meteor-autoform-googleplace.git
+[submodule "packages/meteor-autoform-googleplace"]
+	path = packages/meteor-autoform-googleplace
+	url = https://github.com/cesarve77/meteor-autoform-googleplace.git
+[submodule "packages/meteor-autoform-raty"]
+	path = packages/meteor-autoform-raty
+	url = https://github.com/cesarve77/meteor-autoform-raty.git
+[submodule "packages/meteor-autoform-select2"]
+	path = packages/meteor-autoform-select2
+	url = https://github.com/cesarve77/meteor-autoform-select2.git
+[submodule "packages/meteor-login-token"]
+	path = packages/meteor-login-token
+	url = https://github.com/cesarve77/meteor-login-token.git
