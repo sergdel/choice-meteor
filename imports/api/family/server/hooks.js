@@ -21,11 +21,11 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
  */
 
 export const calcBlueCardStatus = function (blueCards) {
-    this.map = ["n/a","approved" ,"applying", "apply", "expired","declined" ];
-    if (!Array.isArray(blueCards) || blueCards.length<=0)
+    this.map = ["n/a", "approved", "applying", "apply", "expired", "declined"];
+    if (!Array.isArray(blueCards) || blueCards.length <= 0)
         return 'n/a';
     blueCards = _.pluck(blueCards, 'status');
-    blueCards=_.map(blueCards, (blu)=> {
+    blueCards = _.map(blueCards, (blu)=> {
         return _.indexOf(this.map, blu)
     });
     blueCards.sort();
@@ -34,32 +34,34 @@ export const calcBlueCardStatus = function (blueCards) {
 
 
 Meteor.users.after.update(function (userId, doc, fieldNames, modifier, options) {
-
-
     const familyId = doc._id;
     BlueCard.remove({familyId});
-    const allMembers=[];
+    const allMembers = [];
     const insertBlueCard = function (blus, type) {
-        if (Array.isArray(blus))
+        if (Array.isArray(blus)) {
             blus.forEach((blu)=> {
-                const member= {
-                    familyId,
-                    firstName: blu.firstName,
-                    surname: blu.surname,
-                    dateOfBirth: blu.dateOfBirth,
-                    number: blu.blueCard && blu.blueCard.number ? blu.blueCard.number : undefined,
-                    expiryDate: blu.blueCard && blu.blueCard.expiryDate ? blu.blueCard.expiryDate : undefined,
-                    status: blu.blueCard && blu.blueCard.status ? blu.blueCard.status : undefined,
-                    type
-                };
-                allMembers.push(member);
-                BlueCard.insert(member)
+                if (blu) {
+                    const member = {
+                        familyId,
+                        firstName: blu.firstName,
+                        surname: blu.surname,
+                        dateOfBirth: blu.dateOfBirth,
+                        number: blu.blueCard && blu.blueCard.number ? blu.blueCard.number : undefined,
+                        expiryDate: blu.blueCard && blu.blueCard.expiryDate ? blu.blueCard.expiryDate : undefined,
+                        status: blu.blueCard && blu.blueCard.status ? blu.blueCard.status : undefined,
+                        registered: blu.blueCard && blu.blueCard.registered ? blu.blueCard.registered : undefined,
+                        type
+                    };
+                    allMembers.push(member);
+                    BlueCard.insert(member)
+                }
             })
+        }
     };
     insertBlueCard(doc.parents, 'parents');
     insertBlueCard(doc.children, 'children');
     insertBlueCard(doc.guests, 'guests');
-    const blueCardStatus=calcBlueCardStatus(allMembers);
+    const blueCardStatus = calcBlueCardStatus(allMembers);
     if (!modifier.$set) modifier.$set = {};
 
     let numberOfBeds = 0;
@@ -104,38 +106,3 @@ AuditLog.assignCallbacks(Meteor.users, {
 });
 
 
-Meteor.startup(()=> {
-    if (Meteor.isServer) {
-        Meteor.users.update({}, {$set: {version: {number: 4, at: new Date()}}},{multi: true });
-        /*
-         const cursor = Meteor.users.find({
-         roles: 'family',
-         guestsCount: {$exists: 0},
-         bedroomsCount: {$exists: 0},
-         parentsCount: {$exists: 0},
-         childrenCount: {$exists: 0}
-         })
-         cursor.forEach((doc)=> {
-         doc.parentsCount = doc.parents ? doc.parents.length : 0
-         doc.childrenCount = doc.children ? doc.children.length : 0
-         let bedrooms = []
-         for (let i in doc.bedrooms) {
-         if (doc.bedrooms[i] && doc.bedrooms[i].numberOfBeds > 0) {
-         bedrooms.push({numberOfBeds: doc.bedrooms[i].numberOfBeds})
-         }
-         }
-         doc.bedrooms = bedrooms
-         doc.bedroomsCount = doc.bedrooms ? doc.bedrooms.length : 0
-         if (doc.bedroomsCount > 0)
-         doc.bedsCount = _.reduce(doc.bedrooms, (mem, room)=> {
-         return mem + room.numberOfBeds
-         }, 0)
-         else
-         doc.bedsCount = 0
-         doc.guestsCount = doc.guest ? doc.guest.length : 0
-         Meteor.users.update(doc._id, doc)
-         })
-         */
-
-    }
-});

@@ -20,10 +20,9 @@ AutoForm.addInputType("select-checkbox-create-option", {
     },
     contextAdjust: function (context) {
         var itemAtts = _.omit(context.atts);
-
         // build items list
         context.items = [];
-
+        context.extraItems = _.difference(context.value, _.pluck(context.selectOptions, 'value'))
         // Add all defined options
         _.each(context.selectOptions, function (opt) {
             context.items.push({
@@ -50,7 +49,7 @@ Template.afCheckboxCreateOption.events({
             atts += ` ${key}="${instance.data.atts[key]}" `
         }
         $(".addAnother").before(`<div class="row checkbox-create-option">
-              <div class="col-lg-4 col-md-5 col-sm-6">
+              <div class="col-lg-12">
                 <div class="input-group">
                     <input type="text" class="form-control"  ${atts}>
                     <span class="input-group-btn">

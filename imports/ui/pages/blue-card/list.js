@@ -7,7 +7,10 @@ import {rowsByPage} from "/imports/api/globals";
 import {BlueCard} from "/imports/api/blue-card/blue-card";
 import moment from 'moment'
 Template.blueCardList.onCreated(function () {
-    this.limit = new ReactiveVar(parseInt(FlowRouter.getParam("limit")) || rowsByPage);
+    this.limit = new ReactiveVar( );
+    this.autorun(()=>{
+        this.limit.set(parseInt(FlowRouter.getParam("limit") || rowsByPage))
+    })
     Session.setDefaultPersistent('searchBlueCardListForm.orderBy', {createdAt: -1});
     this.query = new ReactiveVar({});
     this.autorun(()=> {
@@ -32,44 +35,44 @@ Template.blueCardList.onCreated(function () {
                 })
         }
         const searchRange = Session.get('searchBlueCardListForm.searchRange');
-        if (Array.isArray(searchRange) && searchRange.length ==2) {
+        if (Array.isArray(searchRange) && searchRange.length == 2) {
 
             query = _.extend(query, {
-                "expiryDate": {$gte: searchRange[0], $lte: moment(searchRange[1]).endOf('day').toDate() },
+                "expiryDate": {$gte: searchRange[0], $lte: moment(searchRange[1]).endOf('day').toDate()},
             })
         }
 
         console.log("---->queryqueryqueryqueryquery", query);
         this.query.set(query);
-        Session.set('searchBlueCardListForm.query',query); //used for send query to server when ask for export cvs
+        Session.set('searchBlueCardListForm.query', query); //used for send query to server when ask for export cvs
         this.subscribe('blueCards', this.limit.get(), query, Session.get('searchBlueCardListForm.orderBy'))
     })
 });
 Template.blueCardList.onRendered(function () {
     /*
-    this.autorun(()=> {
-        if (this.subscriptionsReady()) {
-            Meteor.setTimeout(()=> {
-                this.$('table.table-draggable').dragtable({
-                    dragHandle: '.dragtable-drag-handle',
-                    persistState: function (table) {
-                        table.el.find('th').each(function (i) {
-                            if (this.id != '') {
-                                table.sortOrder[this.id] = i;
-                            }
-                        });
-                        Session.setPersistent('searchBlueCardListForm.columnOrder', table.sortOrder)
-                    },
-                    restoreState: Session.get('searchBlueCardListForm.columnOrder')
-                });
-            })
+     this.autorun(()=> {
+     if (this.subscriptionsReady()) {
+     Meteor.setTimeout(()=> {
+     this.$('table.table-draggable').dragtable({
+     dragHandle: '.dragtable-drag-handle',
+     persistState: function (table) {
+     table.el.find('th').each(function (i) {
+     if (this.id != '') {
+     table.sortOrder[this.id] = i;
+     }
+     });
+     Session.setPersistent('searchBlueCardListForm.columnOrder', table.sortOrder)
+     },
+     restoreState: Session.get('searchBlueCardListForm.columnOrder')
+     });
+     })
 
-            //this.$('.hideWhenSubscriptionsReady').fadeOut()
-            //this.$('table').dragtable('order', Session.get('searchBlueCardListForm.columnOrder'))
-        }
+     //this.$('.hideWhenSubscriptionsReady').fadeOut()
+     //this.$('table').dragtable('order', Session.get('searchBlueCardListForm.columnOrder'))
+     }
 
-    })
-*/
+     })
+     */
 });
 
 Template.blueCardList.onDestroyed(function () {
@@ -91,7 +94,7 @@ Template.blueCardList.helpers({
         return Template.instance().limit.get()
     },
     total: function () {
-        return  Counts.get('blueCardsCounter')
+        return Counts.get('blueCardsCounter')
     },
     showMoreLink: function () {
         const instance = Template.instance();
@@ -99,7 +102,7 @@ Template.blueCardList.helpers({
                 sort: Session.get('searchBlueCardListForm.orderBy')
             }).count() < Counts.get('blueCardsCounter')) {
             const routeName = FlowRouter.current().route.name;
-            const nextLimit = Template.instance().limit.get() + rowsByPage;
+            const nextLimit = instance.limit.get() + rowsByPage;
             return FlowRouter.path(routeName, {limit: nextLimit})
         }
         return false
@@ -137,7 +140,7 @@ Template.blueCardList.events({
         }
     },
     'click .zoom'(e, instance){
-        FlowRouter.go('familyEdit', {familyId: this._id})
+        FlowRouter.go(FlowRouter.path('familyEdit', {familyId: this.familyId, type: this.type})+'#'+this.type)
     },
 
 });

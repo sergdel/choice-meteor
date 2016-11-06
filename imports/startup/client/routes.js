@@ -21,6 +21,9 @@ import "/imports/ui/pages/staff/new";
 import "/imports/ui/layouts/errors.html";
 import "/imports/ui/pages/audit/list";
 
+import "/imports/ui/pages/group/list";
+import "/imports/ui/pages/group/edit";
+
 /*
 FlowRouter.wait();
 //ensure that the roles are accesible before routerFlow were initialized -> for make a route level auth
@@ -219,6 +222,28 @@ familyRoutes.route('/bluecard/:limit?', {
 });
 
 
+/**Groups**/
+const groupRoutes = staffRoleRoutes.group({
+    prefix: '/group'
+});
+
+groupRoutes.route('/list/:limit?', {
+    name: 'groupList',
+    title: 'Groups',
+    action(params, queryParams) {
+        console.log('groupList')
+        BlazeLayout.render('layout', {yield: 'groupList'})
+    }
+});
+groupRoutes.route('/edit/:groupId/:limit?', {
+    name: 'groupEdit',
+    action(params, queryParams) {
+        console.log('groupEdit')
+        BlazeLayout.render('layout', {yield: 'groupEdit'})
+    }
+})
+
+
 /**staff**/
 const staffRoutes = adminRoleRoutes.group({
     prefix: '/staff'
@@ -268,6 +293,7 @@ auditRoutes.route('/list', {
 
 FlowRouter.notFound = {
     action: function () {
+        console.log('notFound')
         BlazeLayout.render('layout', {yield: 'notFound'})
     }
 };

@@ -23,7 +23,7 @@ Template.layout.events({
 
 Template.layout.onRendered(function () {
     $('body').tooltip({
-        selector: '[title]:not(.rate)',
+        selector: '[title]:not(.raty)',
         delay: 200
     });
 });

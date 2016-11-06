@@ -4,32 +4,19 @@ import {ReactiveVar} from "meteor/reactive-var"
 import {Template} from "meteor/templating"
 import {FlowRouter} from "meteor/kadira:flow-router"
 import {rowsByPage} from "/imports/api/globals";
-import {getDistanceFromLatLonInKm} from "/imports/api/utilities";
-//todo: ahref:flow-router-breadcrumb quitar
-
+import {Groups} from "/imports/api/group/group"
 
 Template.groupList.onCreated(function () {
     this.limit = new ReactiveVar(parseInt(FlowRouter.getParam("limit")) || rowsByPage);
     Session.setDefaultPersistent('searchGroupListForm.orderBy', {createdAt: -1});
-    this.query = new ReactiveVar({roles: "group"});
-    this.autorun(()=> {
-        let query = {roles: "group"};
-        const address = Session.get('searchGroupListForm.address');
-        if (address) {
-            query = _.extend(query, {
-                "contact.address.geometry": {
-                    $near: {
-                        $geometry: address.geometry,
-                        $maxDistance: Session.get('searchGroupListForm.distance')
-                    }
-                }
-            })
-        }
-        const adults = Session.get('searchGroupListForm.adults');
-        if (Array.isArray(adults) && adults.length > 0) {
+    this.query = new ReactiveVar({});
 
+    this.autorun(()=> {
+        let query={}
+        const status = Session.get('searchGroupListForm.status');
+        if (Array.isArray(status) && adults.length > 0) {
             query = _.extend(query, {
-                "adult.status": {$in: adults}
+                "status": {$in: status}
             })
         }
         const keyWord = Session.get('searchGroupListForm.keyWord');
@@ -38,33 +25,24 @@ Template.groupList.onCreated(function () {
             query = _.extend(query,
                 {
                     $or: [
-                        {"parents.firstName": regex},
-                        {"parents.surname": regex},
-                        {groupInterests: regex},
-                        {"guest.firstName": regex},
-                        {"guest.surname": regex},
-                        {"children.firstName": regex},
-                        {"emails.address": regex},
-                        {"office.tags": regex},
-                        {"parents.mobilePhone": regex},
-                        {"contact.phoneHome": regex},
-                        {"contact.address.fullAddress": regex},
-                        {"contact.address.street": regex},
-                        {"contact.address.suburb": regex},
-                        {"contact.address.city": regex},
-                        {"contact.address.state": regex},
-                        {"contact.address.zip": regex},
+                        {"id": regex},
+                        {"name": regex},
+                        {"nationality": regex},
+                        {"city": regex},
+                        {"location": regex},
                     ]
                 })
         }
-        const groupStatus = Session.get('searchGroupListForm.groupStatus');
-        if (groupStatus) {
-            query["office.groupStatus"] = groupStatus
+        const searchRange = Session.get('searchGroupListForm.searchRange');
+        if (Array.isArray(searchRange) && searchRange.length == 2) {
+            query = _.extend(query, {
+                "timestamp": {$gte: searchRange[0], $lte: moment(searchRange[1]).endOf("day").toDate()}
+            })
         }
         console.log("query", query);
         this.query.set(query);
-        Session.set('searchGroupListForm.query',query); //used for send query to server when ask for export cvs
-        this.subscribe('families', this.limit.get(), query, Session.get('searchGroupListForm.orderBy'))
+        Session.set('searchGroupListForm.query', query); //used for send query to server when ask for export cvs
+        this.subscribe('groups', this.limit.get(), query, Session.get('searchGroupListForm.orderBy'))
     })
 });
 Template.groupList.onRendered(function () {
@@ -100,44 +78,26 @@ Template.groupList.onDestroyed(function () {
 
 
 Template.groupList.helpers({
-    hasAddress: function () {
-        const query = Template.instance().query.get();
-        return _.isObject(query) && query.hasOwnProperty("contact.address.geometry")
-    },
     group: ()=> {
         const instance = Template.instance();
-        const query = {roles: "group"};
-        console.log('group-------->', query);
-        return Meteor.users.find(query, {
+        const query = instance.query.get()
+        return Groups.find(query, {
             sort: Session.get('searchGroupListForm.orderBy'),
             limit: instance.limit.get(),
-            transform: (doc)=> {
-                try {
-                    const query = instance.query.get();
-                    if (_.isObject(query) && query.hasOwnProperty("contact.address.geometry")) {
-                        const pointA = query["contact.address.geometry"].$near.$geometry.coordinates;
-                        const pointB = doc.contact.address.geometry.coordinates;
-                        doc.distance = getDistanceFromLatLonInKm(pointA[0], pointA[1], pointB[0], pointB[1])
-                    }
-                } catch (e) {
-
-                }
-                return doc
-            }
         })
     },
     showing: ()=> {
         return Template.instance().limit.get()
     },
     total: function () {
-        return  Counts.get('familiesCounter')
+        return Counts.get('groupsCounter')
     },
     showMoreLink: function () {
         const instance = Template.instance();
 
-        if (Meteor.users.find(instance.query.get(), {
+        if (Groups.find(instance.query.get(), {
                 sort: Session.get('searchGroupListForm.orderBy')
-            }).count() < Counts.get('familiesCounter')) {
+            }).count() < Counts.get('groupsCounter')) {
             const routeName = FlowRouter.current().route.name;
             const nextLimit = Template.instance().limit.get() + rowsByPage;
             return FlowRouter.path(routeName, {limit: nextLimit})
@@ -161,8 +121,29 @@ Template.groupList.helpers({
 });
 
 Template.groupList.events({
-    'click .showMore'(e, instance){
-        instance.limit.set(instance.limit.get() + rowsByPage)
+    'click .groupNew'(e, instance){
+        Groups.attachSchema(Groups.schemas.new, {replace: true})
+        BootstrapModalPrompt.prompt({
+            title: "New Group",
+            autoform: {
+                collection: Groups,
+                schema: Groups.schemas.new,
+                type: "method",
+                "meteormethod": "groupNew",
+                id: 'groupNew',
+                buttonContent: false,
+            },
+            btnDismissText: 'Cancel',
+            btnOkText: 'Save'
+        }, function (data) {
+            if (data) {
+                console.log(data)
+                FlowRouter.go('groupEdit', {groupId: data})
+            }
+            else {
+                console.log('cancel')
+            }
+        });
     },
     'click .orderBy'(e, instance) {
         $('input[name="address"]').val('').change();

@@ -47,14 +47,17 @@
                         <br>
 
                     </th>
+                    <th id="registered"><a href="#" class="orderBy" data-order="registered"
+                                           data-direction="-1">Registered</a> {{{orderBy
+                            'registered'}}}
+                    </th>
 
 
                     <th id="status"><a href="#" class="orderBy" data-order="status"
                                        data-direction="-1">Status</a> {{{orderBy
                             'status'}}}
-                        <br>
-
                     </th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -70,6 +73,7 @@
                             <td class="zoom">{{surname}}</td>
                             <td class="zoom">{{showDate dateOfBirth}}</td>
                             <td class="zoom">{{number}}</td>
+                            <td class="zoom">{{registered}}</td>
                             <td class="zoom">{{status}}</td>
                         </tr>
                     {{/each}}

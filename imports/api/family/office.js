@@ -3,7 +3,7 @@
  */
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {familyStatus} from "/imports/api/family/family-status";
-
+import {hints} from'/imports/api/globals'
 
 export const officeSchema = new SimpleSchema({
     familyStatusEmailTemplate: {
@@ -59,6 +59,7 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
+                hints:hints,
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-4',
@@ -75,6 +76,7 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
+                hints:hints,
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-4',
@@ -90,6 +92,7 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
+                hints:hints,
                 readOnly    : true
             },
             afFormGroup: {

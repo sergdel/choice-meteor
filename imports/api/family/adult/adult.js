@@ -1,6 +1,7 @@
 /**
  * Created by cesar on 3/10/16.
  */
+import {hints} from'/imports/api/globals'
 
 
 export const adultSchema = new SimpleSchema({
@@ -42,6 +43,7 @@ export const adultSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
+                hints:hints,
             },
 
 

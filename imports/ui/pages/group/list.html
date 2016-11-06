@@ -1,6 +1,6 @@
 <template name="groupList">
     <h1>Groups
-        <!--a class="btn btn-primary btn-lg" href="{{pathFor 'groupNew'}}"><div class="fa fa-plus"></div></a-->
+        <button class="btn btn-primary btn-lg groupNew"><div class="fa fa-plus"></div></button>
     </h1>
     {{>searchGroupListForm}}
     {{#if group.count}}
@@ -137,7 +137,8 @@
                             <td class="zoom">{{ages}}</td>
                             <td class="zoom">{{city}}</td>
                             <td class="zoom">{{location}}</td>
-                            <td class="zoom">{{guestsHome}}</td>
+                            <td class="zoom">{{guests}}</td>
+                            <td class="zoom">{{homes}}</td>
                             <td class="zoom">{{status}}</td>
                             <td class="zoom">{{students}}</td>
                             <td class="zoom">{{adults}}</td>
@@ -159,7 +160,7 @@
             <div class="row text-center">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <br><br>
-                    There is not families with this criteria
+                    There is not groups with this criteria
                 </div>
             </div>
         {{else}}

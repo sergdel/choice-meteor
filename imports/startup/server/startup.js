@@ -20,6 +20,7 @@ Meteor.startup(()=> {
         });
         Roles.addUsersToRoles(userId, 'admin')
     }
+    /*
     let users=Meteor.users.find({roles: 'family','parents.blueCard':{$exists: false}});
     users.forEach((user)=>{
         if(Array.isArray(user.parents)){
@@ -76,5 +77,5 @@ Meteor.startup(()=> {
             }
         }
         Meteor.users.update(user._id,user)
-    })
+    })*/
 });

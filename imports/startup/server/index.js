@@ -18,3 +18,6 @@ import "/imports/api/family/adult/methods";
 import "/imports/api/staff/server/publication";
 import "/imports/api/staff/staff";
 import "/imports/api/staff/methods";
+import "/imports/api/group/group";
+import "/imports/api/group/methods";
+import "/imports/api/group/server/publication";

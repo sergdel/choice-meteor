@@ -9,7 +9,10 @@ import {getDistanceFromLatLonInKm} from "/imports/api/utilities";
 
 
 Template.familyList.onCreated(function () {
-    this.limit = new ReactiveVar(parseInt(FlowRouter.getParam("limit")) || rowsByPage);
+    this.limit = new ReactiveVar();
+    this.autorun(()=>{
+        this.limit.set(parseInt(FlowRouter.getParam("limit") || rowsByPage))
+    })
     Session.setDefaultPersistent('searchFamilyListForm.orderBy', {createdAt: -1});
     this.query = new ReactiveVar({roles: "family"});
     this.autorun(()=> {
@@ -161,9 +164,7 @@ Template.familyList.helpers({
 });
 
 Template.familyList.events({
-    'click .showMore'(e, instance){
-        instance.limit.set(instance.limit.get() + rowsByPage)
-    },
+
     'click .orderBy'(e, instance) {
         $('input[name="address"]').val('').change();
         const oldOrderKey = Object.keys(Session.get('searchFamilyListForm.orderBy'))[0];

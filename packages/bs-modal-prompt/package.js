@@ -9,6 +9,7 @@ Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('underscore', 'client');
   api.use('templating', 'client');
+  api.use('ecmascript', 'client');
   api.export('BootstrapModalPrompt', 'client');
   api.addFiles([
     'templates/bs_modal_prompt.html',
