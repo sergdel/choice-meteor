@@ -1,3 +1,10 @@
-ul.dropdown-menu p{
+.af-checkbox-group ul.dropdown-menu p{
     margin: 3px 3px 3px 12px;
+}
+.af-checkbox-group .btn{
+    text-align: left;
+}
+.af-checkbox-group label{
+    font-weight: normal;
+    cursor: pointer;
 }

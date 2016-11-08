@@ -5,6 +5,7 @@ import {Template} from "meteor/templating"
 import {FlowRouter} from "meteor/kadira:flow-router"
 import {rowsByPage} from "/imports/api/globals";
 import {Groups} from "/imports/api/group/group"
+import moment from 'moment'
 
 Template.groupList.onCreated(function () {
     this.limit = new ReactiveVar(parseInt(FlowRouter.getParam("limit")) || rowsByPage);

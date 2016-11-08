@@ -26,20 +26,50 @@ export const searchSchema = new SimpleSchema({
         label: "From - To",
         optional: true,
         autoform: {
-            type: "bs-date-range-picker",
+            placeholder: 'Expires between',
+            type: "daterangepicker",
             //rangeDatePickerValue: moment().subtract(50, 'years').format("DD/MM/YYYY") + " - " + moment().add(50,'years').format("DD/MM/YYYY"),
-            rangeDatePickerOptions: {
-                minDate: moment().subtract(50, 'years'),
-                maxDate: moment().add(50,'years'),
-                startDate: moment().subtract(50, 'years'),
-                endDate: moment().add(50,'years'),
+            dateRangePickerOptions: {
+                "ranges": {
+                    "Last 12 month": [
+                        moment().subtract(12, 'months'),
+                        moment()
+                    ],
+                    "Last 6 month": [
+                        moment().subtract(6, 'months'),
+                        moment()
+                    ],
+                    "Next 6 month": [
+                        moment(),
+                        moment().subtract(6, 'months'),
+                    ],
+                    "Next 12 month": [
+                        moment(),
+                        moment().subtract(12, 'months'),
+                    ],
+                },
+                "alwaysShowCalendars": true,
                 timePicker: false,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
+                showCustomRangeLabel: false,
                 autoUpdateInput: false,
                 linkedCalendars: false,
             }
+        }
+    },
+    registered: {
+        label: "Registered",
+        optional: true,
+        type: [String],
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'N/A', value: ''},
+                {label: 'Sponsored', value: 'Sponsored'},
+                {label: 'Authorised', value: 'Authorised'},
+            ]
         }
     },
     status: {
@@ -75,6 +105,10 @@ Template.searchBlueCardListForm.helpers({
     },
     searchRange: ()=> {
         return Session.get('searchBlueCardListForm.searchRange')
+
+    },
+    registered: ()=> {
+        return Session.get('searchBlueCardListForm.registered')
 
     },
 });

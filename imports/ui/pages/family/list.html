@@ -11,7 +11,7 @@
         </div>
         <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
         <div class="table-responsive">
-            <table class="table table-draggable">
+            <table class="table table-draggable table-bordered table-condensed table-striped">
                 <thead>
                 <tr>
                     <th id="external-link"></th>
@@ -43,7 +43,7 @@
                     </th>
 
 
-                    <th id="blueCardStatus"><a href="#" class="orderBy"
+                    <th id="blueCardStatus" class="text-center"><a href="#" class="orderBy"
                                                      data-order="blueCardStatus"
                                                      data-direction="-1">Blue Card</a> {{{orderBy
                             'blueCardStatus'}}}
@@ -51,7 +51,7 @@
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="office.score"><a href="#" class="orderBy"
+                    <th id="office.score" class="text-center"><a href="#" class="orderBy"
                                              data-order="office.score"
                                              data-direction="-1">Score</a> {{{orderBy
                             'office.score'}}}
@@ -60,21 +60,21 @@
                     </th>
 
 
-                    <th id="parentsCount"><a href="#" class="orderBy" data-order="parentsCount"
+                    <th id="parentsCount" class="text-center"><a href="#" class="orderBy" data-order="parentsCount"
                                              data-direction="-1">Parents</a> {{{orderBy
                             'parentsCount'}}}
                         <br>
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="childrenCount"><a href="#" class="orderBy" data-order="childrenCount"
+                    <th id="childrenCount" class="text-center"><a href="#" class="orderBy" data-order="childrenCount"
                                               data-direction="-1">Children</a> {{{orderBy
                             'childrenCount'}}}
                         <br>
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="guestsCount"><a href="#" class="orderBy" data-order="guestsCount"
+                    <th id="guestsCount" class="text-center"><a href="#" class="orderBy" data-order="guestsCount"
                                             data-direction="-1">Guest</a> {{{orderBy
                             'guestsCount'}}}
                         <br>
@@ -82,14 +82,14 @@
                     </th>
 
 
-                    <th id="bedroomsCount"><a href="#" class="orderBy" data-order="bedroomsCount"
+                    <th id="bedroomsCount" class="text-center"><a href="#" class="orderBy" data-order="bedroomsCount"
                                               data-direction="-1">Bedrooms</a> {{{orderBy
                             'bedroomsCount'}}}
                         <br>
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="bedsCount"><a href="#" class="orderBy" data-order="bedsCount"
+                    <th id="bedsCount" class="text-center"><a href="#" class="orderBy" data-order="bedsCount"
                                           data-direction="-1">Beds</a> {{{orderBy
                             'bedsCount'}}}
                         <br>
@@ -103,7 +103,7 @@
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="officefamilyStatus"><a href="#" class="orderBy" data-order="office.familyStatus"
+                    <th id="officefamilyStatus" class="text-center"><a href="#" class="orderBy" data-order="office.familyStatus"
                                                    data-direction="-1">Status</a> {{{orderBy
                             'office.familyStatus'}}}
                         <br>
@@ -111,7 +111,7 @@
                     </th>
 
 
-                    <th id="officefamilySubStatus"><a href="#" class="orderBy"
+                    <th id="officefamilySubStatus" class="text-center"><a href="#" class="orderBy"
                                                       data-order="office.familySubStatus"
                                                       data-direction="-1">Substatus</a> {{{orderBy
                             'office.familySubStatus'}}}
@@ -119,7 +119,7 @@
                         <div class="fa fa-arrows-h dragtable-drag-handle"></div>
                     </th>
 
-                    <th id="otherpreferredGender"><a href="#" class="orderBy"
+                    <th id="otherpreferredGender" class="text-center"><a href="#" class="orderBy"
                                                      data-order="other.preferredGender"
                                                      data-direction="-1">Preferred Gender</a> {{{orderBy
                             'other.preferredGender'}}}
@@ -171,18 +171,18 @@
                             <td class="zoom">{{parents.[0].surname}}</td>
                             <td class="zoom">{{contact.address.city}}</td>
                             <td class="zoom">{{contact.address.suburb}}</td>
-                            <td class="zoom">{{blueCardStatus}}</td>
-                            <td class="zoom">{{office.score}}</td>
-                            <td class="zoom">{{parentsCount}}</td>
-                            <td class="zoom">{{childrenCount}}</td>
-                            <td class="zoom">{{guestsCount}}</td>
-                            <td class="zoom">{{bedroomsCount}}</td>
-                            <td class="zoom">{{bedsCount}}</td>
+                            <td class="zoom text-center">{{blueCardStatus}}</td>
+                            <td class="zoom text-center">{{office.score}}</td>
+                            <td class="zoom text-center">{{parentsCount}}</td>
+                            <td class="zoom text-center">{{childrenCount}}</td>
+                            <td class="zoom text-center">{{guestsCount}}</td>
+                            <td class="zoom text-center">{{bedroomsCount}}</td>
+                            <td class="zoom text-center">{{bedsCount}}</td>
                             <td class="zoom">{{office.tags}}</td>
-                            <td class="zoom">{{familyStatus
+                            <td class="zoom text-center">{{familyStatus
                                     office.familyStatus}}</td>
-                            <td class="zoom">{{office.familySubStatus}}</td>
-                            <td class="zoom">{{other.preferredGender}}</td>
+                            <td class="zoom text-center">{{office.familySubStatus}}</td>
+                            <td class="zoom text-center">{{other.preferredGender}}</td>
                             {{#if isInRole 'admin'}}
                                 <td class="zoom">{{emails.[0].address}}</td>
                                 <td class="zoom">{{parents.[0].mobilePhone}}</td>

@@ -6,6 +6,7 @@ import {FlowRouter} from "meteor/kadira:flow-router"
 import {rowsByPage} from "/imports/api/globals";
 import {BlueCard} from "/imports/api/blue-card/blue-card";
 import moment from 'moment'
+
 Template.blueCardList.onCreated(function () {
     this.limit = new ReactiveVar( );
     this.autorun(()=>{
@@ -20,6 +21,13 @@ Template.blueCardList.onCreated(function () {
 
             query = _.extend(query, {
                 "status": {$in: status}
+            })
+        }
+        const registered = Session.get('searchBlueCardListForm.registered');
+        if (Array.isArray(registered) && registered.length > 0) {
+
+            query = _.extend(query, {
+                "registered": {$in: registered}
             })
         }
         const keyWord = Session.get('searchBlueCardListForm.keyWord');

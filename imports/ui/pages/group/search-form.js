@@ -37,8 +37,9 @@ export const searchSchema = new SimpleSchema({
         label: "From - To",
         optional: true,
         autoform: {
-            type: "bs-date-range-picker",
-            rangeDatePickerOptions: {
+            type: "daterangepicker",
+            placeholder: 'Date range',
+            dateRangePickerOptions: {
                 minDate: moment().subtract(6, 'months'),
                 maxDate: moment(),
                 startDate: moment().subtract(7, 'days'),

@@ -54,7 +54,7 @@ Migrations.add({
                 $or: [
                     {"parents.blueCard.number": number},
                     {"children.blueCard.number": number},
-                    {"guest.blueCard.number": number}
+                    {"guests.blueCard.number": number}
                 ]
             })
             users.forEach((family)=> {
@@ -88,8 +88,8 @@ Migrations.add({
                 }
                 if (gi >= 0) {
                     let modifier = {$set: {}}
-                    modifier.$set["guest." + gi + ".blueCard.status"] = "approved"
-                    modifier.$set["guest." + gi + ".blueCard.registered"] = "sponsored"
+                    modifier.$set["guests." + gi + ".blueCard.status"] = "approved"
+                    modifier.$set["guests." + gi + ".blueCard.registered"] = "sponsored"
                     //console.log(pi, family, number, modifier)
                     Meteor.users.update(family._id, modifier)
                 }

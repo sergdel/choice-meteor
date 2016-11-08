@@ -137,7 +137,6 @@ export const familySchema = new SimpleSchema({
         }
     },
     notes: {
-        label: "Files",
         type: [Object],
         optional: true,
 
@@ -158,6 +157,7 @@ export const familySchema = new SimpleSchema({
         optional: true,
         type: Date,
         autoform: {
+            readonly: true,
             afFieldInput: {
                 type: "datetime-local",
                 readonly: true

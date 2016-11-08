@@ -10,8 +10,8 @@
             </div>
         </div>
         <div class="{{#if Template.subscriptionsReady }}hidden {{/if}} center-loading">{{>loading}}</div>
-        <div class="table-responsive">
-            <table class="table table-draggable">
+        <div class="table-responsive ">
+            <table class="table table-bordered table-condensed table-striped">
                 <thead>
                 <tr>
                     <th id="external-link"></th>
@@ -34,27 +34,27 @@
                         <br>
 
                     </th>
-                    <th id="dateOfBirth"><a href="#" class="orderBy" data-order="cdateOfBirth"
-                                            data-direction="-1">Date of Birth</a> {{{orderBy
+                    <th id="dateOfBirth" class="text-center"><a href="#" class="orderBy" data-order="cdateOfBirth"
+                                                                data-direction="-1">Date of Birth</a> {{{orderBy
                             'dateOfBirth'}}}
                         <br>
 
                     </th>
-                    <th id="number"><a href="#" class="orderBy"
-                                       data-order="number"
-                                       data-direction="-1">Number</a> {{{orderBy
+                    <th id="number" class="text-center"><a href="#" class="orderBy"
+                                                           data-order="number"
+                                                           data-direction="-1">Number</a> {{{orderBy
                             'number'}}}
                         <br>
 
                     </th>
-                    <th id="registered"><a href="#" class="orderBy" data-order="registered"
-                                           data-direction="-1">Registered</a> {{{orderBy
+                    <th id="registered" class="text-center"><a href="#" class="orderBy" data-order="registered"
+                                                               data-direction="-1">Registered</a> {{{orderBy
                             'registered'}}}
                     </th>
 
 
-                    <th id="status"><a href="#" class="orderBy" data-order="status"
-                                       data-direction="-1">Status</a> {{{orderBy
+                    <th id="status" class="text-center"><a href="#" class="orderBy" data-order="status"
+                                                           data-direction="-1">Status</a> {{{orderBy
                             'status'}}}
                     </th>
 
@@ -71,10 +71,10 @@
                             <td class="zoom">{{showDate expiryDate}} {{showFrom expiryDate}}</td>
                             <td class="zoom">{{firstName}} </td>
                             <td class="zoom">{{surname}}</td>
-                            <td class="zoom">{{showDate dateOfBirth}}</td>
-                            <td class="zoom">{{number}}</td>
-                            <td class="zoom">{{registered}}</td>
-                            <td class="zoom">{{status}}</td>
+                            <td class="zoom text-center">{{showDate dateOfBirth}}</td>
+                            <td class="zoom text-center">{{number}}</td>
+                            <td class="zoom text-center">{{registered}}</td>
+                            <td class="zoom text-center">{{status}}</td>
                         </tr>
                     {{/each}}
                 {{/transition}}

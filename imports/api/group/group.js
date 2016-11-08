@@ -71,8 +71,8 @@ const groupEditNewSchema = new SimpleSchema({
     dates: {
         type: [Date],
         autoform: {
-            type: "bs-date-range-picker",
-            rangeDatePickerOptions: {
+            type: "daterangepicker",
+            dateRangePickerOptions: {
                 minDate: moment(),
                 timePicker: false,
                 locale: {
@@ -232,6 +232,7 @@ const groupEditNewSchema = new SimpleSchema({
     },
     requirements: {
         label: "Group Requirements",
+        optional: true,
         type: [String],
         autoform: {
             type: 'select-checkbox-create-option',
@@ -263,6 +264,7 @@ const groupEditNewSchema = new SimpleSchema({
     },
     other: {
         label: "Other Hosting Terms",
+        optional: true,
         type: String,
         autoform: {
             rows: 5,
