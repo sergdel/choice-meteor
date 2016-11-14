@@ -3,7 +3,7 @@
  */
 import {blueCards} from './aproved-blue-card'
 import {_} from 'lodash'
-
+import {BlueCard} from '/imports/api/blue-card/blue-card'
 Migrations.config({
     log: true
 });
@@ -98,5 +98,20 @@ Migrations.add({
         return true
     },
 
+
 })
 
+
+Migrations.add({
+    version: 3,
+    name: 'Update blue card reword Reword "Applying" to "Sent" ',
+    up: function () {//code to migrate up to version 1}
+        Meteor.users.update({"parents.blueCard.status": 'applying'}, {$set: {"parents.blueCard.status": 'sent'}}, {multi: true})
+        Meteor.users.update({"children.blueCard.status": 'applying'}, {$set: {"children.blueCard.status": 'sent'}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.status": 'applying'}, {$set: {"guests.blueCard.status": 'sent'}}, {multi: true})
+        BlueCard.update({status: "applying"}, {$set: {status: "sent"}}, {multi: true})
+        return true
+    },
+
+
+})

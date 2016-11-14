@@ -5,7 +5,7 @@ import {ReactiveVar} from "meteor/reactive-var"
 import {Template} from "meteor/templating"
 import {rowsByPage} from "/imports/api/globals";
 import {familySchema} from '/imports/api/family/family'
-import moment from 'moment'
+import {moment} from 'meteor/momentjs:moment'
 Template.auditList.onCreated(function () {
 
     this.limit = new ReactiveVar(parseInt(FlowRouter.getParam("limit")) || rowsByPage);

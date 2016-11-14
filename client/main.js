@@ -1,14 +1,20 @@
 import {familyStatus} from "/imports/api/family/family-status";
 import "./bootstrap.css"
 import "/node_modules/bootstrap/dist/js/bootstrap"
-
 import "/imports/startup/client/"
+import {moment} from 'meteor/momentjs:moment'
 
-import moment from 'moment'
 Template.registerHelper('showDate', function (val) {
     const limit = moment(val);
     if (limit.isValid())
         return limit.format('Do MMM YY');
+    else
+        return ''
+});
+Template.registerHelper('showDateY', function (val) {
+    const limit = moment(val);
+    if (limit.isValid())
+        return limit.format('Do MMM YYYY');
     else
         return ''
 });

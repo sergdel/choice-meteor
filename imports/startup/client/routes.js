@@ -24,6 +24,9 @@ import "/imports/ui/pages/audit/list";
 import "/imports/ui/pages/group/list";
 import "/imports/ui/pages/group/edit";
 
+import "/imports/ui/pages/email-templates/list";
+import "/imports/ui/pages/email-templates/edit";
+
 /*
 FlowRouter.wait();
 //ensure that the roles are accesible before routerFlow were initialized -> for make a route level auth
@@ -98,7 +101,7 @@ export const familyRoleRoutes = loggedRoutes.group({
     triggersEnter: [function () {
         Session.set('familyRoute', true);
         Tracker.autorun(function () {
-            if (!Roles.userIsInRole(Meteor.userId(), 'family') && Session.get('familyRoute')) {
+            if (!Meteor.userId() && Session.get('familyRoute')) {
                 console.log('familyRoute');
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
                 return FlowRouter.go('forbidden');
@@ -223,7 +226,7 @@ familyRoutes.route('/bluecard/:limit?', {
 
 
 /**Groups**/
-const groupRoutes = staffRoleRoutes.group({
+const groupRoutes = familyRoleRoutes.group({
     prefix: '/group'
 });
 
@@ -312,5 +315,25 @@ familyRoutes.route('/adult/edit/:familyId', {
     title: 'Adult group',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'adultEdit'})
+    }
+});
+
+/*** email templates ***/
+
+
+const emailTemplatesRoutes = adminRoleRoutes.group({
+    prefix: '/email-templates'
+});
+
+emailTemplatesRoutes.route('/list', {
+    name: 'emailTemplatesList',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'emailTemplatesList'})
+    }
+});
+emailTemplatesRoutes.route('/edit/:emailTemplateId', {
+    name: 'emailTemplatesEdit',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'emailTemplatesEdit'})
     }
 });

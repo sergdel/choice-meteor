@@ -21,3 +21,5 @@ import "/imports/api/staff/methods";
 import "/imports/api/group/group";
 import "/imports/api/group/methods";
 import "/imports/api/group/server/publication";
+import "/imports/api/email-templates/server/publication";
+import "/imports/api/email-templates/email-templates";

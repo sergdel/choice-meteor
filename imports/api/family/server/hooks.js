@@ -16,12 +16,20 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
  5) Approved (if any house member's blue card status = Approved, & none = declined, expired, apply or applying)
  6) "n/a" (if all house member are n/a)
  "
-
+ {label: 'Apply', value: 'apply'},
+ {label: 'Reapply', value: 'reapply'},
+ {label: 'Sent', value: 'sent'},
+ {label: 'Send', value: 'send'},
+ {label: 'Approved', value: 'approved'},
+ {label: 'Excempt', value: 'excempt'},
+ {label: 'Declined', value: 'declined'},
+ {label: 'Expired', value: 'expired'},
+ {label: 'n/a', value: 'n/a'}]
 
  */
 
 export const calcBlueCardStatus = function (blueCards) {
-    this.map = ["n/a", "approved", "applying", "apply", "expired", "declined"];
+    this.map = ["n/a", "approved", "excempt", "send", "sent", "apply", "reapply", "expired", "declined"];
     if (!Array.isArray(blueCards) || blueCards.length <= 0)
         return 'n/a';
     blueCards = _.pluck(blueCards, 'status');

@@ -19,7 +19,6 @@
                                            data-direction="-1">Expiry Date</a> {{{orderBy
                             'expiryDate'}}}
                         <br>
-
                     </th>
                     <th id="firstName"><a href="#" class="orderBy" data-order="firstName"
                                           data-direction="1">First
@@ -34,7 +33,7 @@
                         <br>
 
                     </th>
-                    <th id="dateOfBirth" class="text-center"><a href="#" class="orderBy" data-order="cdateOfBirth"
+                    <th id="dateOfBirth" class="text-center"><a href="#" class="orderBy" data-order="dateOfBirth"
                                                                 data-direction="-1">Date of Birth</a> {{{orderBy
                             'dateOfBirth'}}}
                         <br>
@@ -57,7 +56,10 @@
                                                            data-direction="-1">Status</a> {{{orderBy
                             'status'}}}
                     </th>
-
+                    <th id="type" class="text-center"><a href="#" class="orderBy" data-order="type"
+                                                           data-direction="-1">Type</a> {{{orderBy
+                            'type'}}}
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -71,10 +73,11 @@
                             <td class="zoom">{{showDate expiryDate}} {{showFrom expiryDate}}</td>
                             <td class="zoom">{{firstName}} </td>
                             <td class="zoom">{{surname}}</td>
-                            <td class="zoom text-center">{{showDate dateOfBirth}}</td>
+                            <td class="zoom text-center">{{showDateY dateOfBirth}}</td>
                             <td class="zoom text-center">{{number}}</td>
                             <td class="zoom text-center">{{registered}}</td>
                             <td class="zoom text-center">{{status}}</td>
+                            <td class="zoom text-center">{{type}}</td>
                         </tr>
                     {{/each}}
                 {{/transition}}

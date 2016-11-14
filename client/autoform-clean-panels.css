@@ -1,0 +1,26 @@
+.autoform-clear .panel-default:not( .note-editor ) > .panel-heading:not( .note-editor ) {
+    color: #333;
+    border-color: transparent;
+    background-color: transparent;
+    border: 0;
+}
+.autoform-clear .panel-heading:not( .note-editor ){
+    padding: 3;
+
+}
+.autoform-clear:not( .note-editor ) .panel-body:not( .note-editor ), .autoform-clear:not( .note-editor ) .panel:not( .note-editor ){
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+}
+.autoform-clear:not( .note-editor )   .panel-default:not( .note-editor ) {
+    border-color:  transparent;
+    border: 0;
+}
+.autoform-remove-item {
+    background-color: red !important;
+}
+.autoform-add-item{
+    width: 100%;
+}
+

@@ -3,7 +3,10 @@
  */
 import './search-form.html'
 import '/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo'
-import moment from 'moment'
+import "/imports/ui/componets/button-submit"
+
+
+import {moment} from 'meteor/momentjs:moment'
 AutoForm.hooks({
     searchGroupListForm: {
         onSubmit: function (search, modifier) {

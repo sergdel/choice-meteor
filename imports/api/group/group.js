@@ -1,6 +1,7 @@
 import  {LocalCollection} from 'meteor/minimongo'
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
-import moment from 'moment'
+import {AutoTable} from "meteor/cesarve:auto-table";
+import {moment} from 'meteor/momentjs:moment'
 
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
@@ -41,7 +42,7 @@ class GroupCollection extends Mongo.Collection {
     }
 
 }
-const groupNewSchema = new SimpleSchema({
+const schemaObject = {
     id: {
         type: String,
         autoform: {
@@ -57,14 +58,12 @@ const groupNewSchema = new SimpleSchema({
                 "formgroup-class": 'col-sm-6',
             }
         }
-    }
-})
-const groupEditNewSchema = new SimpleSchema({
+    },
     nationality: {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -81,7 +80,7 @@ const groupEditNewSchema = new SimpleSchema({
                 linkedCalendars: false,
             },
             afFormGroup: {
-                "formgroup-class": 'col-sm-7',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -92,16 +91,18 @@ const groupEditNewSchema = new SimpleSchema({
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-1',
+                "formgroup-class": 'col-sm-3',
             }
         },
 
     },
+
+
     ages: {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -109,7 +110,7 @@ const groupEditNewSchema = new SimpleSchema({
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -117,7 +118,7 @@ const groupEditNewSchema = new SimpleSchema({
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -139,16 +140,18 @@ const groupEditNewSchema = new SimpleSchema({
             }
         }
 
-    },
-    homes: {
-        min: 0,
-        type: Number,
-        autoform: {
-            afFormGroup: {
-                "formgroup-class": 'col-sm-3',
-            }
-        }
-    },
+    }, /*
+     homes: {
+     min: 0,
+     type: Number,
+     autoform: {
+     type: 'readonly',
+     class: 'readonly-bordered',
+     afFormGroup: {
+     "formgroup-class": 'col-sm-3',
+     }
+     }
+     },*/
     guests: {
         type: Number,
 
@@ -168,7 +171,7 @@ const groupEditNewSchema = new SimpleSchema({
             capitalize: true,
             defaultValue: "potential",
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -179,7 +182,7 @@ const groupEditNewSchema = new SimpleSchema({
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         },
         autoValue: function () {
@@ -194,7 +197,7 @@ const groupEditNewSchema = new SimpleSchema({
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-4',
+                "formgroup-class": 'col-sm-3',
             }
         },
         autoValue: function () {
@@ -272,20 +275,39 @@ const groupEditNewSchema = new SimpleSchema({
                 "formgroup-class": 'col-sm-6',
             }
         },
-    }
+    },
+}
+const groupNewSchema = new SimpleSchema(_.pick(schemaObject, 'id', 'name'))
+const groupEditNewSchema = new SimpleSchema(_.omit(schemaObject, 'id', 'name'))
 
-})
 
 export const Groups = new GroupCollection('groups');
 Groups.schemas = {
     new: groupNewSchema,
     edit: groupEditNewSchema,
 }
+
+
 /**
  * Publishable fields
  * @type {{}}
  */
-Groups.fields = {}
+Groups.fields = {
+    staff: {},
+    family: {
+        id: true,
+        name: true,
+        nationality: true,
+        dates: true,
+        nights: true,
+        ages: true,
+        city: true,
+        location: true,
+        students: true,
+        //homes: true,
+        guests: true
+    }
+}
 Groups.attachSchema(Groups.schemas.new);
 Groups.attachSchema(Groups.schemas.edit);
 Groups.deny({
@@ -298,3 +320,145 @@ Groups.allow({
     update: ()=>false,
     remove: ()=>false,
 })
+
+const columns = [
+    {
+        key: 'id',
+        operator: '$regex',
+    },
+    {
+        key: 'name',
+        operator: '$regex',
+    },
+    {
+        key: 'nationality',
+        operator: '$regex',
+    },
+    {
+        key: 'dates.1',
+        operator: '$regex',
+    },
+    {
+        key: 'dates.2',
+        operator: '$regex',
+    },
+    {
+        key: 'nights',
+        operator: '$regex',
+    },
+    {
+        key: 'ages',
+        operator: '$regex',
+    },
+    {
+        key: 'city',
+        operator: '$regex',
+    },
+    {
+        key: 'location',
+        operator: '$regex',
+    },
+    {
+        key: 'students',
+        operator: '$regex',
+    },
+    {
+        key: 'adults',
+        operator: '$regex',
+    },
+    {
+        key: 'guests',
+        operator: '$regex',
+    },
+    {
+        key: 'placed',
+        operator: '$regex',
+    },
+
+]
+
+const keys=_.without(_.pluck(columns, 'key'), 'nights', 'guests', 'placed')
+console.log('keys,',keys)
+let groupFilterSchema = AutoTable.pickFromSchema(Groups.simpleSchema(),keys )
+groupFilterSchema = new SimpleSchema([groupFilterSchema,
+    {
+        nights: {type: Number, optional: true}
+    }, {
+        guests: {type: Number, optional: true}
+    },{
+        placed: {type: Number, optional: true}
+    }
+])
+;
+console.log('groupFilterSchema',groupFilterSchema)
+
+Groups.autoTableGroupStaff = new AutoTable(
+    {
+        id: 'groupStaff',
+        collection: Groups,
+        columns,
+        schema: groupFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            }
+        }
+    }
+)
+
+Groups.autoTableGroupFamily = new AutoTable(
+    {
+        id: 'groupFamily',
+        collection: Groups,
+        columns,
+        schema: groupFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            }
+        }
+    }
+)
+
+
+Groups.autoTable = new AutoTable(
+    {
+        id: 'groupStaff',
+        collection: Groups,
+        columns,
+        schema: groupFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            }
+        }
+    }
+)
+
+
+Groups.autoTable = new AutoTable(
+    {
+        id: 'groupStaff',
+        collection: Groups,
+        columns,
+        schema: groupFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            }
+        }
+    }
+)
+

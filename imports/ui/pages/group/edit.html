@@ -3,7 +3,7 @@
     <br>
     {{#if Template.subscriptionsReady }}
         {{#if found}}
-            <h1><a href="{{pathFor 'groupList'}}"> Groups</a>  - {{group.parents.[0].firstName}}
+            <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{group.parents.[0].firstName}}
                 {{group.id}} {{group.name}}
             </h1>
             <div>
@@ -29,7 +29,9 @@
                                 doc=group
                                 resetOnSuccess=false
                                 template='bootstrap3'
+                                buttonContent=false
                         }}
+                        {{>buttonSubmit edit=true}}
                     </div>
                     <div role="tabpanel" class="tab-pane " id="office">
                         <br>

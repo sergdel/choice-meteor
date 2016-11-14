@@ -1,7 +1,4 @@
 import "/imports/api/staff/staff"
-import "/imports/ui/componets/autoform/afArrayField_clean"
-import "/imports/ui/componets/autoform/afObjectField_clean"
-import "/imports/ui/componets/autoform/afFormGroup_clean"
 import './form.html'
 import {Template} from 'meteor/templating'
 import {staffSchema} from "/imports/api/staff/staff";

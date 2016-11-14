@@ -73,8 +73,8 @@
 
 
     {{#autoForm schema=familySchema doc=family id="adultEdit"  type="method-update"
-                meteormethod="adultEdit" resetOnSuccess=false template="clean" omitFields=omitFields }}
-        {{>afQuickField name="adult" template="clean"}}
+                meteormethod="adultEdit" resetOnSuccess=false omitFields=omitFields }}
+        {{>afQuickField name="adult" }}
         <div class="alert alert-success alert-dismissible" role="alert" style="display: none">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                     aria-hidden="true">&times;</span></button>

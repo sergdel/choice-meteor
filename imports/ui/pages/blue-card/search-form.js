@@ -2,7 +2,7 @@
  * Created by cesar on 30/9/16.
  */
 import './search-form.html'
-import moment from 'moment'
+import {moment} from 'meteor/momentjs:moment'
 //import {blueCardStatus} from "/imports/api/blueCard/blueCard-status";
 import '/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo'
 AutoForm.hooks({
@@ -41,11 +41,11 @@ export const searchSchema = new SimpleSchema({
                     ],
                     "Next 6 month": [
                         moment(),
-                        moment().subtract(6, 'months'),
+                        moment().add(6, 'months'),
                     ],
                     "Next 12 month": [
                         moment(),
-                        moment().subtract(12, 'months'),
+                        moment().add(12, 'months'),
                     ],
                 },
                 "alwaysShowCalendars": true,
@@ -80,12 +80,15 @@ export const searchSchema = new SimpleSchema({
             type: 'select-multi-checkbox-combo',
             options: [
                 {label: 'Apply', value: 'apply'},
-                {label: 'Applying', value: 'applying'},
+                {label: 'Reapply', value: 'reapply'},
+                {label: 'Sent', value: 'sent'},
+                {label: 'Send', value: 'send'},
                 {label: 'Approved', value: 'approved'},
+                {label: 'Excempt', value: 'excempt'},
                 {label: 'Declined', value: 'declined'},
                 {label: 'Expired', value: 'expired'},
-                {label: 'N/A', value: 'n/a'}
-            ]
+                {label: 'n/a', value: 'n/a'}]
+
         }
     },
 });

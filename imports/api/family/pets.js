@@ -7,6 +7,7 @@ export const petSchema = new SimpleSchema({
         label: "Type of animal",
         allowedValues: ["Bird", "Cat", "Chicken", "Dog", "Duck", "Fish", "Goat", "Guinea Pig", "Horse", "Lizard", "Mouse", "Other", "Rabbit", "Rat", "Snake", "Wildlife"],
         type: String,
+        optional: true,
         autoform: {
             options: "allowed",
             capitalize: true,
@@ -21,6 +22,7 @@ export const petSchema = new SimpleSchema({
     status: {
         allowedValues: ["Indoor", "Outdoor"],
         type: String,
+        optional: true,
         autoform: {
             options: "allowed",
             capitalize: true,

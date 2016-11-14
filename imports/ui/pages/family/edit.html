@@ -19,9 +19,11 @@
                                                data-toggle="tab">Office Only</a></li>
                     <li role="presentation"><a href="#adult" aria-controls="adult" role="tab" data-toggle="tab">Adults
                         Groups</a></li>
-                    <li role="presentation"><a href="#audit" aria-controls="audit" role="tab"
-                                               data-toggle="tab">Audit</a>
-                    </li>
+                    {{#if isInRole 'admin'}}
+                        <li role="presentation"><a href="#audit" aria-controls="audit" role="tab"
+                                                   data-toggle="tab">Logs</a>
+                        </li>
+                    {{/if}}
                     <li role="presentation"><a href="#notes" aria-controls="notes" role="tab"
                                                data-toggle="tab">Notes</a>
                     </li>
@@ -29,14 +31,17 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="profile">
                         <br>
-
+                        <h3>Profile</h3>
                         {{>familyForm formType="method-update" formMethod="familyEdit" doc=family resetOnSuccess=false
                                 familyStatusOptions=familyStatusOptions}}
 
                     </div>
 
                     <div role="tabpanel" class="tab-pane " id="office">
-                        {{#autoForm schema=familySchema doc=family id="familyFormOfficeOnly" template="clean"
+                        <br>
+                        <h3>Office only</h3>
+                        {{#autoForm schema=familySchema doc=family id="familyFormOfficeOnly"
+                                    class="autoform-clear"
                                     type="method-update"
                                     meteormethod="familyEdit"
                                     resetOnSuccess=false}}
@@ -47,12 +52,13 @@
                             {{>afQuickField name="office.score" }}
                             {{>afQuickField name="office.tags" }}
                             {{>afQuickField name="office.files"}}
-                            {{>familyFormButtonSubmit new=false edit=true}}
+                            {{>buttonSubmit new=false edit=true}}
 
                         {{/autoForm}}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="adult">
                         <br>
+                        <h3>Adults groups</h3>
                         {{#accordionPanel title="Opportunity and requirements" id="opportunityAndRequirements"}}
                             <p>
                                 <b>Choice Homestay</b> is now placing adult guests with our Gold Coast homestay
@@ -143,23 +149,31 @@
 
 
                         {{/accordionPanel}}
-                        {{#autoForm schema=familySchema doc=family  template="clean" id="adultEdit"
+                        {{#autoForm schema=familySchema doc=family   id="adultEdit"
                                     type="method-update"
+                                    class="autoform-clear"
                                     meteormethod="adultEdit" resetOnSuccess=false}}
-                            {{>afQuickField name="adult" template="clean" minCount=1 initialCount=2 }}
+                            {{>afQuickField name="adult"  minCount=1 initialCount=2 }}
 
-                            {{>familyFormButtonSubmit new=false edit=true}}
+                            {{>buttonSubmit new=false edit=true}}
                         {{/autoForm}}
                     </div>
+            {{#if isInRole 'admin'}}
                     <div role="tabpanel" class="tab-pane" id="audit">
-
+                        <br>
+                        <h3>Logs</h3>
+                        <div></div>
                     </div>
+            {{/if}}
                     <div role="tabpanel" class="tab-pane" id="notes">
-                        {{#autoForm schema=familySchema doc=family  template="clean" id="notestEdit"
+                        <br>
+                        <h3>Notes</h3>
+                        {{#autoForm schema=familySchema doc=family   id="notestEdit"
                                     type="method-update"
+                                    class="autoform-clear"
                                     meteormethod="familyEdit" resetOnSuccess=false}}
-                            {{>afQuickField name="notes" template="clean" minCount=1 initialCount=2 }}
-                            {{>familyFormButtonSubmit new=false edit=true}}
+                            {{>afQuickField name="notes"  minCount=1 initialCount=2 }}
+                            {{>buttonSubmit new=false edit=true}}
                         {{/autoForm}}
                     </div>
                 </div>

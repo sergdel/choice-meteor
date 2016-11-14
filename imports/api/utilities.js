@@ -12,13 +12,20 @@ export const delay = (function () {
 
 
 export const beginSubmit = function () {
-    var $form = $('#' + this.formId);
+    const $form = $('#' + this.formId);
     var $button = $form.find('[data-original]').prop("disabled", true);
+    if ($button.length==0){
+        $button = $('[data-original]').prop("disabled", true);
+    }
     $button.html($button.data('begin'))
 };
 export const endSubmit = function () {
     var $form = $('#' + this.formId);
     var $button = $form.find('[data-original]').prop("disabled", false);
+    if ($button.length==0){
+        $button = $('[data-original]').prop("disabled", false);
+    }
+    console.log('$button',$button)
     if (this.validationContext._invalidKeys.length > 0)
         $button.html($button.data('original'));
     else

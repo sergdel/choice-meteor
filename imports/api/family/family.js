@@ -20,6 +20,7 @@ export const familySchema = new SimpleSchema({
     parents: {
         type: [Object],
 
+
     },
     "parents.$": {
         type: parentSchema,
@@ -139,6 +140,9 @@ export const familySchema = new SimpleSchema({
     notes: {
         type: [Object],
         optional: true,
+        autoform: {
+            initialCount: 1,
+        },
 
     },
     "notes.$.note": {
@@ -146,7 +150,7 @@ export const familySchema = new SimpleSchema({
         type: String,
         autoform: {
             afFieldInput: {
-               rows: 3
+                rows: 3
             },
             afFormGroup: {
                 template: "bootstrap3",
@@ -159,22 +163,22 @@ export const familySchema = new SimpleSchema({
         autoform: {
             readonly: true,
             afFieldInput: {
+
                 type: "datetime-local",
                 readonly: true
             },
             afFormGroup: {
+                readonly: true,
                 template: "bootstrap3",
             }
         },
-        autoValue:function () {
+        autoValue: function () {
             return new Date()
         }
 
     },
 
 });
-
-
 
 
 familySchema.messages({

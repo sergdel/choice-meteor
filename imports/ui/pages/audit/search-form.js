@@ -3,7 +3,7 @@
  */
 
 import './search-form.html'
-import moment from 'moment'
+import {moment} from 'meteor/momentjs:moment'
 
 AutoForm.hooks({
     searchAuditListForm: {

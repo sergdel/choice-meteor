@@ -1,15 +1,12 @@
 import "./form";
 import "./edit.html";
+import "/imports/ui/componets/button-submit"
 import {Template} from "meteor/templating";
 import {AutoForm} from "meteor/aldeed:autoform";
 import {FlowRouter} from "meteor/kadira:flow-router";
 import {familyStatus} from "/imports/api/family/family-status";
 import {_} from "meteor/underscore";
 import {familySchema} from "/imports/api/family/family";
-
-import "/imports/ui/componets/autoform/afArrayField_clean"
-import "/imports/ui/componets/autoform/afObjectField_clean"
-import "/imports/ui/componets/autoform/afFormGroup_clean"
 import {emailTemplateSchema} from "/imports/api/family/email-template";
 
 
@@ -41,9 +38,7 @@ Template.familyEdit.helpers({
         const familyId = FlowRouter.getParam("familyId") || Meteor.userId(); //if familyId is undifed is because is a family user
         return !!Meteor.users.findOne(familyId)
     },
-
     familyStatusOptions: ()=> {
-
         if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
             const family = Meteor.users.findOne(FlowRouter.getParam("familyId"));
             const currentStatus = (family && family.office && family.office.familyStatus );
@@ -59,7 +54,6 @@ Template.familyEdit.helpers({
             }
         }
     }
-
 })
 ;
 

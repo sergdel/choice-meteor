@@ -1,6 +1,9 @@
 import "/imports/api/family/family";
 import "/imports/ui/componets/accordion";
+import "/imports/ui/componets/button-submit"
+
 import "./form.html";
+
 import {Template} from "meteor/templating";
 import {familySchema} from "/imports/api/family/family";
 import {familyStatus} from "/imports/api/family/family-status";

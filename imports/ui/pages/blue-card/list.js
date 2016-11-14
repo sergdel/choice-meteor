@@ -5,7 +5,7 @@ import {Template} from "meteor/templating"
 import {FlowRouter} from "meteor/kadira:flow-router"
 import {rowsByPage} from "/imports/api/globals";
 import {BlueCard} from "/imports/api/blue-card/blue-card";
-import moment from 'moment'
+import {moment} from 'meteor/momentjs:moment'
 
 Template.blueCardList.onCreated(function () {
     this.limit = new ReactiveVar( );
@@ -13,9 +13,10 @@ Template.blueCardList.onCreated(function () {
         this.limit.set(parseInt(FlowRouter.getParam("limit") || rowsByPage))
     })
     Session.setDefaultPersistent('searchBlueCardListForm.orderBy', {createdAt: -1});
-    this.query = new ReactiveVar({});
+    const defaultQuery={ dateOfBirth: { '$lte': moment().subtract(17.5, 'years').toDate() } }
+    this.query = new ReactiveVar(defaultQuery);
     this.autorun(()=> {
-        let query = {};
+        let query = defaultQuery;
         const status = Session.get('searchBlueCardListForm.status');
         if (Array.isArray(status) && status.length > 0) {
 
@@ -132,7 +133,6 @@ Template.blueCardList.helpers({
 });
 
 Template.blueCardList.events({
-
     'click .orderBy'(e, instance) {
         $('input[name="address"]').val('').change();
         const oldOrderKey = Object.keys(Session.get('searchBlueCardListForm.orderBy'))[0];

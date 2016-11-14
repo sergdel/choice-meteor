@@ -3,7 +3,7 @@
  */
 import {familySchema} from "../imports/api/family/family";
 import {_} from "meteor/underscore";
-import moment from 'moment'
+import {moment} from 'meteor/momentjs:moment'
 var Fiber = Npm.require('fibers');
 
 WebApp.connectHandlers.use("/import", function (req, res, next) {
