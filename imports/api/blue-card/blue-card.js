@@ -78,7 +78,7 @@ BlueCard.filterSchema = new SimpleSchema({
         }
     }
 })
-console.log('console.log(BlueCard.filterSchema)',BlueCard.filterSchema)
+console.log('console.log(BlueCard.filterSchema)', BlueCard.filterSchema)
 BlueCard.autoTable = new AutoTable({
     columns: [
         {
@@ -180,6 +180,11 @@ BlueCard.autoTable = new AutoTable({
             showing: true,
             filters: true,
         }
+    },
+    publishExtraFields: ['familyId'],
+    link: function (doc) {
+
+        return  FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
     }
 })
 
