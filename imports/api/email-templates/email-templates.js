@@ -12,14 +12,32 @@ export const EmailTemplates = new Mongo.Collection('emailTemplates')
 
 EmailTemplates.schema = new SimpleSchema({
     id: {
+        label: 'Description',
         type: String,
+        autoform: {
+            afFieldInput: {
+                type: 'readonly',
+            }
+        }
     },
     subject: {
         type: String,
     },
+    from: {
+        type: String,
+        autoform: {
+            afFieldInput: {
+                type: 'email',
+            }
+        }
+    },
+    fromName: {
+        optional: true,
+        type: String,
+    },
     body: {
         type: String,
-        autoform:{
+        autoform: {
             afFieldInput: {
                 type: 'summernote',
                 class: 'editor', // optional
@@ -29,36 +47,50 @@ EmailTemplates.schema = new SimpleSchema({
             },
         }
     },
-    parameters: {
-        type: [String]
+    buttons: {
+        optional: true,
+        type: Object,
+        blackbox: true,
     }
 })
 EmailTemplates.attachSchema(EmailTemplates.schema)
-EmailTemplates.filterSchema = new SimpleSchema(EmailTemplates.schema.pick(['id', 'subject']), {
-    body: {
-        type: String,
-    },
-})
+/*EmailTemplates.filterSchema = new SimpleSchema(EmailTemplates.schema.pick(['id', 'subject']), {
+ body: {
+ type: String,
+ },
+ })*/
 
+EmailTemplates.deny({
+    insert: function (userId, doc) {
+        return true
+    },
+    update: function (userId, doc, fields, modifier) {
+        return true
+    },
+    remove: function (userId, doc) {
+        return true
+    },
+    fetch: [],
+})
 EmailTemplates.allow({
     insert: function (userId, doc) {
         return false
     },
     update: function (userId, doc, fields, modifier) {
-       return Roles.userIsInRole(userId,'admin')
+        return false
     },
     remove: function (userId, doc) {
         // can only remove your own documents
         return false
     },
-    fetch:[],
+    fetch: [],
 })
-EmailTemplates.autoTable=new AutoTable({
+EmailTemplates.autoTable = new AutoTable({
     id: 'EmailTemplates',
     collection: EmailTemplates,
-    columns: [{key: 'id',label:'Email Template description'},{key: 'subject',label:'Subject'},{key: 'body',label:'Body'}],
-    link: function(row){
-        console.log('link',row,FlowRouter.path('emailTemplatesEdit',{emailTemplateId: row._id}))
-        return FlowRouter.path('emailTemplatesEdit',{emailTemplateId: row._id})
+    columns: [{key: 'id', label: 'Email Template description'}, {key: 'subject', label: 'Subject'}],
+    link: function (row) {
+        console.log('link', row, FlowRouter.path('emailTemplatesEdit', {emailTemplateId: row._id}))
+        return FlowRouter.path('emailTemplatesEdit', {emailTemplateId: row._id})
     }
 })

@@ -38,7 +38,6 @@ ostrio:files
 ostrio:autoform-files
 dispatch:login-token
 http@1.2.10
-email@1.1.18
 matb33:collection-hooks
 meteorhacks:kadira
 kadira:debug

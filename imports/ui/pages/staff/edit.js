@@ -18,10 +18,30 @@ Template.staffEdit.onDestroyed(function () {
 });
 
 Template.staffEdit.helpers({
+    ami: ()=> FlowRouter.getParam("staffId")==Meteor.userId(),
     staff: ()=>Meteor.users.findOne(FlowRouter.getParam("staffId")),
 
 });
 
 Template.staffEdit.events({
-    //add your events here
+    'click .remove'(e,instance){
+        BootstrapModalPrompt.prompt({
+            title: "Please confirm",
+            content: 'Are you sure to remove this staff, this acction can not be undo',
+            btnDismissText: 'Cancel',
+            btnOkText: 'Yes, remove it',
+            btnOkTextClass: 'btn-danger'
+        }, function (data) {
+            if (data) {
+                Meteor.call('staffRemove', FlowRouter.getParam("staffId"), function (err, res) {
+                    if (!err)
+                        FlowRouter.go('staffList')
+                })
+            }
+            else {
+                console.log('cancel')
+            }
+        });
+    }
+
 });

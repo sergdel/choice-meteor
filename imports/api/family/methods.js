@@ -5,16 +5,17 @@ import {Meteor} from "meteor/meteor";
 import {Accounts} from "meteor/accounts-base";
 import {Roles} from "meteor/alanning:roles";
 import {familySchema} from "/imports/api/family/family";
+import {Families} from "/imports/api/family/family";
 import {
     sendEnrollmentEmailTemplateForFamily,
     sendVerificationEmailTemplateForFamily,
     sendUpdateFamilyStatusEmail
 } from "/imports/api/utilities";
 import {Random} from 'meteor/random'
-var Future = Npm.require("fibers/future");
-var exec = Npm.require("child_process").exec;
+
+
 Meteor.methods({
-       familyEdit: function (modifier, familyId) {
+    familyEdit: function (modifier, familyId) {
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
@@ -52,15 +53,16 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
+        console.log('1*********************')
+        Families.update(familyId, modifier)
+        console.log('2*********************')
 
-        Meteor.users.update(familyId, modifier)
     },
     emailExist: function (email, isNotThisFamilyId) {
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         let query = {$or: [{emails: {$elemMatch: {address: email}}}, {parents: {$elemMatch: {email}}}]};
         if (isNotThisFamilyId)
             query._id = {$ne: isNotThisFamilyId};
-        console.log('emailExist', query);
         return Meteor.users.find(query).count() > 0
     },
 

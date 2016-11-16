@@ -9,7 +9,7 @@ Migrations.config({
 });
 
 
-Meteor.startup(()=> {
+Meteor.startup(() => {
 
     Migrations.migrateTo(2)
 })
@@ -48,7 +48,7 @@ Migrations.add({
     version: 2,
     name: 'Update blue card status',
     up: function () {//code to migrate up to version 1}
-        blueCards.forEach((number)=> {
+        blueCards.forEach((number) => {
             const users = Meteor.users.find({
                 roles: 'family',
                 $or: [
@@ -57,7 +57,7 @@ Migrations.add({
                     {"guests.blueCard.number": number}
                 ]
             })
-            users.forEach((family)=> {
+            users.forEach((family) => {
                 //console.log(family)
                 family.parents = family.parents || []
                 family.children = family.children || []
@@ -110,6 +110,19 @@ Migrations.add({
         Meteor.users.update({"children.blueCard.status": 'applying'}, {$set: {"children.blueCard.status": 'sent'}}, {multi: true})
         Meteor.users.update({"guests.blueCard.status": 'applying'}, {$set: {"guests.blueCard.status": 'sent'}}, {multi: true})
         BlueCard.update({status: "applying"}, {$set: {status: "sent"}}, {multi: true})
+        return true
+    },
+
+
+})
+
+Migrations.add({
+    version: 4,
+    name: 'Update blue card status" ',
+    up: function () {//code to migrate up to version 1}
+        Meteor.users.find({"roles": "family"}).forEach((family) => {
+            Families.update(family._id, {$set: {version: 4}})
+        })
         return true
     },
 

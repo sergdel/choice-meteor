@@ -1,0 +1,44 @@
+/**
+ * Created by cesar on 15/11/16.
+ */
+import {EmailTemplates} from '/imports/api/email-templates/email-templates'
+import {emailTemplateFixtures} from  './email-template-fixtures'
+import htmlToText from 'html-to-text'
+
+export const  modifyEmailTemplates=function(emailTemplate){
+    if (_.contains(["enrollAccount","resetPassword","verifyEmail","resetPassword"],emailTemplate._id)) {
+        Accounts.emailTemplates[emailTemplate._id].subject = function (user) {
+            return emailTemplate.subject
+        };
+        Accounts.emailTemplates[emailTemplate._id].html = function (user, url) {
+            let body=''
+            const firstName=user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName
+            const surname= user.surname ?  user.surname : user.parents && user.parents[0] && user.parents[0].surname
+            body = emailTemplate.body.replace(/<img id="firstName" src="(.*)">/, firstName)
+            body = body.replace(/<img id="surname" src="(.*)">/,surname)
+            body = body.replace(/<img id="url" src="(.*)">/, url)
+            return body
+
+        };
+        Accounts.emailTemplates[emailTemplate._id].text = function (user, url) {
+            return htmlToText.fromString(Accounts.emailTemplates[emailTemplate._id].html(user,url))
+        };
+        Accounts.emailTemplates[emailTemplate._id].from = function () {
+            return `${emailTemplate.fromName} <${emailTemplate.from}>`;
+        };
+    }
+}
+
+Meteor.startup(()=> {
+    const emailTemplate = EmailTemplates.find({})
+    if (emailTemplate.count() == 0) {
+        for (let i in emailTemplateFixtures) {
+            EmailTemplates.insert(emailTemplateFixtures[i])
+        }
+    }
+    emailTemplate.forEach((template)=> {
+        modifyEmailTemplates(template)
+    })
+})
+
+

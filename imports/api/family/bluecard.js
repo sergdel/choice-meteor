@@ -30,21 +30,21 @@ export const blueCardSchema = new SimpleSchema({
     status: {
         optional: true,
         type: String,
-        allowedValues: ['Apply', 'apply', 'reapply', 'sent', 'send', 'approved', 'excempt', 'declined', 'expired', 'n/a'],
+        allowedValues: ['apply', 'reapply', 'reapply', 'sent', 'send', 'approved', 'excempt', 'declined', 'expired', 'n/a'],
         autoform: {
             options: function (x) {
                 const parent = this.name.replace('blueCard.status', 'dateOfBirth');
                 const dateOfBirth = AutoForm.getFieldValue(parent, AutoForm.getFormId());
                 if (!dateOfBirth) {
                     return [
-                        {label: 'Apply', value: 'apply'},
+                        {label: 'Apply', value: 'apply',},
                         {label: 'Reapply', value: 'reapply'},
                         {label: 'Sent', value: 'sent'},
                         {label: 'Send', value: 'send'},
                         {label: 'Approved', value: 'approved'},
                         {label: 'Excempt', value: 'excempt'},
                         {label: 'Declined', value: 'declined'},
-                        {label: 'Expired', value: 'expired'},
+                        {label: 'Expired', value: 'expired' },
                         {label: 'n/a', value: 'n/a'}]
                 }
                 if (dateOfBirth instanceof Date && moment(dateOfBirth).add(18, 'years').toDate() <= new Date()) {
@@ -56,7 +56,7 @@ export const blueCardSchema = new SimpleSchema({
                         {label: 'Approved', value: 'approved'},
                         {label: 'Excempt', value: 'excempt'},
                         {label: 'Declined', value: 'declined'},
-                        {label: 'Expired', value: 'expired'},
+                        {label: 'Expired', value: 'expired' },
                         {label: 'n/a', value: 'n/a'}]
                 }
                 return [{label: 'n/a', value: 'n/a'}]

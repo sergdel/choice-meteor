@@ -1,18 +1,27 @@
 <template name="emailTemplatesEdit">
     <h1>Email Templates Edit</h1>
-    <div class="autoform-clear">
+
+    {{#if Template.subscriptionsReady}}
+        <div class="autoform-clear">
 
 
-        {{#autoForm collection=collection id="emailTemplatesEdit" doc=doc   type="update"}}
-            {{> afQuickField name='id'}}
-            {{> afQuickField name='subject'}}
-            <div class="form-group{{#if afFieldIsInvalid name='body'}} has-error{{/if}}">
-                {{> afFieldInput name='body' settings=settings}}
-                {{#if afFieldIsInvalid name='body'}}
-                    <span class="help-block">{{afFieldMessage name='body'}}</span>
-                {{/if}}
-            </div>
-            <button type="submit" class="btn btn-primary">Insert</button>
-        {{/autoForm}}
-    </div>
+            {{#autoForm collection=collection id="emailTemplatesEdit" doc=doc   type="method-update" meteormethod="emailTemplateUpdate"}}
+                {{> afQuickField name='id'}}
+                {{> afQuickField name='subject'}}
+                {{> afQuickField name='from'}}
+                {{> afQuickField name='fromName'}}
+                <div class="form-group{{#if afFieldIsInvalid name='body'}} has-error{{/if}}">
+                    {{> afFieldInput name='body' settings=settings}}
+                    {{#if afFieldIsInvalid name='body'}}
+                        <span class="help-block">{{afFieldMessage name='body'}}</span>
+                    {{/if}}
+                </div>
+                {{>buttonSubmit new=false edit=true}}
+                <div class="clearfix"></div>
+            {{/autoForm}}
+        </div>
+    {{else}}
+        {{>loading}}
+    {{/if}}
+
 </template>

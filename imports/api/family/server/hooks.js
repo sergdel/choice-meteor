@@ -26,9 +26,9 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
  {label: 'Expired', value: 'expired'},
  {label: 'n/a', value: 'n/a'}]
 
- */
 
-export const calcBlueCardStatus = function (blueCards) {
+
+ const calcBlueCardStatus = function (blueCards) {
     this.map = ["n/a", "approved", "excempt", "send", "sent", "apply", "reapply", "expired", "declined"];
     if (!Array.isArray(blueCards) || blueCards.length <= 0)
         return 'n/a';
@@ -39,37 +39,47 @@ export const calcBlueCardStatus = function (blueCards) {
     blueCards.sort();
     return this.map[blueCards.pop()]
 };
+const insertBlueCard = function (familyId,blus, type) {
+    const members = [];
+    if (Array.isArray(blus)) {
+        blus.forEach((blu)=> {
+            if (blu) {
+                const member = {
+                    familyId,
+                    firstName: blu.firstName,
+                    surname: blu.surname,
+                    dateOfBirth: blu.dateOfBirth,
+                    number: blu.blueCard && blu.blueCard.number ? blu.blueCard.number : undefined,
+                    expiryDate: blu.blueCard && blu.blueCard.expiryDate ? blu.blueCard.expiryDate : undefined,
+                    status: blu.blueCard && blu.blueCard.status ? blu.blueCard.status : undefined,
+                    registered: blu.blueCard && blu.blueCard.registered ? blu.blueCard.registered : undefined,
+                    type
+                };
+                members.push(member);
+                BlueCard.insert(member)
+            }
+        })
+    }
+    return members
+
+};
+
+const checkBlueCardDatesAndUpdateStatus=function(family){
+
+}
+ */
 
 
+/*
 Meteor.users.after.update(function (userId, doc, fieldNames, modifier, options) {
-    const familyId = doc._id;
+   const familyId = doc._id;
+    checkBlueCardDatesAndUpdateStatus(doc)
     BlueCard.remove({familyId});
-    const allMembers = [];
-    const insertBlueCard = function (blus, type) {
-        if (Array.isArray(blus)) {
-            blus.forEach((blu)=> {
-                if (blu) {
-                    const member = {
-                        familyId,
-                        firstName: blu.firstName,
-                        surname: blu.surname,
-                        dateOfBirth: blu.dateOfBirth,
-                        number: blu.blueCard && blu.blueCard.number ? blu.blueCard.number : undefined,
-                        expiryDate: blu.blueCard && blu.blueCard.expiryDate ? blu.blueCard.expiryDate : undefined,
-                        status: blu.blueCard && blu.blueCard.status ? blu.blueCard.status : undefined,
-                        registered: blu.blueCard && blu.blueCard.registered ? blu.blueCard.registered : undefined,
-                        type
-                    };
-                    allMembers.push(member);
-                    BlueCard.insert(member)
-                }
-            })
-        }
-    };
-    insertBlueCard(doc.parents, 'parents');
-    insertBlueCard(doc.children, 'children');
-    insertBlueCard(doc.guests, 'guests');
-    const blueCardStatus = calcBlueCardStatus(allMembers);
+    const allMembers=[]
+    allMembers.push(insertBlueCard(familyId,doc.parents, 'parents'))
+    allMembers.push(insertBlueCard(familyId,doc.children, 'children'))
+    allMembers.push(insertBlueCard(familyId,doc.guests, 'guests'))
+    const blueCardStatus = calcBlueCardStatus(allMembers)
     if (!modifier.$set) modifier.$set = {};
 
     let numberOfBeds = 0;
@@ -97,7 +107,7 @@ Meteor.users.after.update(function (userId, doc, fieldNames, modifier, options) 
 
 }, {fetchPrevious: false});
 
-
+ */
 AuditLog.assignCallbacks(Meteor.users, {
     omit: ['createdAt', 'services', 'updatedAt', 'lastLogin'],
     auditFindOne: false,

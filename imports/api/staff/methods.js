@@ -34,6 +34,13 @@ Meteor.methods({
             }
         })
     },
+    staffRemove: function (staffId) {
+        if (!Roles.userIsInRole(this.userId, ['admin']))
+            throw new Meteor.Error(403, 'Access forbidden', 'User have not admin role');
+        if (staffId == this.userId)
+            throw new Meteor.Error(404, 'Access forbidden', 'You can not remove your self');
+        Meteor.users.remove(staffId)
+    },
     staffEdit: function (modifier, staffId) {
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized

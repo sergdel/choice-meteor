@@ -3,8 +3,8 @@
  */
 import {EmailTemplates} from '/imports/api/email-templates/email-templates'
 import './edit.html'
-
-
+import domtoimage from 'dom-to-image'
+console.log('domtoimage', domtoimage)
 const createButtons = function (buttons) {
     const res = {}
     for (let key in buttons) {
@@ -15,8 +15,21 @@ const createButtons = function (buttons) {
                 contents: buttons[key].contents,
                 tooltip: buttons[key].tooltip,
                 click: function () {
-                    // invoke insertText method with 'hello' on editor module.
-                    context.invoke('editor.insertText', buttons[key].insertText);
+                    const node = $(buttons[key].insertText)
+                    context.invoke('editor.insertNode', node.get(0),()=>alert());
+                    domtoimage.toPng(node.get(0))
+                        .then(function (dataUrl) {
+                            node.remove()
+                            var img = new Image();
+                            img.id=key
+                            img.src = dataUrl;
+                            document.body.appendChild(img);
+                            context.invoke('editor.insertNode', img);
+                        })
+                        .catch(function (error) {
+                            console.error('oops, something went wrong!', error);
+                        });
+
                 }
             });
             return button.render();   // return button as jquery object
@@ -41,28 +54,25 @@ Template.emailTemplatesEdit.onRendered(function () {
 Template.emailTemplatesEdit.helpers({
     collection: EmailTemplates,
     doc: ()=>EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId')),
-    settings: {
-        height: 350,
-        toolbar: [
-            ['mybutton',['name']]
-        ],
-        buttons: {
-            name: function (context) {
-                console.log('context',context)
-                var ui = $.summernote.ui;
-                // create button
-                var button = ui.button({
-                    contents: 'cesar',
-                    tooltip: 'ramos',
-                    click: function () {
-                        // invoke insertText method with 'hello' on editor module.
-                        context.invoke('editor.insertText', 'nermde');
-                    }
-                });
-                return button.render();   // return button as jquery object
-
-            }
+    settings: ()=> {
+        const doc = EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId'))
+        if (!doc) return {}
+        const buttons = createButtons(doc.buttons)
+        const settings = {
+            height: 350,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['misc', ['codeview','fullscreen']],
+                ['Parameters', Object.keys(doc.buttons)]
+            ],
+            buttons
         }
+        return settings
     }
 });
 
