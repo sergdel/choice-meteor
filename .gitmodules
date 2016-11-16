@@ -10,9 +10,6 @@
 [submodule "packages/meteor-autoform-googleplace"]
 	path = packages/meteor-autoform-googleplace
 	url = https://github.com/cesarve77/meteor-autoform-googleplace.git
-[submodule "packages/meteor-autoform-googleplace"]
-	path = packages/meteor-autoform-googleplace
-	url = https://github.com/cesarve77/meteor-autoform-googleplace.git
 [submodule "packages/meteor-autoform-raty"]
 	path = packages/meteor-autoform-raty
 	url = https://github.com/cesarve77/meteor-autoform-raty.git
