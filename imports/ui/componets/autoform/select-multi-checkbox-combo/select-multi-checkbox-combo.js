@@ -27,7 +27,7 @@ AutoForm.addInputType("select-multi-checkbox-combo", {
 
         // build items list
         context.items = [];
-
+        console.log('context.selectOptions',context)
         // Add all defined options
         _.each(context.selectOptions, function (opt) {
             context.items.push({
@@ -52,7 +52,6 @@ Template.afSelectMultiCheckboxCombo.helpers({
         return AutoForm.getFormSchema().schema(this.name).label
     },
     selected: function () {
-        console.log('selected',this.value)
         return !!( Array.isArray(this.value) && this.value.length > 0)
     },
     atts: function selectedAttsAdjust() {

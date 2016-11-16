@@ -378,7 +378,6 @@ const columns = [
 ]
 
 const keys=_.without(_.pluck(columns, 'key'), 'nights', 'guests', 'placed')
-console.log('keys,',keys)
 let groupFilterSchema = AutoTable.pickFromSchema(Groups.simpleSchema(),keys )
 groupFilterSchema = new SimpleSchema([groupFilterSchema,
     {
@@ -390,7 +389,6 @@ groupFilterSchema = new SimpleSchema([groupFilterSchema,
     }
 ])
 ;
-console.log('groupFilterSchema',groupFilterSchema)
 
 Groups.autoTableGroupStaff = new AutoTable(
     {

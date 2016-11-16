@@ -35,7 +35,8 @@ BlueCard.filterSchema = new SimpleSchema({
         optional: true,
         type: Date,
     },
-    status: {
+    "status": {
+        label: 'Status',
         optional: true,
         type: [String],
         autoform: {
@@ -53,6 +54,7 @@ BlueCard.filterSchema = new SimpleSchema({
         },
     },
     type: {
+        label: 'Type',
         optional: true,
         type: [String],
         autoform: {
@@ -64,6 +66,7 @@ BlueCard.filterSchema = new SimpleSchema({
         }
     },
     registered: {
+        label: 'Registered',
         optional: true,
         type: [String],
         autoform: {
@@ -75,7 +78,7 @@ BlueCard.filterSchema = new SimpleSchema({
         }
     }
 })
-
+console.log('console.log(BlueCard.filterSchema)',BlueCard.filterSchema)
 BlueCard.autoTable = new AutoTable({
     columns: [
         {
@@ -180,4 +183,3 @@ BlueCard.autoTable = new AutoTable({
     }
 })
 
-console.log('BlueCard.autoTable ', BlueCard.autoTable)

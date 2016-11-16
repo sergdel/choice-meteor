@@ -142,7 +142,6 @@ export const searchSchema = new SimpleSchema({
     }
 });
 
-
 Template.searchFamilyListForm.onCreated(function () {
     Session.setDefaultPersistent('searchFamilyListForm.query', {roles: 'family'})
 });
