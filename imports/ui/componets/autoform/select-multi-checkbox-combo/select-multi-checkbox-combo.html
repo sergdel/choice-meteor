@@ -8,7 +8,8 @@
                     <i class="fa fa-check-square-o"></i>
                 {{else}}
                     <i class="fa fa-square-o"></i>
-                {{/if}} {{label}}
+                {{/if}}
+                {{#if this.label}}{{this.label}}{{else}}{{afFieldLabelText name=this.name}}{{/if}}
 
                 <span class="caret"></span>
             </button>

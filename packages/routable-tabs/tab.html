@@ -1,0 +1,19 @@
+<template name="routableTabs">
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            {{#each tabs}}
+                <li role="presentation" class="{{#if active this @index}}active{{/if}}"><a href="#{{id}}" class="routable" aria-controls="{{id}}" role="tab"
+                                                                      data-toggle="tab">{{title}}</a></li>
+            {{/each}}
+        </ul>
+
+        <div class="tab-content">
+            {{#each tabs}}
+                <div role="tabpanel" class="tab-pane {{#if active this @index}}active{{/if}}" id="{{id}}">
+                    {{> Template.dynamic template=template}}
+                    </div>
+            {{/each}}
+        </div>
+
+    </div>
+</template>

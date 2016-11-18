@@ -27,7 +27,6 @@ AutoForm.addInputType("select-multi-checkbox-combo", {
 
         // build items list
         context.items = [];
-        console.log('context.selectOptions',context)
         // Add all defined options
         _.each(context.selectOptions, function (opt) {
             context.items.push({

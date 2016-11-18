@@ -2,7 +2,9 @@
     <br>
     {{#if Template.subscriptionsReady }}
         {{#if found}}
-            <h1><a href="{{pathFor 'familyList'}}"> Families</a> - {{family.parents.[0].firstName}}
+            <h1>
+                {{#if isInRole 'staff'}}<a href="{{pathFor 'familyList'}}"> Families</a> - {{/if}}
+                {{family.parents.[0].firstName}}
                 {{#if family.parents.[1].firstName}}
                     &
                 {{/if}}
@@ -15,8 +17,10 @@
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab"
                                                               data-toggle="tab">Profile</a></li>
-                    <li role="presentation"><a href="#office" aria-controls="office" role="tab"
-                                               data-toggle="tab">Office Only</a></li>
+                    {{#if isInRole 'staff'}}
+                        <li role="presentation"><a href="#office" aria-controls="office" role="tab"
+                                                   data-toggle="tab">Office Only</a></li>
+                    {{/if}}
                     <li role="presentation"><a href="#adult" aria-controls="adult" role="tab" data-toggle="tab">Adults
                         Groups</a></li>
                     {{#if isInRole 'admin'}}
@@ -24,9 +28,11 @@
                                                    data-toggle="tab">Logs</a>
                         </li>
                     {{/if}}
-                    <li role="presentation"><a href="#notes" aria-controls="notes" role="tab"
-                                               data-toggle="tab">Notes</a>
-                    </li>
+                    {{#if isInRole 'staff'}}
+                        <li role="presentation"><a href="#notes" aria-controls="notes" role="tab"
+                                                   data-toggle="tab">Notes</a>
+                        </li>
+                    {{/if}}
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="profile">
@@ -36,26 +42,27 @@
                                 familyStatusOptions=familyStatusOptions}}
 
                     </div>
+                    {{#if isInRole 'staff'}}
+                        <div role="tabpanel" class="tab-pane " id="office">
+                            <br>
+                            <h3>Office only</h3>
+                            {{#autoForm schema=familySchema doc=family id="familyFormOfficeOnly"
+                                        class="autoform-clear"
+                                        type="method-update"
+                                        meteormethod="familyEdit"
+                                        resetOnSuccess=false}}
+                                {{>afQuickField name="office.familyStatus" options=familyStatusOptions}}
+                                {{>afQuickField name="office.familySubStatus" }}
+                                {{>afQuickField name="office.familyScore" }}
+                                {{>afQuickField name="office.homeScore" }}
+                                {{>afQuickField name="office.score" }}
+                                {{>afQuickField name="office.tags" }}
+                                {{>afQuickField name="office.files"}}
+                                {{>buttonSubmit new=false edit=true}}
 
-                    <div role="tabpanel" class="tab-pane " id="office">
-                        <br>
-                        <h3>Office only</h3>
-                        {{#autoForm schema=familySchema doc=family id="familyFormOfficeOnly"
-                                    class="autoform-clear"
-                                    type="method-update"
-                                    meteormethod="familyEdit"
-                                    resetOnSuccess=false}}
-                            {{>afQuickField name="office.familyStatus" options=familyStatusOptions}}
-                            {{>afQuickField name="office.familySubStatus" }}
-                            {{>afQuickField name="office.familyScore" }}
-                            {{>afQuickField name="office.homeScore" }}
-                            {{>afQuickField name="office.score" }}
-                            {{>afQuickField name="office.tags" }}
-                            {{>afQuickField name="office.files"}}
-                            {{>buttonSubmit new=false edit=true}}
-
-                        {{/autoForm}}
-                    </div>
+                            {{/autoForm}}
+                        </div>
+                    {{/if}}
                     <div role="tabpanel" class="tab-pane" id="adult">
                         <br>
                         <h3>Adults groups</h3>
@@ -149,33 +156,35 @@
 
 
                         {{/accordionPanel}}
-                        {{#autoForm schema=familySchema doc=family   id="adultEdit"
+                        {{#autoForm schema=familySchema doc=family   id="adultEdit" omitFields=omitFields
                                     type="method-update"
                                     class="autoform-clear"
                                     meteormethod="adultEdit" resetOnSuccess=false}}
-                            {{>afQuickField name="adult"  minCount=1 initialCount=2 }}
+                            {{>afQuickField name="adult" label=false }}
 
                             {{>buttonSubmit new=false edit=true}}
                         {{/autoForm}}
                     </div>
-            {{#if isInRole 'admin'}}
-                    <div role="tabpanel" class="tab-pane" id="audit">
-                        <br>
-                        <h3>Logs</h3>
-                        <div></div>
-                    </div>
-            {{/if}}
-                    <div role="tabpanel" class="tab-pane" id="notes">
-                        <br>
-                        <h3>Notes</h3>
-                        {{#autoForm schema=familySchema doc=family   id="notestEdit"
-                                    type="method-update"
-                                    class="autoform-clear"
-                                    meteormethod="familyEdit" resetOnSuccess=false}}
-                            {{>afQuickField name="notes"  minCount=1 initialCount=2 }}
-                            {{>buttonSubmit new=false edit=true}}
-                        {{/autoForm}}
-                    </div>
+                    {{#if isInRole 'admin'}}
+                        <div role="tabpanel" class="tab-pane" id="audit">
+                            <br>
+                            <h3>Logs</h3>
+                            <div id="audit_container"></div>
+                        </div>
+                    {{/if}}
+                    {{#if isInRole 'staff'}}
+                        <div role="tabpanel" class="tab-pane" id="notes">
+                            <br>
+                            <h3>Notes</h3>
+                            {{#autoForm schema=familySchema doc=family   id="notestEdit"
+                                        type="method-update"
+                                        class="autoform-clear"
+                                        meteormethod="familyEdit" resetOnSuccess=false}}
+                                {{>afQuickField name="notes"  minCount=1 initialCount=2 }}
+                                {{>buttonSubmit new=false edit=true}}
+                            {{/autoForm}}
+                        </div>
+                    {{/if}}
                 </div>
             </div>
         {{else}}

@@ -21,7 +21,6 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             options:function () {
               return _.map(familyStatus,(status)=>{
-                  console.log(status,{label: status.label, value: status.id});
                   return {label: status.label, value: status.id}
               })
             },

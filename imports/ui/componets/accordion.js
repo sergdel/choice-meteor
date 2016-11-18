@@ -36,7 +36,6 @@ Template.accordionPanel.helpers({
 Template.accordionPanel.events({
     'click a'(e){
         if(history.replaceState) {
-            console.log(history.replaceState);
             history.replaceState(null, null, $(e.currentTarget).attr('href'));
         }
         else {

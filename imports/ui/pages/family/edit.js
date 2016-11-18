@@ -1,4 +1,5 @@
 import "./form";
+import "./adult.css";
 import "./edit.html";
 import "/imports/ui/componets/button-submit"
 import {Template} from "meteor/templating";
@@ -13,7 +14,7 @@ import {emailTemplateSchema} from "/imports/api/family/email-template";
 AutoForm.debug();
 
 Template.familyEdit.onCreated(function () {
-    this.autorun(()=> {
+    this.autorun(() => {
         this.data.familyId = FlowRouter.getParam("familyId");
         this.subscribe('family', this.data.familyId)
 
@@ -29,20 +30,26 @@ Template.familyEdit.onDestroyed(function () {
 });
 
 Template.familyEdit.helpers({
+    omitFields: () => {
+        if (Roles.userIsInRole(Meteor.userId(), ['family'])) {
+            return ['adult.score','adult.status']
+        }
+        return []
+    },
     familySchema: familySchema,
-    family: ()=> {
+    family: () => {
         const familyId = FlowRouter.getParam("familyId") || Meteor.userId(); //if familyId is undifed is because is a family user
         return Meteor.users.findOne(familyId)
     },
-    found:()=>{
+    found: () => {
         const familyId = FlowRouter.getParam("familyId") || Meteor.userId(); //if familyId is undifed is because is a family user
         return !!Meteor.users.findOne(familyId)
     },
-    familyStatusOptions: ()=> {
+    familyStatusOptions: () => {
         if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
             const family = Meteor.users.findOne(FlowRouter.getParam("familyId"));
             const currentStatus = (family && family.office && family.office.familyStatus );
-            if (currentStatus===undefined)
+            if (currentStatus === undefined)
                 return [{label: "Loading", value: 0}];
             return function () {
                 const filtered = _.filter(familyStatus, function (val) {
@@ -59,7 +66,10 @@ Template.familyEdit.helpers({
 
 Template.familyEdit.events({
     'click [href="#audit"]': function (e, instance) {
-        Blaze.renderWithData(Template.auditList, {familyId: this.familyId}, instance.$('#audit').get(0))
+        const $node = instance.$('#audit_container')
+        if ($node.html() == '') {
+            Blaze.renderWithData(Template.auditList, {familyId: this.familyId}, $node.get(0))
+        }
     }
 });
 
@@ -88,7 +98,7 @@ AutoForm.hooks({
                             btnOkTextClass: 'btn-primary',
                             btnDismissText: 'Not now',
                             btnOkText: 'Update and send email',
-                        }, (data)=> {
+                        }, (data) => {
                             if (data) {
                                 modifier.$set["office.familyStatusEmailTemplate"] = data.body;
                                 this.result(modifier)

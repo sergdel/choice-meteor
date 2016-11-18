@@ -26,7 +26,6 @@ Meteor.publish('groups', function (limit, query = {}, sort = {}) {
     }else{
         fields=Groups.fields.family
     }
-    console.log(Groups.find(query, {limit, sort, fields}).count())
     Meteor._sleepForMs(800 * Meteor.isDevelopment);
     return  Groups.find(query, {limit, sort, fields})
 

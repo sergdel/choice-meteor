@@ -49,6 +49,7 @@ import json2csv from 'json2csv'
 
 Meteor.methods({
     exportFamilies: function (query, order, columns) {
+        this.unblock()
             if (!Roles.userIsInRole(this.userId, 'admin')) {
             throw new Meteor.Error(403, 'Access forbidden', 'Only admin can export data base')
         }

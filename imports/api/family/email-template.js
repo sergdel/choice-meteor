@@ -14,11 +14,9 @@ export const emailTemplateSchema = new SimpleSchema({
 
 AutoForm.addHooks('emailTemplateSchema', {
     onSubmit: function (doc) {
-        console.log('onSubmit AutoForm.hooks  emailTemplateSchema', doc);
         this.done();
         return false;
     },
     onSuccess(t,r){
-        console.log('onSuccessonSuccessonSuccessonSuccessonSuccessonSuccessonSuccess',t,r)
     }
 },false);

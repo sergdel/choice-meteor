@@ -16,33 +16,44 @@ import {adultSchema} from "./adult/adult";
 import {_} from "meteor/underscore";
 import {moment} from "meteor/momentjs:moment";
 import {BlueCard} from '/imports/api/blue-card/blue-card'
+import {Audit} from '/imports/api/audit/audit'
 
 export const Families = {}
-Families.find = function (selector, options) {
+Families.find = function(selector, options)  {
+    if (typeof selector === 'string')
+        Audit.insert({type: 'access', docId: selector, userId: options.userId})
     selector = _.extend(selector, {roles: 'family'})
+    console.log(' Meteor.users.find', selector)
     return Meteor.users.find(selector, options)
 }
-Families.findOne = function (_id, options) {
+Families.findOne = (_id, options) => {
     return Meteor.users.findOne({_id, roles: 'family'}, options)
 }
 Families.insert = function (doc, callback) {
     return //for now you can add families
     // return Meteor.users.find(selector,options)
 }
-Families.update = function (_id, modifier, options) {
-    const updated=Meteor.users.update(_id, modifier, options)
+Families.update =function (_id, modifier, options, callback) {
+    const oldDoc = Meteor.users.findOne(_id)
+    const updated = Meteor.users.update(_id, modifier, options, callback)
     if (!updated) throw new Meteor.Error(404, 'Family not found', '_id: ' + _id)
-    const newDoc=Meteor.users.findOne(_id)
-    //console.log('3********************')
+    const newDoc = Meteor.users.findOne(_id)
     //todo change that to next line (now is having problem with a infitite cycle
     //todo do the log here
     //LocalCollection._modify(newDoc, modifier)
+    let time = new Date().getTime()
+
     setBlueCardStatus(newDoc)
+    console.log(1, time - new Date().getTime())
     insertBluecards(newDoc)
-    setChildrenSurname(newDoc)
-    return Meteor.users.update(_id, newDoc, options)
+    console.log(2, time - new Date().getTime())
+    Meteor.users.update(_id, newDoc, options)
+    console.log(3, time - new Date().getTime())
+    Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
+    console.log(4, time - new Date().getTime())
+    return true
 }
-Families.upsert = function (selector, modifier, options) {
+Families.upsert = function (_id, modifier, options, callback) {
     return //
 }
 Families.remove = function (selector) {
@@ -149,12 +160,16 @@ export const familySchema = new SimpleSchema({
         optional: true,
         type: adultSchema,
         autoform: {
+            afFieldInput: {
+                label: false
+            },
             atts: {
+                label: false,
                 template: "bootstrap3"
             },
             afFormGroup: {
+                label: false,
                 template: "bootstrap3",
-                label: false
             }
         }
     },
@@ -251,24 +266,19 @@ export const setBlueCardStatus = function (family) {
     return family
 }
 
-export const setChildrenSurname = function (family) {
-    const type = 'children'
-    if (Array.isArray(family[type])) {
-        for (let i in family[type]) {
-            family[type].surname = family.parents && family.parents[0] && family.parents[0].surname
-        }
-    }
-}
+
 export const insertBluecards = function (family) {
-    BlueCard.remove({familyId: family._id}, {multi: true})
+    BlueCard.remove({familyId: family._id})
     for (let type of ['parents', 'children', 'guests']) {
         if (Array.isArray(family[type])) {
             for (let i in family[type]) {
                 const member = family[type]
+                let surname = member.surname
+                if (type == 'children') surname = family.parents && family.parents[0] && family.parents[0].surname
                 const blueCard = {
                     familyId: family._id,
                     firstName: member.firstName,
-                    surname: member.surname,
+                    surname,
                     dateOfBirth: member.dateOfBirth,
                     number: member.blueCard && member.blueCard.number ? member.blueCard.number : undefined,
                     expiryDate: member.blueCard && member.blueCard.expiryDate ? member.blueCard.expiryDate : undefined,
@@ -303,3 +313,4 @@ export const setFamilyScore = function (family) {
     return family.familyScore
 
 }
+

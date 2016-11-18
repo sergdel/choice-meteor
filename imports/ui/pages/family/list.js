@@ -64,7 +64,6 @@ Template.familyList.onCreated(function () {
         if (familyStatus) {
             query["office.familyStatus"] = familyStatus
         }
-        console.log("query", query);
         this.query.set(query);
         Session.set('searchFamilyListForm.query',query); //used for send query to server when ask for export cvs
         this.subscribe('families', this.limit.get(), query, Session.get('searchFamilyListForm.orderBy'))
@@ -110,7 +109,6 @@ Template.familyList.helpers({
     family: ()=> {
         const instance = Template.instance();
         const query = {roles: "family"};
-        console.log('family-------->', query);
         return Meteor.users.find(query, {
             sort: Session.get('searchFamilyListForm.orderBy'),
             limit: instance.limit.get(),
@@ -164,7 +162,11 @@ Template.familyList.helpers({
 });
 
 Template.familyList.events({
+    'click .copyToken'(e,instance){
+        Meteor.call('createToken',this._userId,(err,token)=>{
 
+        })
+    },
     'click .orderBy'(e, instance) {
         $('input[name="address"]').val('').change();
         const oldOrderKey = Object.keys(Session.get('searchFamilyListForm.orderBy'))[0];
@@ -180,7 +182,6 @@ Template.familyList.events({
         }
     },
     'click .zoom'(e, instance){
-        console.log(e);
         FlowRouter.go('familyEdit', {familyId: this._id})
     },
 

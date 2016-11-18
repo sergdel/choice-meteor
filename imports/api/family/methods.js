@@ -12,17 +12,25 @@ import {
     sendUpdateFamilyStatusEmail
 } from "/imports/api/utilities";
 import {Random} from 'meteor/random'
+import {_} from 'lodash'
 
 
 Meteor.methods({
+
+    createToken: function (familyId) {
+        if (!Roles.userIsInRole(this.userId, ['admin'])) {
+            Meteor.Error(403, 'Access forbidden', 'Only admin can create tokens')
+        }
+        LoginToken.setExpiration(60*1000)
+        return  LoginToken.createTokenForUser(familyId);
+
+    },
     familyEdit: function (modifier, familyId) {
-        if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
+        //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             if (familyId == this.userId) {
-                if ((modifier.$set && modifier.$set.office) || modifier.$unset && modifier.$unset.office) {
-                    throw new Meteor.Error(403, 'Access forbidden', 'Users can\'t edit their status ')
-                }
+                modifier=_.omit(['$set.office','$unset.office','$set.adult.status','$set.adult.score','$unset.adult.status','$unset.adult.score'])
             } else {
                 throw new Meteor.Error(403, 'Access forbidden', 'Users can only edit their own profile')
             }
@@ -53,13 +61,13 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-        console.log('1*********************')
-        Families.update(familyId, modifier)
-        console.log('2*********************')
+
+        Families.update(familyId, modifier,{userId: this.userId})
+
 
     },
     emailExist: function (email, isNotThisFamilyId) {
-        if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
+        //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         let query = {$or: [{emails: {$elemMatch: {address: email}}}, {parents: {$elemMatch: {email}}}]};
         if (isNotThisFamilyId)
             query._id = {$ne: isNotThisFamilyId};

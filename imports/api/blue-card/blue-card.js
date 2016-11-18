@@ -78,7 +78,6 @@ BlueCard.filterSchema = new SimpleSchema({
         }
     }
 })
-console.log('console.log(BlueCard.filterSchema)', BlueCard.filterSchema)
 BlueCard.autoTable = new AutoTable({
     columns: [
         {

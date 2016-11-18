@@ -17,11 +17,11 @@ Package.onUse(function (api) {
     api.use('amplify', 'client')
     api.mainModule('client.js');
 });
-/*
+
 Package.onTest(function (api) {
     api.use('ecmascript');
     api.use('tinytest');
+    api.use('accounts-base', 'client', {weak: true});
     api.use('cesarve:persistent-reactive-var');
-    api.mainModule('client.js');
+    api.mainModule('client.test.js');
 });
-*/

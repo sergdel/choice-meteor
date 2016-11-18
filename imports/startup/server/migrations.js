@@ -16,7 +16,7 @@ Meteor.startup(() => {
 
 Migrations.add({
     version: 1,
-    name: 'Remove empty secod parent',
+    name: 'Remove empty second parent',
     up: function () {//code to migrate up to version 1}
         // This is how to get access to the raw MongoDB node collection that the Meteor server collection wraps
         const batch = Meteor.users.rawCollection().initializeUnorderedBulkOp();
@@ -29,7 +29,6 @@ Migrations.add({
             "parents.1.blueCardNumber": {$exists: false},
             "parents.1.firstName": {$exists: false}
         })
-        console.log('users', users.count())
         users.forEach(family => {
             // We have to use pure MongoDB syntax here, thus the `{_id: X}`
             batch.find({_id: family._id}).updateOne({$set: {parentsCount: 1}, $unset: {"parents.1": ""}});
@@ -44,67 +43,12 @@ Migrations.add({
         return true;
     }
 })
-Migrations.add({
-    version: 2,
-    name: 'Update blue card status',
-    up: function () {//code to migrate up to version 1}
-        blueCards.forEach((number) => {
-            const users = Meteor.users.find({
-                roles: 'family',
-                $or: [
-                    {"parents.blueCard.number": number},
-                    {"children.blueCard.number": number},
-                    {"guests.blueCard.number": number}
-                ]
-            })
-            users.forEach((family) => {
-                //console.log(family)
-                family.parents = family.parents || []
-                family.children = family.children || []
-                family.guests = family.guests || []
-                const pi = _.findIndex(family.parents, function (person) {
-                    return person && person.blueCard && person.blueCard.number == number
-                });
-                const ci = _.findIndex(family.children, function (person) {
-                    return person && person.blueCard && person.blueCard.number == number
-                });
-                const gi = _.findIndex(family.guests, function (person) {
-                    return person && person.blueCard && person.blueCard.number == number
-                });
-                console.log('pi, ci, gi', pi, ci, gi)
-                if (pi >= 0) {
-                    let modifier = {$set: {}}
-                    modifier.$set["parents." + pi + ".blueCard.status"] = "approved"
-                    modifier.$set["parents." + pi + ".blueCard.registered"] = "sponsored"
-                    //console.log(pi, family, number, modifier)
-                    Meteor.users.update(family._id, modifier)
-                }
-                if (ci >= 0) {
-                    let modifier = {$set: {}}
-                    modifier.$set["children." + ci + ".blueCard.status"] = "approved"
-                    modifier.$set["children." + ci + ".blueCard.registered"] = "sponsored"
-                    //console.log(pi, family, number, modifier)
-                    Meteor.users.update(family._id, modifier)
-                }
-                if (gi >= 0) {
-                    let modifier = {$set: {}}
-                    modifier.$set["guests." + gi + ".blueCard.status"] = "approved"
-                    modifier.$set["guests." + gi + ".blueCard.registered"] = "sponsored"
-                    //console.log(pi, family, number, modifier)
-                    Meteor.users.update(family._id, modifier)
-                }
-            })
-        })
-        return true
-    },
 
-
-})
 
 
 Migrations.add({
     version: 3,
-    name: 'Update blue card reword Reword "Applying" to "Sent" ',
+    name: 'Update blue card  Reword "Applying" to "Sent" ',
     up: function () {//code to migrate up to version 1}
         Meteor.users.update({"parents.blueCard.status": 'applying'}, {$set: {"parents.blueCard.status": 'sent'}}, {multi: true})
         Meteor.users.update({"children.blueCard.status": 'applying'}, {$set: {"children.blueCard.status": 'sent'}}, {multi: true})
@@ -116,8 +60,9 @@ Migrations.add({
 
 })
 
+
 Migrations.add({
-    version: 4,
+    version: 5,
     name: 'Update blue card status" ',
     up: function () {//code to migrate up to version 1}
         Meteor.users.find({"roles": "family"}).forEach((family) => {

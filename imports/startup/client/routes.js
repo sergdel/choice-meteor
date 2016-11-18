@@ -24,8 +24,9 @@ import "/imports/ui/pages/audit/list";
 import "/imports/ui/pages/group/list";
 import "/imports/ui/pages/group/edit";
 
-import "/imports/ui/pages/email-templates/list";
-import "/imports/ui/pages/email-templates/edit";
+import "/imports/ui/pages/email/emails";
+
+
 
 /*
 FlowRouter.wait();
@@ -322,18 +323,12 @@ familyRoutes.route('/adult/edit/:familyId', {
 
 
 const emailTemplatesRoutes = adminRoleRoutes.group({
-    prefix: '/email-templates'
+    prefix: '/email'
 });
 
-emailTemplatesRoutes.route('/list', {
-    name: 'emailTemplatesList',
+emailTemplatesRoutes.route('/', {
+    name: 'email',
     action(params, queryParams) {
-        BlazeLayout.render('layout', {yield: 'emailTemplatesList'})
-    }
-});
-emailTemplatesRoutes.route('/edit/:emailTemplateId', {
-    name: 'emailTemplatesEdit',
-    action(params, queryParams) {
-        BlazeLayout.render('layout', {yield: 'emailTemplatesEdit'})
+        BlazeLayout.render('layout', {yield: 'emails'})
     }
 });

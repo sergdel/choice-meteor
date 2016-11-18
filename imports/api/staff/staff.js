@@ -59,9 +59,7 @@ export const staffSchema = new SimpleSchema({
             }
         },
         custom: function () {
-            console.log('custom',this);
             if (this.isSet && this.docId == this.userId && Array.isArray(this.value) && this.value[0]!='admin') {
-                console.log('inactivateYourSelf');
                 staffSchema.namedContext("staffForm").addInvalidKeys([{name: this.key, type: "inactivateYourSelf"}]);
             }
         }

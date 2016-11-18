@@ -4,7 +4,8 @@
 
 Meteor.methods({
     adultEdit(modifier, familyId){
-        console.log(modifier, familyId);
+        this.unblock()
+
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         if (Roles.userIsInRole(this.userId, ['family'])) {
             if (familyId != this.userId)

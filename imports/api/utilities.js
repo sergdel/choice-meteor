@@ -25,7 +25,6 @@ export const endSubmit = function () {
     if ($button.length==0){
         $button = $('[data-original]').prop("disabled", false);
     }
-    console.log('$button',$button)
     if (this.validationContext._invalidKeys.length > 0)
         $button.html($button.data('original'));
     else
@@ -38,8 +37,7 @@ export const endSubmit = function () {
 };
 
 export const sendVerificationEmailTemplateForStaff = function (userId) {
-     console.log('sendVerificationEmail',userId );
-    console.log('sendVerificationEmail',Accounts.sendVerificationEmail(userId));
+    Accounts.sendVerificationEmail(userId)
     //Accounts.sendVerificationEmail(userId)
 
 };
@@ -49,7 +47,7 @@ export const sendVerificationEmailTemplateForFamily = function (userId) {
 };
 
 export const sendEnrollmentEmailTemplateForStaff = function (userId) {
-    console.log('sendEnrollmentEmailTemplateForStaff',Accounts.sendEnrollmentEmail(userId)  );
+    Accounts.sendEnrollmentEmail(userId)
     //Todo
 
 };

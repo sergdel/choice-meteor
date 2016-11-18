@@ -1,10 +1,8 @@
 /**
  * Created by cesar on 28/9/16.
  */
-
+import {Families} from '/imports/api/family/family'
 Meteor.publish('families', function (limit, query = {}, sort = {}) {
-    console.log(query, {limit, sort});
-    Meteor._sleepForMs(800 * Meteor.isDevelopment);
     query.roles = "family";
     if (!limit) {
         limit = rowsByPage
@@ -32,26 +30,28 @@ Meteor.publish('families', function (limit, query = {}, sort = {}) {
         fields["parents.mobilePhone"] = 1;
         fields["contact.homePhone"] = 1
     }
-    Counts.publish(this, 'familiesCounter', Meteor.users.find(query, {limit, sort}),{ noReady: true });
+    Counts.publish(this, 'familiesCounter', Meteor.users.find(query, {limit, sort}), {noReady: true});
     return Meteor.users.find(query, {limit, sort})
 });
 Meteor.publish('family', function (familyId) {
-    console.log('family', familyId);
-    const user = Meteor.users.findOne(this.userId); //I don't want to user Roles packages at this tiem because then probably you fave to use meteor.users.find 3 times.
+    const user = Meteor.users.findOne(this.userId); //I don't want to user Roles packages at this tiem because then probably you have to use meteor.users.find 3 times.
+    if (!user){
+        return this.ready()
+    }
     const userRoles = user.roles;
+    let fields = {}
     if (_.difference(['family', 'admin', 'staff'], userRoles).length == 3) //have no roles
         return [];
-    if (_.difference(['family'], userRoles).length == 0) //is family role
-        familyId = this.userId;
-    AuditLog.insert({
-        userId: this.userId,
-        docId: familyId,
-        action: "findOne",
-        collection: "users",
-        custom: {
-            roles: userRoles,
-            name: user.firstName + ' ' + user.surname
+    if (_.difference(['family'], userRoles).length == 0) {
+        fields = {
+            office: 0,
         }
-    });
-    return Meteor.users.find({_id: familyId, roles: 'family'})
+    }//is family role
+    const cursor = Families.find(familyId, {fields,userId: this.userId})
+    const family = cursor.fetch()[0]
+    const familyFiles = (family.files || [])
+    const adultFiles = (family.adult && family.adult.files || [])
+    const officeFiles = (family.office && family.office.files ||  [])
+    const files = _.union(familyFiles, adultFiles, officeFiles)
+    return [cursor, Files.collection.find({_id: {$in: files}})]
 });

@@ -3,6 +3,9 @@
  */
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
+
+
+
 Meteor.startup(()=> {
     const email = 'jonathan@freewill.vision';
     if (!Accounts.findUserByEmail(email)) {

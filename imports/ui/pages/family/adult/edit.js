@@ -8,7 +8,7 @@ import "/imports/api/files/files";
 import {AutoForm} from "meteor/aldeed:autoform";
 import {familySchema} from "/imports/api/family/family";
 Template.adultEdit.helpers({
-    omitFields: ['adult.status'],
+    omitFields: ['adult.status','adult.score'],
     familySchema: familySchema,
     family: ()=> {
         let familyId;
@@ -28,7 +28,7 @@ Template.adultEdit.helpers({
 });
 Template.adultEdit.onCreated(function () {
     //todo que solo se suscriba a lo que se esta viendo
-    this.subscribe('files');
+
 });
 AutoForm.hooks({
     adultEdit: {

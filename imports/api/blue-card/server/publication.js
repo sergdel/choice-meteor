@@ -9,7 +9,6 @@ Meteor.publish('blueCards', function (limit, query = {}, sort = {}) {
     Meteor._sleepForMs(800 * Meteor.isDevelopment);
     if (!Roles.userIsInRole(this.userId, ['admin', 'staff']))
         return this.ready();
-    console.log(query)
     query = _.extend(query, )
     Counts.publish(this, 'blueCardsCounter', BlueCard.find(query, {limit, sort}), {noReady: true});
     return BlueCard.find(query, {limit, sort})

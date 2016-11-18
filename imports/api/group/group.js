@@ -5,7 +5,6 @@ import {moment} from 'meteor/momentjs:moment'
 
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
-        console.log('this.isUpdate  this.isSet', this.isUpdate, !this.isSet, !this.value)
         return 'required'
     }
     return true

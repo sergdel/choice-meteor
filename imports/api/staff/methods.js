@@ -13,6 +13,8 @@ import {sendEnrollmentEmailTemplateForStaff} from "/imports/api/utilities";
 import {sendVerificationEmailTemplateForStaff} from "/imports/api/utilities";
 Meteor.methods({
     staffNew: function (doc) {
+        this.unblock()
+
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //todo pregunta quien peude crear nuevois usuarios
         if (!Roles.userIsInRole(this.userId, ['admin']))
@@ -35,6 +37,8 @@ Meteor.methods({
         })
     },
     staffRemove: function (staffId) {
+        this.unblock()
+
         if (!Roles.userIsInRole(this.userId, ['admin']))
             throw new Meteor.Error(403, 'Access forbidden', 'User have not admin role');
         if (staffId == this.userId)
@@ -42,7 +46,8 @@ Meteor.methods({
         Meteor.users.remove(staffId)
     },
     staffEdit: function (modifier, staffId) {
-        if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
+        this.unblock()
+
         //check if is authorized
         if (!Roles.userIsInRole(this.userId, ['admin']))
             throw new Meteor.Error(403, 'Access forbidden', 'User have not admin role');

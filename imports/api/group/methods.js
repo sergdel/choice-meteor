@@ -8,15 +8,15 @@ import {Groups} from '/imports/api/group/group'
 
 Meteor.methods({
     groupNew: function (doc) {
+        this.unblock()
         check(doc, Groups.schemas.new)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff']))
             throw new Meteor.Error(403, 'Access denied!', 'Only staff can create new groups')
-        this.unblock()
         Groups.attachSchema(Groups.schemas.new, {replace: true})
         return Groups.insert(doc)
     },
     groupEdit: function (modifier, groupId) {
-        console.log('id', groupId, 'mod', modifier)
+        this.unblock()
         check(groupId, String)
         check(modifier, Object)
         Groups.simpleSchema().newContext("groupEdit").validate(modifier, {modifier: true});
@@ -29,6 +29,7 @@ Meteor.methods({
 
     },
     groupApply: function (groupId) {
+        this.unblock()
         check(groupId, String)
         if (!Roles.userIsInRole('family')) {
             throw new Meteor.Error(403, 'Access denied!', 'Only families can apply to groups')

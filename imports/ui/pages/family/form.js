@@ -24,7 +24,7 @@ Template.familyForm.events({
 
 Template.familyForm.onCreated(function () {
     //todo que solo se suscriba a lo que se esta viendo
-    this.subscribe('files');
+
 });
 
 Template.familyForm.onRendered(function () {
