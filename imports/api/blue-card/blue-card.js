@@ -90,6 +90,11 @@ BlueCard.autoTable = new AutoTable({
         },
         {
             key: 'dateOfBirth',
+            render: function (val) {
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YY')
+            },
             operator: '$gte',
             operators: [
                 {
@@ -126,6 +131,11 @@ BlueCard.autoTable = new AutoTable({
         {
             key: 'expiryDate',
             operator: '$gte',
+            render: function (val) {
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YY') + ' - ' + m.fromNow()
+            },
             operators: [
                 {
                     label: 'Equal',
@@ -183,7 +193,7 @@ BlueCard.autoTable = new AutoTable({
     publishExtraFields: ['familyId'],
     link: function (doc) {
 
-        return  FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
+        return FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
     }
 })
 

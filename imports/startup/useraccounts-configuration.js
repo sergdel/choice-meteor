@@ -5,7 +5,7 @@ AccountsTemplates.configure({
     enablePasswordChange: true,
     /**
      * No users creation from client
-    **/
+     **/
     forbidClientAccountCreation: true,
     overrideLoginErrors: true,
     sendVerificationEmail: true,
@@ -37,11 +37,11 @@ AccountsTemplates.configure({
 
     // Hooks
     /*
-    onLogoutHook: myLogoutFunc,
-    onSubmitHook: mySubmitFunc,
-    preSignUpHook: myPreSubmitFunc,
-    postSignUpHook: myPostSubmitFunc,
-    */
+     onLogoutHook: myLogoutFunc,
+     onSubmitHook: mySubmitFunc,
+     preSignUpHook: myPreSubmitFunc,
+     postSignUpHook: myPostSubmitFunc,
+     */
     // Texts
     texts: {
         button: {
@@ -80,17 +80,25 @@ AccountsTemplates.addField({
     ],
 });
 
-    AccountsTemplates.configureRoute('signIn');
-    /** no creation users from client side at moment
-    AccountsTemplates.configureRoute('signUp',{
+AccountsTemplates.configureRoute('signIn', {
+    redirect: function () {
+        console.log('AccountsTemplates.configureRoute',Meteor.userId(),Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
+        if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
+            Router.go('familyList')
+        else
+            Router.go('userProfile')
+    }
+})
+/** no creation users from client side at moment
+ AccountsTemplates.configureRoute('signUp',{
     })
-     **/
-    AccountsTemplates.configureRoute('changePwd');
-    AccountsTemplates.configureRoute('enrollAccount');
-    AccountsTemplates.configureRoute('forgotPwd');
-    AccountsTemplates.configureRoute('resetPwd');
-    AccountsTemplates.configureRoute('verifyEmail');
-    AccountsTemplates.configureRoute('resendVerificationEmail');
+ **/
+AccountsTemplates.configureRoute('changePwd');
+AccountsTemplates.configureRoute('enrollAccount');
+AccountsTemplates.configureRoute('forgotPwd');
+AccountsTemplates.configureRoute('resetPwd');
+AccountsTemplates.configureRoute('verifyEmail');
+AccountsTemplates.configureRoute('resendVerificationEmail');
 
 
 
