@@ -36,7 +36,12 @@ Meteor.methods({
             text,
             "h:Reply-To": doc.email
         };
-        return Email.send(options);
+         Email.send(options);
+        options.from='emailus@choicehomestay.com'
+        options.subject = 'Thank you for contacting Choice Homestay'
+        option.text
+
+
     },
     sendCampaign: function (doc) {
         check(doc, {

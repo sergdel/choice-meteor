@@ -18,7 +18,8 @@ Template.layout.events({
     },
     'click .goto'(e){
         FlowRouter.go($(e.currentTarget).data('link'))
-    }
+    },
+
 });
 
 Template.layout.onRendered(function () {

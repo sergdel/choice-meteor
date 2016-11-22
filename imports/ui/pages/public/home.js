@@ -5,7 +5,7 @@ Template.home.helpers({
 });
 
 Template.home.events({
-    //add your events here
+
 });
 
 Template.home.onCreated(function () {

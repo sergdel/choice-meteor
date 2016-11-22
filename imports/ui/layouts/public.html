@@ -17,8 +17,8 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right nav-choice">
                     <li><a href="/">Home</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                    <li><a href="{{pathFor 'information'}}">Imformation</a></li>
+                    <li><a href="{{pathFor 'home' hash='contact'}}" class="gotoHash">Contact Us</a></li>
+                    <li><a href="{{pathFor 'information'}}">Information</a></li>
                     <li><a href="{{pathFor 'gallery'}}">Photos</a></li>
                     {{#if logged}}
                         <li><a href="{{pathFor 'familyList'}}">Private</a></li>
@@ -40,37 +40,37 @@
                 <div class="col-xs-12 col-sm-6 col-md-3">
                     <h3>Contact</h3>
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-xs-5">
                             <strong>
                                 <i class="fa fa-map-marker"></i> Address:
                             </strong>
                         </div>
-                        <div class="col-sm-6">
-                            <h5>1 Como Cres</h5>
-                            <h5>Southport QLD 4215</h5>
-                            <h5>Australia</h5>
+                        <div class="col-xs-7">
+                            <p>1 Como Cres</p>
+                            <p>Southport QLD 4215</p>
+                            <p>Australia</p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-xs-5">
                             <strong>
                                 <i class="fa fa-edit"></i> Postal:
                             </strong>
                         </div>
-                        <div class="col-sm-6">
-                            <h5>PO Box 298</h5>
-                            <h5>Helensvale, QLD 4212</h5>
-                            <h5>Australia</h5>
+                        <div class="col-xs-7">
+                            <p>PO Box 298</p>
+                            <p>Helensvale, QLD 4212</p>
+                            <p>Australia</p>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-xs-5">
                             <strong>
                                 <i class="fa fa-file-text"></i> ACN::
                             </strong>
                         </div>
-                        <div class="col-sm-6">
-                            <h5>142 098 600</h5>
+                        <div class="col-xs-7">
+                            <p>142 098 600</p>
                         </div>
                     </div>
                 </div>

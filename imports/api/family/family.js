@@ -19,7 +19,7 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Audit} from '/imports/api/audit/audit'
 
 export const Families = {}
-Families.find = function(selector, options)  {
+Families.find = function(selector={}, options)  {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
     selector = _.extend(selector, {roles: 'family'})

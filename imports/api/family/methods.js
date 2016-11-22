@@ -21,8 +21,8 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, ['admin'])) {
             Meteor.Error(403, 'Access forbidden', 'Only admin can create tokens')
         }
-        LoginToken.setExpiration(60*1000)
-        return  LoginToken.createTokenForUser(familyId);
+        LoginToken.setExpiration(60 * 1000)
+        return LoginToken.createTokenForUser(familyId);
 
     },
     familyEdit: function (modifier, familyId) {
@@ -30,7 +30,7 @@ Meteor.methods({
         //check if is authorized
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             if (familyId == this.userId) {
-                modifier=_.omit(['$set.office','$unset.office','$set.adult.status','$set.adult.score','$unset.adult.status','$unset.adult.score'])
+                modifier = _.omit(['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
             } else {
                 throw new Meteor.Error(403, 'Access forbidden', 'Users can only edit their own profile')
             }
@@ -61,8 +61,8 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-
-        Families.update(familyId, modifier,{userId: this.userId})
+        console.log(modifier)
+        Families.update(familyId, modifier, {userId: this.userId})
 
 
     },

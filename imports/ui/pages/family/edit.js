@@ -15,7 +15,7 @@ AutoForm.debug();
 
 Template.familyEdit.onCreated(function () {
     this.autorun(() => {
-        this.data.familyId = FlowRouter.getParam("familyId");
+        this.data.familyId = FlowRouter.getParam("familyId") || Meteor.userId();
         this.subscribe('family', this.data.familyId)
 
     })
