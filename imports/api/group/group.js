@@ -335,10 +335,12 @@ const columns = [
     },
     {
         key: 'dates.1',
+        label: 'From',
         operator: '$regex',
     },
     {
         key: 'dates.2',
+        label: 'To',
         operator: '$regex',
     },
     {
@@ -402,6 +404,9 @@ Groups.autoTableGroupStaff = new AutoTable(
                 showing: true,
                 filters: true,
             }
+        },
+        link: function(row){
+            return FlowRouter.path('groupEdit',{groupId: row._id})
         }
     }
 )
@@ -424,23 +429,7 @@ Groups.autoTableGroupFamily = new AutoTable(
 )
 
 
-Groups.autoTable = new AutoTable(
-    {
-        id: 'groupStaff',
-        collection: Groups,
-        columns,
-        schema: groupFilterSchema,
-        settings: {
-            options: {
-                columnsSort: true,
-                columnsDisplay: true,
-                showing: true,
-                filters: true,
-            }
-        }
-    }
-)
-
+/*
 
 Groups.autoTable = new AutoTable(
     {
@@ -459,3 +448,4 @@ Groups.autoTable = new AutoTable(
     }
 )
 
+*/

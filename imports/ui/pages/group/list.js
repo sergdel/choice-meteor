@@ -19,7 +19,7 @@ Template.groupList.onDestroyed(function () {
 
 
 Template.groupList.helpers({
-    autoTable: Groups.autoTable
+    autoTable: Groups.autoTableGroupStaff
 });
 
 Template.groupList.events({

@@ -7,9 +7,7 @@ Template.buttonSubmit.events({
         const $button=$(e.currentTarget)
         let $form=$button.parent().find('form')
         $form.submit()
-        if ($form.length==0){
-            $button.parents('section').find('form').submit()
-        }
+
 
     }
 })
