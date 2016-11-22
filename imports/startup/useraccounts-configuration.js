@@ -1,4 +1,5 @@
 import {AccountsTemplates} from "meteor/useraccounts:core";
+import {FlowRouter} from 'meteor/kadira:flow-router'
 AccountsTemplates.configure({
     // Behavior
     confirmPassword: false,
@@ -35,9 +36,12 @@ AccountsTemplates.configure({
     homeRoutePath: '/family/list',
     redirectTimeout: 4000,
 
+    onLogoutHook: function () {
+        FlowRouter.go('/sign-in');
+    },
     // Hooks
     /*
-     onLogoutHook: myLogoutFunc,
+
      onSubmitHook: mySubmitFunc,
      preSignUpHook: myPreSubmitFunc,
      postSignUpHook: myPostSubmitFunc,
@@ -82,11 +86,11 @@ AccountsTemplates.addField({
 
 AccountsTemplates.configureRoute('signIn', {
     redirect: function () {
-        console.log('AccountsTemplates.configureRoute',Meteor.userId(),Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
+        console.log('AccountsTemplates.configureRoute', Meteor.userId(), Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
         if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
-            Router.go('familyList')
+            FlowRouter.go('familyList')
         else
-            Router.go('userProfile')
+            FlowRouter.go('userProfile')
     }
 })
 /** no creation users from client side at moment

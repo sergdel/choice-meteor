@@ -1,4 +1,5 @@
 import './home.html'
+import './contact'
 Template.home.helpers({
     //add you helpers here
 });

@@ -21,6 +21,23 @@ Meteor.methods({
     saveCampaign: function (query, tempolate, Id) {
 
     },
+    contact: function (doc) {
+        Meteor._sleepForMs(300 * Meteor.isDeveloment)
+        this.unblock()
+        const text = `Name: ${doc.name}\nEmail: ${doc.email}\nPhone: ${doc.phone}\nSuburb: ${doc.suburb}\nSchool Drop-off & Pick-up  : ${doc.school}\nAvailability: ${doc.availability}\n\nMessage: ${doc.message}\n`
+        var options = {
+            to: 'emailus@choicehomestay.com',
+            from: 'newcontact@choicehomestay.com',
+            subject: "New contact from home page",
+            "parent1": doc.name,
+            'suburb': doc.suburb,
+            'campaign': 'website',
+            status: 'sending',
+            text,
+            "h:Reply-To": doc.email
+        };
+        return Email.send(options);
+    },
     sendCampaign: function (doc) {
         check(doc, {
             name: String,

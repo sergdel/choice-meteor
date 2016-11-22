@@ -12,7 +12,13 @@
                 data-original="Save <i class='fa fa-floppy-o'></i>"
                 data-begin="Saving <i class='fa fa-spinner fa-spin fa-fw'></i>"
                 data-end="Saved <i class='fa fa-check-circle'></i>"
-
         >Save <i class='fa fa-floppy-o'></i></button>
+    {{/if}}
+    {{#if submit }}
+        <button type="submit" class="btn btn-primary pull-right btn-lg"
+                data-original="Submit <i class='fa fa-floppy-o'></i>"
+                data-begin="Submiting <i class='fa fa-spinner fa-spin fa-fw'></i>"
+                data-end="Submited <i class='fa fa-check-circle'></i>"
+        >Submit <i class='fa fa-floppy-o'></i></button>
     {{/if}}
 </template>

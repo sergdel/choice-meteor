@@ -8,6 +8,7 @@ import "/imports/ui/layouts/public";
 import {FlowRouter} from "meteor/kadira:flow-router";
 import {BlazeLayout} from "meteor/kadira:blaze-layout";
 import "/imports/ui/pages/public/home";
+import "/imports/ui/pages/public/gallery.html";
 import "/imports/ui/pages/public/information";
 import "/imports/ui/pages/family/adult/edit";
 import "/imports/ui/pages/family/list";
@@ -160,6 +161,14 @@ publicRoutes.route('/information', {
     title: 'Information',
     action(params, queryParams) {
         BlazeLayout.render('public', {yield: 'information'})
+    }
+});
+
+publicRoutes.route('/gallery', {
+    name: 'gallery',
+    parent: 'gallery',
+    action(params, queryParams) {
+        BlazeLayout.render('public', {yield: 'gallery'})
     }
 });
 
