@@ -18,8 +18,26 @@ import {moment} from "meteor/momentjs:moment";
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Audit} from '/imports/api/audit/audit'
 
+export const emailSchema = new SimpleSchema({
+    email: {
+        label: "E-mail address",
+        type: String,
+        regEx: SimpleSchema.RegEx.Email,
+        unique: true,
+        custom: function () {
+            if (Meteor.isClient && this.isSet) {
+                Meteor.call("emailExist", this.value, function (error, result) {
+                    if (result) {
+                        emailSchema.namedContext("familyNew").addInvalidKeys([{name: "email", type: "notUnique"}]);
+                    }
+                });
+            }
+        }
+    }
+})
+
 export const Families = {}
-Families.find = function(selector={}, options)  {
+Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
     selector = _.extend(selector, {roles: 'family'})
@@ -27,13 +45,16 @@ Families.find = function(selector={}, options)  {
     return Meteor.users.find(selector, options)
 }
 Families.findOne = (_id, options) => {
+
     return Meteor.users.findOne({_id, roles: 'family'}, options)
 }
-Families.insert = function (doc, callback) {
-    return //for now you can add families
-    // return Meteor.users.find(selector,options)
+Families.insert = function (email, options) {
+    const familyId = Accounts.createUser({email})
+    Meteor.users.update(familyId, {$set: {roles: ['family'], "parents": [{"email": email}]}})
+    Audit.insert({type: 'create', docId: familyId, userId: options.userId})
+    return familyId
 }
-Families.update =function (_id, modifier, options, callback) {
+Families.update = function (_id, modifier, options, callback) {
     const oldDoc = Meteor.users.findOne(_id)
     const updated = Meteor.users.update(_id, modifier, options, callback)
     if (!updated) throw new Meteor.Error(404, 'Family not found', '_id: ' + _id)
@@ -192,10 +213,6 @@ export const familySchema = new SimpleSchema({
     notes: {
         type: [Object],
         optional: true,
-        autoform: {
-            initialCount: 1,
-        },
-
     },
     "notes.$.note": {
         optional: true,

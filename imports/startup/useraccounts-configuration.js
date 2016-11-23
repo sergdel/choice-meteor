@@ -29,11 +29,11 @@ AccountsTemplates.configure({
     showValidating: true,
 
     // Privacy Policy and Terms of Use
-    privacyUrl: 'privacy',
-    termsUrl: 'terms-of-use',
+    privacyUrl: '',
+    termsUrl: '',
 
     // Redirects
-    homeRoutePath: '/family/list',
+    homeRoutePath: '/user/profile',
     redirectTimeout: 4000,
 
     onLogoutHook: function () {
@@ -66,45 +66,62 @@ AccountsTemplates.configure({
     defaultLayoutRegions: {},
     defaultContentRegion: 'yield',
 });
-AccountsTemplates.addField({
-    _id: 'type',
-    type: 'select',
-    required: true,
-    minLength: 6,
-    displayName: "¿Que buscas?",
-    select: [
-        {
-            text: "Busco un gestor para realizar mis tramites",
-            value: "client",
-        },
-        {
-            text: "Busco ofrecer mis servicios de gestoria",
-            value: "manager",
-        },
-    ],
-});
+
+
+const redirect = function () {
+    console.log('AccountsTemplates.configureRoute', Meteor.userId(), Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
+    if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
+        FlowRouter.go('familyList')
+    } else {
+        FlowRouter.go('userProfile')
+
+    }
+}
+
 
 AccountsTemplates.configureRoute('signIn', {
-    redirect: function () {
-        console.log('AccountsTemplates.configureRoute', Meteor.userId(), Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
-        if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
-            FlowRouter.go('familyList')
-        else
-            FlowRouter.go('userProfile')
-    }
+    redirect: redirect
 })
 /** no creation users from client side at moment
  AccountsTemplates.configureRoute('signUp',{
     })
  **/
-AccountsTemplates.configureRoute('changePwd');
-AccountsTemplates.configureRoute('enrollAccount');
-AccountsTemplates.configureRoute('forgotPwd');
-AccountsTemplates.configureRoute('resetPwd');
-AccountsTemplates.configureRoute('verifyEmail');
-AccountsTemplates.configureRoute('resendVerificationEmail');
+AccountsTemplates.configureRoute('changePwd', {
+    redirect: redirect
+})
+AccountsTemplates.configureRoute('enrollAccount', {
+    redirect: redirect
+})
+AccountsTemplates.configureRoute('forgotPwd', {
+    redirect: redirect
+})
+AccountsTemplates.configureRoute('resetPwd', {
+    redirect: redirect
+})
+AccountsTemplates.configureRoute('verifyEmail', {
+    redirect: redirect
+})
+AccountsTemplates.configureRoute('resendVerificationEmail', {
+    redirect: redirect
+})
 
 
+AccountsTemplates.configure({
+
+    texts: {
+        termsPreamble: "",
+        termsPrivacy: "",
+        termsAnd: "",
+        termsTerms: "",
+        title: {
+            enrollAccount: "Create a password for your account",
+        },
+        button: {
+            enrollAccount: "Save password",
+        }
+    },
+
+});
 
 
 

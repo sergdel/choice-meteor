@@ -58,6 +58,7 @@ export const addressSchema = new SimpleSchema({
 });
 export const optsGoogleplace= {
     type: 'googleUI',
+    optional: true,
     stopTimeoutOnKeyup: false,
     googleOptions: {
         componentRestrictions: {country: 'au'}
@@ -65,6 +66,7 @@ export const optsGoogleplace= {
 };
 export const addressType={
     type: addressSchema,
+    optional: true,
     autoform: {
         type: 'googleplace',
         opts:optsGoogleplace

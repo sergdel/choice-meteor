@@ -8,17 +8,18 @@ import {Email} from 'meteor/email'
 
 
 export const modifyEmailTemplates = function (emailTemplate) {
+    console.log(emailTemplate._id)
     if (_.contains(["enrollAccount", "resetPassword", "verifyEmail", "resetPassword"], emailTemplate._id)) {
         Accounts.emailTemplates[emailTemplate._id].subject = function (user) {
             return emailTemplate.subject
         };
         Accounts.emailTemplates[emailTemplate._id].html = function (user, url) {
             let body = ''
-            const firstName = user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName
-            const surname = user.surname ? user.surname : user.parents && user.parents[0] && user.parents[0].surname
-            body = emailTemplate.body.replace(/<img id="firstName" src="(.*)">/, firstName)
-            body = body.replace(/<img id="surname" src="(.*)">/, surname)
-            body = body.replace(/<img id="url" src="(.*)">/, url)
+            const firstName = user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName || ''
+            const surname = user.surname ? user.surname : user.parents && user.parents[0] && user.parents[0].surname || ''
+            body = emailTemplate.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+            body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
+            body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${url}">${url}</a>`)
             return body
 
         };
@@ -28,7 +29,11 @@ export const modifyEmailTemplates = function (emailTemplate) {
         Accounts.emailTemplates[emailTemplate._id].from = function () {
             return `${emailTemplate.fromName} <${emailTemplate.from}>`;
         };
+        console.log('ahora si modificadas')
+    } else {
+        console.log('ahora NOOOO modificadas')
     }
+
 }
 Meteor.startup(() => {
     const emailTemplate = EmailTemplates.find({})

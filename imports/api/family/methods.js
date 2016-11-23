@@ -28,18 +28,23 @@ Meteor.methods({
     familyEdit: function (modifier, familyId) {
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
+
+
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             if (familyId == this.userId) {
-                modifier = _.omit(['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
+                modifier = _.omit(modifier,['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
             } else {
                 throw new Meteor.Error(403, 'Access forbidden', 'Users can only edit their own profile')
             }
         }
         //check if is a validate schema
         if (Meteor.isServer) {
+            console.log('modifier1',modifier)
             familySchema.newContext("familyEdit").validate(modifier, {modifier: true});
             //clean the modifier to be as schema
+            console.log('modifier2',modifier)
             familySchema.clean(modifier, {isModifier: true});
+            console.log('modifier3',modifier)
             //if the modifier are setting parents checks the email
             if (modifier.$set && modifier.$set.parents) {
                 modifier.$set.parents.forEach(function (parent) {
@@ -61,7 +66,7 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-        console.log(modifier)
+        console.log('modifier4',modifier)
         Families.update(familyId, modifier, {userId: this.userId})
 
 
@@ -73,9 +78,14 @@ Meteor.methods({
             query._id = {$ne: isNotThisFamilyId};
         return Meteor.users.find(query).count() > 0
     },
+    familyNew: function (doc) {
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            throw new Meteor.Error(403, 'Access forbidden', 'Only staff and admin can create new families')
 
-
-});
+        }
+        return Families.insert(doc.email, {userId: this.userId})
+    }
+})
 
 /**
  familyNew: function (doc) {

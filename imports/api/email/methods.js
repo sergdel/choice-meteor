@@ -15,7 +15,7 @@ Meteor.methods({
             if (!_.contains(["enrollAccount", "resetPassword", "verifyEmail", "resetPassword"], id)) return res
             console.log('modifyEmailTemplates')
             const emailTemplate = EmailTemplates.findOne(id)
-            modifyEmailTemplates(EmailTemplates)
+            modifyEmailTemplates(emailTemplate)
         }
     },
     saveCampaign: function (query, tempolate, Id) {
@@ -32,14 +32,17 @@ Meteor.methods({
             "parent1": doc.name,
             'suburb': doc.suburb,
             'campaign': 'website',
-            status: 'sending',
+            status: 'sent',
             text,
             "h:Reply-To": doc.email
         };
          Email.send(options);
-        options.from='emailus@choicehomestay.com'
-        options.subject = 'Thank you for contacting Choice Homestay'
-        option.text
+         if (doc.copy){
+             options.from='Choice Homestay <emailus@choicehomestay.com>'
+             options.to=doc.email
+             options.subject = 'Thank you for contacting Choice Homestay'
+             Email.send(options);
+         }
 
 
     },
@@ -94,7 +97,7 @@ Meteor.methods({
                     'campaign': doc.name,
                     "loggedAt": user.loggedAt,
                     "userId": user._id,
-                    status: 'sending',
+                    status: 'sent',
                 };
 
                 if (typeof Accounts.emailTemplates.enrollAccount.text === 'function') {
@@ -115,6 +118,30 @@ Meteor.methods({
             })
         }
 
+    },
+    testSendEmail:function () {
+        const t=new Date().getTime()
+        for (let i=0;i<=50;i++){
+            var options = {
+                to: 'cesar@imagenproactiva.com',
+                from: 'no-replay@choicehomestay.com',
+                subject: 'Probando ' + i,
+                "parent1": "parent1",
+                "parent2": "parent2",
+                "surname": "surname",
+                'city': 'city',
+                'suburb':'suburb',
+                'campaign':'campaign',
+                "loggedAt": "loggedAt",
+                "userId": "userId",
+                status: 'sent',
+                text: i +'lskdlkasmdklasmldkmsalkdmaslkdmlsakmdlaskmdlkasmdlskamdlksm lk aslask dlkasdlksadlkas',
+                html: i +'lskdlka smdklasmldkmsal <a>cesar</a>kdmaslkdmlsakmdlaskmdlkasmdlskamdlksm lk aslask dlkasdlksadlkas',
+            };
+            Email.send(options);
+            console.log(new Date().getTime()-t)
+        }
+        console.log('total', new Date().getTime()-t)
     }
 })
 

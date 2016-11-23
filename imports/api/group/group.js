@@ -46,7 +46,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         }
     },
@@ -54,7 +54,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         }
     },
@@ -62,7 +62,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -79,7 +79,7 @@ const schemaObject = {
                 linkedCalendars: false,
             },
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -90,7 +90,7 @@ const schemaObject = {
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         },
 
@@ -101,7 +101,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -109,7 +109,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -117,7 +117,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -126,7 +126,7 @@ const schemaObject = {
         type: Number,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -135,7 +135,7 @@ const schemaObject = {
         type: Number,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
 
@@ -147,7 +147,7 @@ const schemaObject = {
      type: 'readonly',
      class: 'readonly-bordered',
      afFormGroup: {
-     "formgroup-class": 'col-sm-3',
+     //"formgroup-class": 'col-sm-3',
      }
      }
      },*/
@@ -158,7 +158,7 @@ const schemaObject = {
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -170,7 +170,7 @@ const schemaObject = {
             capitalize: true,
             defaultValue: "potential",
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         }
     },
@@ -181,7 +181,7 @@ const schemaObject = {
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         },
         autoValue: function () {
@@ -196,7 +196,7 @@ const schemaObject = {
             type: 'readonly',
             class: 'readonly-bordered',
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                //"formgroup-class": 'col-sm-3',
             }
         },
         autoValue: function () {
@@ -210,7 +210,7 @@ const schemaObject = {
         autoform: {
             rows: 4,
             afFormGroup: {
-                "formgroup-class": 'col-sm-12',
+                //"formgroup-class": 'col-sm-12',
             }
         },
     },
@@ -219,7 +219,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         },
     },
@@ -228,7 +228,7 @@ const schemaObject = {
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         },
     },
@@ -260,7 +260,7 @@ const schemaObject = {
                     value: "Don't have other student of the same nationality in the home during their visit"
                 }],
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         },
     },
@@ -271,7 +271,7 @@ const schemaObject = {
         autoform: {
             rows: 5,
             afFormGroup: {
-                "formgroup-class": 'col-sm-6',
+                //"formgroup-class": 'col-sm-6',
             }
         },
     },
@@ -310,14 +310,14 @@ Groups.fields = {
 Groups.attachSchema(Groups.schemas.new);
 Groups.attachSchema(Groups.schemas.edit);
 Groups.deny({
-    insert: ()=>true,
-    update: ()=>true,
-    remove: ()=>true,
+    insert: () => true,
+    update: () => true,
+    remove: () => true,
 })
 Groups.allow({
-    insert: ()=>false,
-    update: ()=>false,
-    remove: ()=>false,
+    insert: () => false,
+    update: () => false,
+    remove: () => false,
 })
 
 const columns = [
@@ -336,60 +336,400 @@ const columns = [
     {
         key: 'dates.1',
         label: 'From',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'dates.2',
         label: 'To',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'nights',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'ages',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'city',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'location',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'students',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'adults',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'guests',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
     {
         key: 'placed',
-        operator: '$regex',
+        operator: '$eq',
+        operators: [  // Optional Array works for option filter
+            {
+                label: 'Equal',
+                shortLabel: '=',
+                operator: '$eq',
+            },
+            {
+                label: 'More than',
+                shortLabel: '>',
+                operator: '$gt',
+            },
+            {
+                label: 'Less than',
+                shortLabel: '<',
+                operator: '$lt',
+            },
+            {
+                label: 'More or equal than',
+                shortLabel: '≥',
+                operator: '$gte',
+            },
+            {
+                label: 'Less or equal than',
+                shortLabel: '≤',
+                operator: '$lte',
+            }
+        ],
+
     },
 
 ]
 
-const keys=_.without(_.pluck(columns, 'key'), 'nights', 'guests', 'placed')
-let groupFilterSchema = AutoTable.pickFromSchema(Groups.simpleSchema(),keys )
-groupFilterSchema = new SimpleSchema([groupFilterSchema,
-    {
-        nights: {type: Number, optional: true}
-    }, {
-        guests: {type: Number, optional: true}
-    },{
-        placed: {type: Number, optional: true}
-    }
-])
-;
+
+let groupFilterSchema = new SimpleSchema({
+    id: {
+        type: String,
+        optional: true,
+    },
+    name: {
+        type: String,
+        optional: true,
+    },
+    nationality: {
+        type: String,
+        optional: true,
+    },
+    "dates.$": {
+        type: Date,
+        optional: true,
+    },
+
+    nights: {
+        type: Number,
+        optional: true,
+    },
+    ages: {
+        type: String,
+        optional: true,
+    },
+    city: {
+        type: String,
+        optional: true,
+    },
+    location: {
+        type: String,
+        optional: true,
+    },
+    students: {
+        type: Number,
+        optional: true,
+    },
+    adults: {
+        type: Number,
+        optional: true,
+
+    },
+    guests: {
+        type: Number,
+        optional: true,
+    },
+    status: {
+        type: String,
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'potential', value: 'potential',},
+                {label: 'confirmed', value: 'confirmed',},
+                {label: 'cancelled', value: 'cancelled',},
+            ]
+        },
+    },
+    placed: {
+        type: Number,
+
+        optional: true,
+    },
+    availablePlacements: {
+        type: Number,
+        optional: true,
+    },
+
+
+})
 
 Groups.autoTableGroupStaff = new AutoTable(
     {
@@ -405,8 +745,8 @@ Groups.autoTableGroupStaff = new AutoTable(
                 filters: true,
             }
         },
-        link: function(row){
-            return FlowRouter.path('groupEdit',{groupId: row._id})
+        link: function (row) {
+            return FlowRouter.path('groupEdit', {groupId: row._id})
         }
     }
 )
@@ -431,21 +771,21 @@ Groups.autoTableGroupFamily = new AutoTable(
 
 /*
 
-Groups.autoTable = new AutoTable(
-    {
-        id: 'groupStaff',
-        collection: Groups,
-        columns,
-        schema: groupFilterSchema,
-        settings: {
-            options: {
-                columnsSort: true,
-                columnsDisplay: true,
-                showing: true,
-                filters: true,
-            }
-        }
-    }
-)
+ Groups.autoTable = new AutoTable(
+ {
+ id: 'groupStaff',
+ collection: Groups,
+ columns,
+ schema: groupFilterSchema,
+ settings: {
+ options: {
+ columnsSort: true,
+ columnsDisplay: true,
+ showing: true,
+ filters: true,
+ }
+ }
+ }
+ )
 
-*/
+ */

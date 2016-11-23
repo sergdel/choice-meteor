@@ -20,18 +20,102 @@
 
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane fade active" id="details">
-                        {{>quickForm formType="method-update"
-                                id="groupEdit"
-                                collection=collection
-                                meteormethod="groupEdit"
-                                type="method-update"
-                                doc=group
-                                resetOnSuccess=false
-                                template='bootstrap3'
-                                buttonContent=false
+                    <div role="tabpanel" class="tab-pane  fade in active" id="details">
+                        {{#autoForm formType="method-update"
+                                    id="groupEdit"
+                                    collection=collection
+                                    meteormethod="groupEdit"
+                                    type="method-update"
+                                    doc=group
+                                    resetOnSuccess=false
+                                    template='bootstrap3'
+                                    buttonContent=false
                         }}
-                        {{>buttonSubmit edit=true}}
+                            <div class="row">
+                                <div class="col-sm-6 ">
+                                    {{> afQuickField name='id' autofocus=true}}
+                                </div>
+                                <div class="col-sm-6 ">
+                                    {{> afQuickField name='name'}}
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='nationality'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='dates'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='nights'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='ages'}}
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='city'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='location'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='students'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='adults'}}
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='guests'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='status'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='placed'}}
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    {{> afQuickField name='availablePlacements'}}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    {{> afQuickField name='notes'}}
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    {{> afQuickField name='supervisorsName'}}
+                                </div>
+                                <div class="col-sm-6">
+                                    {{> afQuickField name='supervisorsMobile'}}
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    {{> afQuickField name='requirements'}}
+                                </div>
+                                <div class="col-sm-6">
+                                    {{> afQuickField name='other'}}
+                                </div>
+
+                            </div>
+
+                            {{>buttonSubmit edit=true}}
+                        {{/autoForm}}
                     </div>
                     <div role="tabpanel" class="tab-pane  fade " id="office">
                         <br>

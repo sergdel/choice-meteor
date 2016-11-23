@@ -12,9 +12,9 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 class AuditCollection extends Mongo.Collection {
     insert({userId, type, docId, newDoc, oldDoc, where = 'families'}) {
         let res
-        console.log(111,userId)
         const user = Meteor.users.findOne(userId)
         const name = user.firstName
+        console.log('user auidr',user)
         const role = user.roles.pop()
         if (type == 'update') {
             let result = diff.getDiff(oldDoc, newDoc)
@@ -60,6 +60,17 @@ class AuditCollection extends Mongo.Collection {
                 timestamp: new Date()
             });
         }
+        if (type == 'create') {
+            return super.insert({
+                type,
+                where,
+                docId,
+                role,
+                name,
+                userId,
+                timestamp: new Date()
+            });
+        }
         throw new Meteor.Error('Audit type not recognise ')
     }
 
@@ -92,7 +103,8 @@ const AuditFilterSchema = new SimpleSchema({
             type: 'select-multi-checkbox-combo',
             options: [
                 {label: 'Access', value: 'access'},
-                {label: 'Update', value: 'update'}
+                {label: 'Update', value: 'update'},
+                {label: 'Created', value: 'create'}
             ]
         }
     },
@@ -127,13 +139,17 @@ const AuditFilterSchema = new SimpleSchema({
     }
 })
 
-export const  AuditAutoTable = new AutoTable({
+export const AuditAutoTable = new AutoTable({
     id: 'Audit',
     columns: [
-        {key: 'name', operator: '$regex', label:'Name'},
-        {key: 'type', operator: '$regex', label:'Type'},
-        {key: 'role', operator: '$in', label:'Role'},
-        {key: 'userId', operator: '$in', label:'Staff'},
+        {key: 'name', operator: '$regex', label: 'Name'},
+        {key: 'type', operator: '$in', label: 'Type'},
+        {key: 'role', operator: '$in', label: 'Role'},
+        {
+            key: 'userId', operator: '$in', label: 'Staff', render: function (val, path) {
+            return this.name
+        }
+        },
     ],
     collection: Audit,
     schema: AuditFilterSchema,
@@ -143,14 +159,14 @@ export const  AuditAutoTable = new AutoTable({
             showing: true,
         },
     },
-    publishExtraFields:['result','docId'],
+    publishExtraFields: ['result', 'docId'],
     publish: function () {
         return true
         if (!Roles.userIsInRole(this.userId, 'admin')) {
             return false
         }
     },
-    link: function (doc,key) {
+    link: function (doc, key) {
         return ""
     }
 })

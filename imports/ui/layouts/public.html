@@ -21,7 +21,13 @@
                     <li><a href="{{pathFor 'information'}}">Information</a></li>
                     <li><a href="{{pathFor 'gallery'}}">Photos</a></li>
                     {{#if logged}}
-                        <li><a href="{{pathFor 'familyList'}}">Private</a></li>
+                        {{#if isInRole 'admin,staff' }}
+                            <li><a href="{{pathFor 'familyList'}}">Private</a></li>
+                        {{/if}}
+                        {{#if isInRole 'family' }}
+                            <li><a href="{{pathFor 'userProfile'  }}">Profile</a></li>
+                        {{/if}}
+
                     {{else}}
                         <li><a href="{{pathFor 'sign-in'}}">Sign In</a></li>
                     {{/if}}

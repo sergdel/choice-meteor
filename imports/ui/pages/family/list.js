@@ -1,7 +1,7 @@
 import "./list.html"
 import {Template} from "meteor/templating"
 import {familiesAutoTableAdmin,familiesAutoTableStaff} from "/imports/api/family/auto-table";
-
+import {emailSchema} from "/imports/api/family/family"
 Template.familyList.onCreated(function () {
 
 });
@@ -27,6 +27,28 @@ Template.familyList.helpers({
 
 Template.familyList.events({
 
+    'click .groupFamily'(e, instance){
 
+        BootstrapModalPrompt.prompt({
+            title: "New Family",
+            autoform: {
+                schema: emailSchema,
+                type: "method",
+                meteormethod: "familyNew",
+                id: 'familyNew',
+                buttonContent: false,
+            },
+            btnDismissText: 'Cancel',
+            btnOkText: 'Save'
+        }, function (data) {
+            if (data) {
+                console.log(data)
+                FlowRouter.go('familyEdit', {familyId: data})
+            }
+            else {
+                console.log('cancel')
+            }
+        });
+    },
 });
 
