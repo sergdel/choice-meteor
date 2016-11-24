@@ -731,7 +731,7 @@ let groupFilterSchema = new SimpleSchema({
 
 })
 
-Groups.autoTableGroupStaff = new AutoTable(
+Groups.autoTableStaff = new AutoTable(
     {
         id: 'groupStaff',
         collection: Groups,
@@ -751,7 +751,7 @@ Groups.autoTableGroupStaff = new AutoTable(
     }
 )
 
-Groups.autoTableGroupFamily = new AutoTable(
+Groups.autoTableFamilyAvailable = new AutoTable(
     {
         id: 'groupFamily',
         collection: Groups,
@@ -767,6 +767,25 @@ Groups.autoTableGroupFamily = new AutoTable(
         }
     }
 )
+
+
+Groups.aautoTableFamilyApplied = new AutoTable(
+    {
+        id: 'groupFamily',
+        collection: Groups,
+        columns,
+        schema: groupFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            }
+        }
+    }
+)
+
 
 
 /*

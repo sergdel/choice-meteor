@@ -4,7 +4,16 @@
             <div class="fa fa-plus"></div>
         </button>
     </h1>
-    {{>atTable at=autoTable }}
+
+    {{#if isInRole 'admin,staff' }}
+        {{>atTable at=autoTableStaff }}
+    {{/if}}
+    {{#if isInRole 'family' }}
+        {{>atTable at=autoTableFamilyAvailable }}
+
+        {{>atTable at=aautoTableFamilyApplied }}
+    {{/if}}
+
 </template>
 
 

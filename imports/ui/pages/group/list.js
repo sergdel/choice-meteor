@@ -1,6 +1,5 @@
 import "./table.html"
 import "./list.html"
-import "./search-form"
 import {Template} from "meteor/templating"
 import {FlowRouter} from "meteor/kadira:flow-router"
 import {Groups} from "/imports/api/group/group"
@@ -19,7 +18,9 @@ Template.groupList.onDestroyed(function () {
 
 
 Template.groupList.helpers({
-    autoTable: Groups.autoTableGroupStaff
+    autoTableStaff: Groups.autoTableStaff,
+    autoTableFamilyAvailable: Groups.autoTableFamilyAvailable,
+    aautoTableFamilyApplied: Groups.aautoTableFamilyApplied
 });
 
 Template.groupList.events({

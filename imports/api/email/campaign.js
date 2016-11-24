@@ -78,7 +78,7 @@ export const campaignSchema = new SimpleSchema({
         type: String,
         autoform: {
             options: function () {
-                return EmailTemplates.find({}).map((template) => {
+                return EmailTemplates.find('enrollAccount').map((template) => {
                     return {value: template._id, label: template.description}
                 })
             },
