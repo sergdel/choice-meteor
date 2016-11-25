@@ -2,7 +2,25 @@ import './select-multi-checkbox-combo.css'
 import './select-multi-checkbox-combo.html'
 AutoForm.addInputType("select-multi-checkbox-combo", {
     template: "afSelectMultiCheckboxCombo",
-    valueIsArray: false,
+    valueIsArray: true,
+    valueConverters: {
+        "numberArray": function (val) {
+            if (typeof val === "string") {
+                val = val.split(",");
+                return _.map(val, function (item) {
+                    item = $.trim(item);
+                    return AutoForm.valueConverters.stringToNumber(item);
+                });
+            }
+            if (Array.isArray(val)) {
+                return _.map(val, function (item) {
+                    item = $.trim(item);
+                    return AutoForm.valueConverters.stringToNumber(item);
+                });
+            }
+            return val;
+        },
+    },
     valueOut: function () {
 
         var val = [];
@@ -11,20 +29,10 @@ AutoForm.addInputType("select-multi-checkbox-combo", {
                 val.push($(this).val());
             }
         });
-        this.find('input[type="text"]').each(function () {
-            if ($(this).val()) {
-                val.push($(this).val());
-            }
-        });
         return val;
     },
     contextAdjust: function (context) {
-
-
-
-
         var itemAtts = _.omit(context.atts);
-
         // build items list
         context.items = [];
         // Add all defined options

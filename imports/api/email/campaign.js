@@ -5,6 +5,7 @@ import {Families} from '/imports/api/family/family'
 import {AutoTable} from 'meteor/cesarve:auto-table'
 import {SimpleSchema} from 'meteor/aldeed:simple-schema'
 import {EmailTemplates} from '/imports/api/email/templates'
+import {familyStatus} from "/imports/api/family/family-status";
 const emailFamilyFilter = new SimpleSchema({
     'emails.$.address': {
         label: 'Email',
@@ -20,7 +21,36 @@ const emailFamilyFilter = new SimpleSchema({
         label: 'Surname',
         type: String,
         optional: true,
-    }
+    },
+    'office.familyStatus': {
+        type: [Number],
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: function () {
+                return _.map(familyStatus, function (status) {
+                    return {label: status.label, value: status.id}
+                })
+            },
+        },
+    },
+    'office.familySubStatus': {
+        type: [String],
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'unreliable', value: 'unreliable',},
+                {label: 'active', value: 'active',},
+                {label: 'inactive', value: 'inactive',},
+            ]
+        },
+    },
+    "contact.address.suburb": {
+        optional: true,
+        type: String,
+    },
+
 
 })
 export const campaignAutoTable = new AutoTable({
@@ -41,10 +71,23 @@ export const campaignAutoTable = new AutoTable({
             label: 'Surname',
             operator: '$regex'
         },
+        {
+            key: 'office.familyStatus', operator: '$in',
+            render: function (val) {
+                const status = _.findWhere(familyStatus, {id: val})
+                return status && status.label || ''
+            }
+        },
+        {key: 'office.familySubStatus', operator: '$in',},
+        {
+            key: "contact.address.suburb",
+            label: 'Suburb',
+            operator: '$regex'
+        },
     ],
     collection: Meteor.users,
     query: {roles: 'family'},
-    publishExtraFields:['roles'],
+    publishExtraFields: ['roles'],
     schema: emailFamilyFilter,
     settings: {
         options: {
@@ -53,8 +96,8 @@ export const campaignAutoTable = new AutoTable({
         }
     },
     publish: function () {
-        console.log('publish ' , this.userId, Roles.userIsInRole(this.userId,'admin'))
-        return Roles.userIsInRole(this.userId,'admin')
+        console.log('publish ', this.userId, Roles.userIsInRole(this.userId, 'admin'))
+        return Roles.userIsInRole(this.userId, 'admin')
     }
 
 })
