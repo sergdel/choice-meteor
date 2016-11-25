@@ -188,6 +188,9 @@ BlueCard.autoTable = new AutoTable({
             columnsDisplay: true,
             showing: true,
             filters: true,
+        },
+        klass:{
+            tableWrapper: ''
         }
     },
     publishExtraFields: ['familyId'],

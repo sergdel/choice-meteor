@@ -9,6 +9,7 @@ const custom = function () {
     }
     return true
 }
+
 class GroupCollection extends Mongo.Collection {
     insert(group, callback) {
         return super.insert(group, callback);
@@ -41,6 +42,52 @@ class GroupCollection extends Mongo.Collection {
     }
 
 }
+
+const groupApplySchema = new SimpleSchema({
+    familyId: {
+        type: String,
+        autoValue: function () {
+            console.log('autoValue familyId', this.userId)
+            console.log('autoValue familyId', this.userId)
+            return this.userId
+        }
+    },
+    adults: {
+        label: 'Adults',
+        type: String,
+        allowedValues: ['yes', 'no', 'preferred'],
+        autoform: {
+            firstOption: false,
+            capitalize: true,
+        }
+    },
+    gender: {
+        label: 'Gender Pref',
+        type: String,
+        allowedValues: ['any', 'only female', 'only male', 'pref female', 'pref male'],
+        autoform: {
+            firstOption: false,
+            capitalize: true,
+        }
+    },
+    minimum: {
+        label: 'Minimum number of guests you can welcome',
+        type: Number,
+        min: 1,
+    },
+    maximum: {
+        label: 'Maximum number of guests you can welcome',
+        type: Number,
+        min: 1,
+        custom: function () {
+            if (this.value < this.field('minimum').value) {
+                return "maximumMismatch";
+            }
+        }
+    }
+})
+
+
 const schemaObject = {
     id: {
         type: String,
@@ -275,15 +322,29 @@ const schemaObject = {
             }
         },
     },
+    familiesApplying: {
+        label: 'Are you happy to welcome',
+        type: Array,
+        optional: true,
+    },
+    "familiesApplying.$": {
+        type: groupApplySchema,
+        optional: true,
+    }
 }
 const groupNewSchema = new SimpleSchema(_.pick(schemaObject, 'id', 'name'))
 const groupEditNewSchema = new SimpleSchema(_.omit(schemaObject, 'id', 'name'))
 
 
+groupApplySchema.messages({
+    maximumMismatch: "[label] has to be more or equal than minimun"
+})
+
 export const Groups = new GroupCollection('groups');
 Groups.schemas = {
     new: groupNewSchema,
     edit: groupEditNewSchema,
+    apply: groupApplySchema,
 }
 
 
@@ -319,7 +380,33 @@ Groups.allow({
     update: () => false,
     remove: () => false,
 })
-
+const operators = [  // Optional Array works for option filter
+    {
+        label: 'Equal',
+        shortLabel: '=',
+        operator: '$eq',
+    },
+    {
+        label: 'More than',
+        shortLabel: '>',
+        operator: '$gt',
+    },
+    {
+        label: 'Less than',
+        shortLabel: '<',
+        operator: '$lt',
+    },
+    {
+        label: 'More or equal than',
+        shortLabel: '≥',
+        operator: '$gte',
+    },
+    {
+        label: 'Less or equal than',
+        shortLabel: '≤',
+        operator: '$lte',
+    }
+]
 const columns = [
     {
         key: 'id',
@@ -327,6 +414,7 @@ const columns = [
     },
     {
         key: 'name',
+        label: 'Group Name',
         operator: '$regex',
     },
     {
@@ -337,323 +425,75 @@ const columns = [
         key: 'dates.1',
         label: 'From',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators,
+        render: function (val) {
+            const m = moment(val)
+            if (!m.isValid()) return val
+            return m.format('Do MMM YYYY')
+        },
 
     },
     {
         key: 'dates.2',
         label: 'To',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators,
+        render: function (val) {
+            const m = moment(val)
+            if (!m.isValid()) return val
+            return m.format('Do MMM YYYY')
+        },
+
 
     },
     {
         key: 'nights',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'ages',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'city',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'location',
+        label: 'Study Location',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'students',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'adults',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators
 
     },
     {
         key: 'guests',
+        label: 'Available Guests',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
+        operators,
 
     },
     {
         key: 'placed',
         operator: '$eq',
-        operators: [  // Optional Array works for option filter
-            {
-                label: 'Equal',
-                shortLabel: '=',
-                operator: '$eq',
-            },
-            {
-                label: 'More than',
-                shortLabel: '>',
-                operator: '$gt',
-            },
-            {
-                label: 'Less than',
-                shortLabel: '<',
-                operator: '$lt',
-            },
-            {
-                label: 'More or equal than',
-                shortLabel: '≥',
-                operator: '$gte',
-            },
-            {
-                label: 'Less or equal than',
-                shortLabel: '≤',
-                operator: '$lte',
-            }
-        ],
-
+        operators
     },
 
 ]
@@ -731,6 +571,16 @@ let groupFilterSchema = new SimpleSchema({
 
 })
 
+const columnsKeys = function (keys) {
+    const res = []
+    for (const column of columns) {
+        if (_.indexOf(keys, column.key) >= 0)
+            res.push(column)
+
+    }
+    return res
+}
+
 Groups.autoTableStaff = new AutoTable(
     {
         id: 'groupStaff',
@@ -743,6 +593,9 @@ Groups.autoTableStaff = new AutoTable(
                 columnsDisplay: true,
                 showing: true,
                 filters: true,
+            },
+            klass: {
+                tableWrapper: ''
             }
         },
         link: function (row) {
@@ -750,42 +603,88 @@ Groups.autoTableStaff = new AutoTable(
         }
     }
 )
-
+const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.1', 'dates.2', 'nights', 'ages', 'city', 'location', 'guests'])
+columnsFamilyAvailable.push({
+    key: 'action',
+    label: 'Action',
+    render: () => '<button class="btn btn-default btn-xs applyGroup  pull-right">Apply <i class="fa fa-hand-o-down"></i></button>'
+})
 Groups.autoTableFamilyAvailable = new AutoTable(
     {
-        id: 'groupFamily',
+        id: 'groupFamilyAvailable',
         collection: Groups,
-        columns,
+        columns: columnsFamilyAvailable,
         schema: groupFilterSchema,
+        publishExtraFields: ['familiesApplying'],
         settings: {
             options: {
-                columnsSort: true,
-                columnsDisplay: true,
+                columnsSort: false,
+                columnsDisplay: false,
                 showing: true,
-                filters: true,
+                filters: false,
+            },
+            msg:{
+                noRecordsCriteria: 'There are not any groups available at this time',
+            },
+            klass: {
+                tableWrapper: ''
             }
-        }
+        },
+
     }
 )
 
+const columnsFamilyApplied = columnsKeys(['id', 'name', 'nationality', 'dates.1', 'dates.2', 'nights', 'ages', 'city', 'location', 'guests'])
+const capitalize = function (str) {
+    if (typeof str == 'string')
+        return str.charAt(0).toUpperCase() + str.slice(1);
+}
+columnsFamilyApplied.push({
+    key: 'groupApply.gender',
+    label: 'Gender Pref',
+    render: function (val, path) {
+        console.log('columnsFamilyApplied', val, path, this)
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        return capitalize(groupApply.gender)
+    }
 
-Groups.aautoTableFamilyApplied = new AutoTable(
+})
+columnsFamilyApplied.push({
+    key: 'groupApply.adults',
+    label: 'Adults',
+    render: function (val, path) {
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        return capitalize(groupApply.adults)
+    }
+})
+columnsFamilyApplied.push({
+    key: 'action',
+    label: 'Action',
+    render: () => '<button class="btn btn-default btn-xs applyGroup pull-right">Update <i class="fa fa-pencil"></i></button>'
+})
+Groups.autoTableFamilyApplied = new AutoTable(
     {
-        id: 'groupFamily',
+        id: 'groupFamilyApplied',
         collection: Groups,
-        columns,
+        columns: columnsFamilyApplied,
         schema: groupFilterSchema,
+        publishExtraFields: ['familiesApplying'],
         settings: {
             options: {
-                columnsSort: true,
-                columnsDisplay: true,
+                columnsSort: false,
+                columnsDisplay: false,
                 showing: true,
-                filters: true,
+                filters: false,
+            },
+            msg:{
+                noRecordsCriteria: 'You haven\'t apply for any groups yet',
+            },
+            klass: {
+                tableWrapper: ''
             }
         }
     }
 )
-
 
 
 /*

@@ -15,7 +15,9 @@ BootstrapModalPrompt = function () {
     exports.prompt = function (options, callback) {
         options = _.extend({
             title: 'Confirmation',
+
             content: '',
+            content1: '',
             template: null,
             templateData: {},
             dialogTemplate: Template.bsModalPrompt,
@@ -66,6 +68,7 @@ BootstrapModalPrompt = function () {
         var dialogData = _.extend({
             title: options.title,
             content: options.content,
+            content1: options.content1,
             btnDismissText: options.btnDismissText,
             btnOkText: options.btnOkText,
             btnDismissTextClass: options.btnDismissTextClass,
@@ -101,7 +104,7 @@ BootstrapModalPrompt = function () {
             Blaze.renderWithData(
                 options.template,
                 options.templateData,
-                modal.find('.modal-body').get(0)
+                modal.find('.modal-body-middle').get(0)
             );
         }
 
@@ -111,26 +114,29 @@ BootstrapModalPrompt = function () {
             Blaze.renderWithData(
                 Template.quickForm,
                 options.autoform,
-                modal.find('.modal-body').get(0)
+                modal.find('.modal-body-middle').get(0)
             );
 
 
             // Handle form submit.
             // Note the important second parameter true for replacing hooks.
-            console.log('tiene que entrar',options.autoform.id);
-            AutoForm.addHooks(options.autoform.id, {
 
+            AutoForm.addHooks(options.autoform.id, {
+                onSubmit: function(doc) {
+                    this.done(null, doc);
+                    return false
+                },
                 onError: function (formType, result) {
                     console.log('onError formType, result', formType, result)
                 },
                 onSuccess: function (formType, result) {
-                    console.log('onSuccess formType, result', formType, result);
+                    console.log('onSuccess formType, result this.currentDoc', formType, result,this);
                     if (formType == 'normal') {
-                        onConfirm(this.currentDoc)
+                        onConfirm(result)
                     } else {
                         onConfirm(result)
                     }
-                    return true
+                    return false
                 },
             },true)
         }
@@ -200,14 +206,18 @@ BootstrapModalPrompt = function () {
         }
         $("[data-toggle='tooltip']").tooltip('hide');
         modal.modal('show');
+        return modal
     };
 
     // Dismisses current modal if open
     exports.hide = function () {
         var modal = $('.bs-modal-prompt .modal');
+        console.log('hide',modal)
         modal.modal('hide');
-        AutoForm.resetForm(options.autoform.id);
-        $('.bs-modal-prompt').remove();
+        modal.on('hidden.bs.modal',()=>{
+            console.log('bs-modal-prompt')
+            $('.bs-modal-prompt').remove();
+        })
     };
 
     return exports;

@@ -28,12 +28,24 @@ Meteor.methods({
         return Groups.update(groupId, modifier)
 
     },
-    groupApply: function (groupId) {
-        this.unblock()
+    groupCancelApply:function(groupId){
         check(groupId, String)
-        if (!Roles.userIsInRole('family')) {
+        if (!Roles.userIsInRole(this.userId, 'family')) {
             throw new Meteor.Error(403, 'Access denied!', 'Only families can apply to groups')
         }
-        return Groups.update(groupId, {$addToSet: {appliedFamilies: this.userId}}, {filter: false})
+        Groups.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: this.userId}}}}, {filter: false})
+    },
+    groupApply: function (groupId, data) {
+
+        data.familyId = this.userId
+        check(data, Groups.schemas.apply)
+        this.unblock()
+        check(groupId, String)
+        if (!Roles.userIsInRole(this.userId, 'family')) {
+            throw new Meteor.Error(403, 'Access denied!', 'Only families can apply to groups')
+        }
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        Groups.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: this.userId}}}}, {filter: false})
+        return Groups.update(groupId, {$addToSet: {familiesApplying: data}}, {filter: false})
     }
 })
