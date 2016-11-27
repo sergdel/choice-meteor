@@ -48,9 +48,9 @@ Template.familyEdit.helpers({
     familyStatusOptions: () => {
         if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
             const family = Meteor.users.findOne(FlowRouter.getParam("familyId"));
-            const currentStatus = (family && family.office && family.office.familyStatus );
+            let currentStatus = (family && family.office && family.office.familyStatus );
             if (currentStatus === undefined)
-                return [{label: "Loading", value: 0}];
+                currentStatus =0
             return function () {
                 const filtered = _.filter(familyStatus, function (val) {
                     return _.indexOf(familyStatus[currentStatus].map, val.id) >= 0

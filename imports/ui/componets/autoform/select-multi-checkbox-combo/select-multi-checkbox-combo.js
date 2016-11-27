@@ -2,7 +2,6 @@ import './select-multi-checkbox-combo.css'
 import './select-multi-checkbox-combo.html'
 AutoForm.addInputType("select-multi-checkbox-combo", {
     template: "afSelectMultiCheckboxCombo",
-    valueIsArray: true,
     valueConverters: {
         "numberArray": function (val) {
             if (typeof val === "string") {
@@ -59,6 +58,7 @@ Template.afSelectMultiCheckboxCombo.helpers({
         return AutoForm.getFormSchema().schema(this.name).label
     },
     selected: function () {
+        console.log('Template.afSelectMultiCheckboxCombo.helpers selected',this.value)
         return !!( Array.isArray(this.value) && this.value.length > 0)
     },
     atts: function selectedAttsAdjust() {

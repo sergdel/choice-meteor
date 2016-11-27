@@ -109,6 +109,9 @@ AccountsTemplates.configureRoute('resendVerificationEmail', {
 AccountsTemplates.configure({
 
     texts: {
+        errors: {
+            loginForbidden: "Wrong email or password",
+        },
         termsPreamble: "",
         termsPrivacy: "",
         termsAnd: "",

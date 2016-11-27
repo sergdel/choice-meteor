@@ -45,7 +45,6 @@ Migrations.add({
 })
 
 
-
 Migrations.add({
     version: 3,
     name: 'Update blue card  Reword "Applying" to "Sent" ',
@@ -68,6 +67,28 @@ Migrations.add({
         Meteor.users.find({"roles": "family"}).forEach((family) => {
             Families.update(family._id, {$set: {version: 4}})
         })
+        return true
+    },
+
+
+})
+
+Migrations.add({
+    version: 6,
+    name: 'Update blue card status" ',
+    up: function () {//code to migrate up to version 1}
+        Meteor.users.update({
+            "roles":"family",
+            "parents.blueCard.expiryDate": {$gte: new Date()},
+            "parents.blueCard.number": {"$type": 2, "$ne": ""},
+
+        }, {$set: {"parents.blueCard.status": 'approved'}}, {multi: true})
+        Meteor.users.update({
+            "roles":"family",
+            "$or": [{"office.familySubStatus": ""},
+                {"office.familySubStatus": {"$not": {"$type": 2}}}]
+        }, {$set: {"office.familySubStatus": 'active'}}, {multi: true})
+
         return true
     },
 
