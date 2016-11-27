@@ -79,6 +79,11 @@ const redirect = function () {
 }
 
 
+
+const redirectToSignIn = function () {
+        FlowRouter.go('/sign-in')
+}
+
 AccountsTemplates.configureRoute('signIn', {
     redirect: redirect
 })
@@ -87,22 +92,22 @@ AccountsTemplates.configureRoute('signIn', {
     })
  **/
 AccountsTemplates.configureRoute('changePwd', {
-    redirect: redirect
+    redirect: redirectToSignIn
 })
 AccountsTemplates.configureRoute('enrollAccount', {
     redirect: redirect
 })
 AccountsTemplates.configureRoute('forgotPwd', {
-    redirect: redirect
+    redirect: redirectToSignIn
 })
 AccountsTemplates.configureRoute('resetPwd', {
-    redirect: redirect
+    redirect: redirectToSignIn
 })
 AccountsTemplates.configureRoute('verifyEmail', {
-    redirect: redirect
+    redirect: redirectToSignIn
 })
 AccountsTemplates.configureRoute('resendVerificationEmail', {
-    redirect: redirect
+    redirect: redirectToSignIn
 })
 
 

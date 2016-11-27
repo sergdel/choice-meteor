@@ -4,93 +4,41 @@
 import {blueCards} from './aproved-blue-card'
 import {_} from 'lodash'
 import {BlueCard} from '/imports/api/blue-card/blue-card'
+import {Meteor} from 'meteor/meteor'
+import {Migrations} from 'meteor/percolate:migrations'
 Migrations.config({
     log: true
 });
 
 
 Meteor.startup(() => {
-
-    Migrations.migrateTo(2)
+    Migrations.migrateTo('latest');
 })
-
 Migrations.add({
     version: 1,
-    name: 'Remove empty second parent',
-    up: function () {//code to migrate up to version 1}
-        // This is how to get access to the raw MongoDB node collection that the Meteor server collection wraps
-        const batch = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-
-        //Mongo throws an error if we execute a batch operation without actual operations, e.g. when Lists was empty.
-        let hasUpdates = false;
-        const users = Meteor.users.find({
-            roles: 'family',
-            "parents.1.mobilePhone": {$exists: false},
-            "parents.1.blueCardNumber": {$exists: false},
-            "parents.1.firstName": {$exists: false}
-        })
-        users.forEach(family => {
-            // We have to use pure MongoDB syntax here, thus the `{_id: X}`
-            batch.find({_id: family._id}).updateOne({$set: {parentsCount: 1}, $unset: {"parents.1": ""}});
-            hasUpdates = true;
-        });
-        if (hasUpdates) {
-            // We need to wrap the async function to get a synchronous API that migrations expects
-            const execute = Meteor.wrapAsync(batch.execute, batch);
-            return execute();
-        }
-
-        return true;
-    }
-})
-
-
-Migrations.add({
-    version: 3,
-    name: 'Update blue card  Reword "Applying" to "Sent" ',
-    up: function () {//code to migrate up to version 1}
-        Meteor.users.update({"parents.blueCard.status": 'applying'}, {$set: {"parents.blueCard.status": 'sent'}}, {multi: true})
-        Meteor.users.update({"children.blueCard.status": 'applying'}, {$set: {"children.blueCard.status": 'sent'}}, {multi: true})
-        Meteor.users.update({"guests.blueCard.status": 'applying'}, {$set: {"guests.blueCard.status": 'sent'}}, {multi: true})
-        BlueCard.update({status: "applying"}, {$set: {status: "sent"}}, {multi: true})
-        return true
-    },
-
-
-})
-
-
-Migrations.add({
-    version: 5,
-    name: 'Update blue card status" ',
-    up: function () {//code to migrate up to version 1}
-        Meteor.users.find({"roles": "family"}).forEach((family) => {
-            Families.update(family._id, {$set: {version: 4}})
-        })
-        return true
-    },
-
-
-})
-
-Migrations.add({
-    version: 6,
     name: 'Update blue card status" ',
     up: function () {//code to migrate up to version 1}
         Meteor.users.update({
-            "roles":"family",
-            "parents.blueCard.expiryDate": {$gte: new Date()},
-            "parents.blueCard.number": {"$type": 2, "$ne": ""},
-
-        }, {$set: {"parents.blueCard.status": 'approved'}}, {multi: true})
-        Meteor.users.update({
-            "roles":"family",
+            "roles": "family",
             "$or": [{"office.familySubStatus": ""},
                 {"office.familySubStatus": {"$not": {"$type": 2}}}]
         }, {$set: {"office.familySubStatus": 'active'}}, {multi: true})
+        console.log('migrating', Meteor.users.update({
+            "roles": "family",
+            "parents.0.blueCard.expiryDate": {$gte: new Date()},
+            "parents.0.blueCard.number": {"$type": 2, "$ne": ""},
+        }, {$set: {"parents.0.blueCard.status": 'approved'}}, {multi: true}))
+
+        console.log('migrating', Meteor.users.update({
+            "roles": "family",
+            "parents.1.blueCard.expiryDate": {$gte: new Date()},
+            "parents.1.blueCard.number": {"$type": 2, "$ne": ""},
+        }, {$set: {"parents.1.blueCard.status": 'approved'}}, {multi: true}))
+
 
         return true
     },
-
-
 })
+
+
+

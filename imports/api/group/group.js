@@ -692,7 +692,7 @@ columnsFamilyApplied.push({
 })
 columnsFamilyApplied.push({
     key: 'groupApply.adults',
-    label: 'Adults',
+    label: 'Guest Pref',
     render: function (val, path) {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
         return capitalize(groupApply.adults)
