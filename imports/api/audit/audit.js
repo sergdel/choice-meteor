@@ -14,7 +14,6 @@ class AuditCollection extends Mongo.Collection {
         let res
         const user = Meteor.users.findOne(userId)
         const name = user.firstName
-        console.log('user auidr',user)
         const role = user.roles.pop()
         if (type == 'update') {
             let result = diff.getDiff(oldDoc, newDoc)

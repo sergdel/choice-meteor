@@ -69,7 +69,6 @@ AccountsTemplates.configure({
 
 
 const redirect = function () {
-    console.log('AccountsTemplates.configureRoute', Meteor.userId(), Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']))
     if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
         FlowRouter.go('familyList')
     } else {

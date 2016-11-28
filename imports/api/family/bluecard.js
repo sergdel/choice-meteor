@@ -8,7 +8,7 @@ export const blueCardSchema = new SimpleSchema({
         type: String,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                "formgroup-class": 'col-sm-6',
             },
             afFieldInput: {
                 class: 'form-control'
@@ -20,7 +20,7 @@ export const blueCardSchema = new SimpleSchema({
         type: Date,
         autoform: {
             afFormGroup: {
-                "formgroup-class": 'col-sm-3',
+                "formgroup-class": 'col-sm-6',
             },
             afFieldInput: {
                 class: 'form-control'
@@ -74,7 +74,7 @@ export const blueCardSchema = new SimpleSchema({
                 class: 'form-control'
             },
             afFormGroup: {
-                "formgroup-class": 'col-sm-3'
+                "formgroup-class": 'col-sm-6'
             }
         }
     },
@@ -92,7 +92,7 @@ export const blueCardSchema = new SimpleSchema({
                 class: 'form-control'
             },
             afFormGroup: {
-                "formgroup-class": 'col-sm-3'
+                "formgroup-class": 'col-sm-6'
             }
         }
     }

@@ -76,7 +76,6 @@ export const loggedRoutes = FlowRouter.group({
         var route;
         Tracker.autorun(function () {
             if (!Meteor.userId() && Session.get('loggedRoute')) {
-                console.log('loggedRoute');
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
                 return FlowRouter.go('/sign-in');
             }
@@ -104,7 +103,6 @@ export const familyRoleRoutes = loggedRoutes.group({
         Session.set('familyRoute', true);
         Tracker.autorun(function () {
             if (!Meteor.userId() && Session.get('familyRoute')) {
-                console.log('familyRoute');
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
                 return FlowRouter.go('forbidden');
             }
@@ -120,7 +118,6 @@ export const adminRoleRoutes = loggedRoutes.group({
         Session.set('adminRoute', true);
         Tracker.autorun(function () {
             if (!Roles.userIsInRole(Meteor.userId(), 'admin') && Session.get('adminRoute')) {
-                console.log('adminRoute');
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
                 return FlowRouter.go('forbidden');
             }
@@ -244,14 +241,12 @@ groupRoutes.route('/list/:limit?', {
     name: 'groupList',
     title: 'Groups',
     action(params, queryParams) {
-        console.log('groupList')
         BlazeLayout.render('layout', {yield: 'groupList'})
     }
 });
 groupRoutes.route('/edit/:groupId/:limit?', {
     name: 'groupEdit',
     action(params, queryParams) {
-        console.log('groupEdit')
         BlazeLayout.render('layout', {yield: 'groupEdit'})
     }
 })
@@ -306,7 +301,6 @@ auditRoutes.route('/list', {
 
 FlowRouter.notFound = {
     action: function () {
-        console.log('notFound')
         BlazeLayout.render('layout', {yield: 'notFound'})
     }
 };
@@ -314,7 +308,6 @@ FlowRouter.notFound = {
 publicRoutes.route('/forbidden', {
     name: 'forbidden',
     action(params, queryParams) {
-        console.log('render forbidden');
         BlazeLayout.render('forbidden')
     }
 });

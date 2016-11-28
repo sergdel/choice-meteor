@@ -35,9 +35,7 @@ AutoForm.addHooks('campaignForm', {
         }
     },
     after: {
-        // Replace `formType` with the form `type` attribute to which this hook applies
         method: function (error, result) {
-            console.log('after')
 
         }
     },

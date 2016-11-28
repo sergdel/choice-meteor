@@ -13,7 +13,6 @@ Meteor.methods({
         const res = EmailTemplates.update(id, modifier)
         if (res) {
             if (!_.contains(["enrollAccount", "resetPassword", "verifyEmail", "resetPassword"], id)) return res
-            console.log('modifyEmailTemplates')
             const emailTemplate = EmailTemplates.findOne(id)
             modifyEmailTemplates(emailTemplate)
         }
@@ -139,9 +138,7 @@ Meteor.methods({
                 html: i +'lskdlka smdklasmldkmsal <a>cesar</a>kdmaslkdmlsakmdlaskmdlkasmdlskamdlksm lk aslask dlkasdlksadlkas',
             };
             Email.send(options);
-            console.log(new Date().getTime()-t)
         }
-        console.log('total', new Date().getTime()-t)
     }
 })
 

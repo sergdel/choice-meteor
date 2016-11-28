@@ -42,7 +42,6 @@ Template.familyList.events({
             btnOkText: 'Save'
         }, function (data) {
             if (data) {
-                console.log(data)
                 FlowRouter.go('familyEdit', {familyId: data})
             }
             else {

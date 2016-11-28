@@ -12,6 +12,7 @@ const custom = function () {
 
 class GroupCollection extends Mongo.Collection {
     insert(group, callback) {
+        group.requirements = ["Share time and talk with guests each day", "Provide three quality meals and snacks each day", "Provide drop-off and pick-up to & from school each day", "Provide each guest with an individual comfortable bed (no bunks)", "Don't have other student of the same nationality in the home during their visit"]
         return super.insert(group, callback);
     }
 
@@ -33,12 +34,11 @@ class GroupCollection extends Mongo.Collection {
             const date1 = moment(group.dates[1])
             modifier.$set.nights = date1.diff(date0, 'days')
         }
-        /*
-         if (group.adults || group.students) {
-         group.adults = group.adults || 0
-         group.students = group.students || 0
-         modifier.$set.guests = group.students + group.adults
-         }*/
+        if (group.adults || group.students) {
+            group.adults = group.adults || 0
+            group.students = group.students || 0
+            modifier.$set.availablePlacements = group.students + group.adults
+        }
         return super.update(_id, modifier, callback);
     }
 
@@ -91,6 +91,7 @@ const groupApplySchema = new SimpleSchema({
 
 const schemaObject = {
     id: {
+        label: 'ID',
         type: String,
         autoform: {
             afFormGroup: {
@@ -178,7 +179,8 @@ const schemaObject = {
             }
         }
     },
-    guests: {
+    adults: {
+        label: 'Adults',
         min: 0,
         type: Number,
         autoform: {
@@ -200,10 +202,12 @@ const schemaObject = {
      }
      },*/
     guestsFrom: {
+        label: 'From guests/home',
         type: Number,
         min: 1,
     },
     guestsTo: {
+        label: 'To guests/home',
         type: Number,
         min: 1,
         custom: function () {
@@ -257,6 +261,7 @@ const schemaObject = {
     },
     notes: {
         type: String,
+        optional: true,
         autoform: {
             rows: 4,
             afFormGroup: {
@@ -309,9 +314,6 @@ const schemaObject = {
                     label: "Don't have other student of the same nationality in the home during their visit",
                     value: "Don't have other student of the same nationality in the home during their visit"
                 }],
-            afFormGroup: {
-                //"formgroup-class": 'col-sm-6',
-            }
         },
     },
     other: {
@@ -324,6 +326,7 @@ const schemaObject = {
                 //"formgroup-class": 'col-sm-6',
             }
         },
+
     },
     familiesApplying: {
         label: 'Are you happy to welcome',
@@ -335,7 +338,13 @@ const schemaObject = {
         optional: true,
     }
 }
-const groupNewSchema = new SimpleSchema(_.pick(schemaObject, 'id', 'name'))
+
+const newObj=(_.pick(schemaObject, 'id','name'))
+newObj.requirements={
+    optional: true,
+    type: [String]
+}
+const groupNewSchema = new SimpleSchema(newObj)
 const groupEditNewSchema = new SimpleSchema(_.omit(schemaObject, 'id', 'name'))
 
 groupEditNewSchema.messages({
@@ -369,7 +378,7 @@ Groups.fields = {
         city: true,
         location: true,
         students: true,
-        guests: true,
+        adults: true,
         guestsFrom: true,
         guestsTo: true,
     }
@@ -484,22 +493,22 @@ const columns = [
 
     },
     {
-        key: 'guests',
-        label: 'Guests',
+        key: 'adults',
+        label: 'Adults',
         operator: '$eq',
         operators
 
     },
     {
         key: 'guestsFrom',
-        label: 'Guests from',
+        label: 'From guests/home',
         operator: '$eq',
         operators,
 
     },
     {
         key: 'guestsTo',
-        label: 'Guests to',
+        label: 'To guests/home',
         operator: '$eq',
         operators,
 
@@ -552,7 +561,7 @@ let groupFilterSchema = new SimpleSchema({
         type: Number,
         optional: true,
     },
-    guests: {
+    adults: {
         type: Number,
         optional: true,
 
@@ -628,7 +637,6 @@ columnsFamilyAvailable.push({
     key: 'guest.home',
     label: 'Guest/home',
     render: function () {
-        console.log('columnsFamilyAvailable render', this)
         if (this.guestsTo == this.guestsFrom) {
             return this.guestsTo
         }
@@ -658,7 +666,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                 noRecordsCriteria: 'There are not any groups available at this time',
             },
             klass: {
-                tableWrapper: ''
+                //   tableWrapper: ''
             }
         },
 
@@ -674,7 +682,6 @@ columnsFamilyApplied.push({
     key: 'guest.home',
     label: 'Guest/home',
     render: function () {
-        console.log('columnsFamilyAvailable render', this)
         if (this.guestsTo == this.guestsFrom) {
             return this.guestsTo
         }
@@ -682,7 +689,7 @@ columnsFamilyApplied.push({
     }
 })
 columnsFamilyApplied.push({
-    key: 'groupApply.gender',
+    key: 'groupApplied.gender',
     label: 'Gender Pref',
     render: function (val, path) {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
@@ -691,11 +698,11 @@ columnsFamilyApplied.push({
 
 })
 columnsFamilyApplied.push({
-    key: 'groupApply.adults',
+    key: 'groupApplied.guests',
     label: 'Guest Pref',
     render: function (val, path) {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
-        return capitalize(groupApply.adults)
+        return capitalize(groupApply.guests)
     }
 })
 columnsFamilyApplied.push({
@@ -703,7 +710,6 @@ columnsFamilyApplied.push({
     label: 'Welcome guests',
     render: function () {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
-        console.log('columnsFamilyApplied',groupApply)
         if (groupApply.minimum == groupApply.maximum) {
             return groupApply.minimum
         }
@@ -733,7 +739,7 @@ Groups.autoTableFamilyApplied = new AutoTable(
                 noRecordsCriteria: 'You haven\'t apply for any groups yet',
             },
             klass: {
-                tableWrapper: ''
+                //  tableWrapper: ''
             }
         }
     }

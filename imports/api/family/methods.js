@@ -39,12 +39,9 @@ Meteor.methods({
         }
         //check if is a validate schema
         if (Meteor.isServer) {
-            console.log('modifier1',modifier)
             familySchema.newContext("familyEdit").validate(modifier, {modifier: true});
             //clean the modifier to be as schema
-            console.log('modifier2',modifier)
             familySchema.clean(modifier, {isModifier: true});
-            console.log('modifier3',modifier)
             //if the modifier are setting parents checks the email
             if (modifier.$set && modifier.$set.parents) {
                 modifier.$set.parents.forEach(function (parent) {
@@ -66,7 +63,6 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-        console.log('modifier4',modifier)
         Families.update(familyId, modifier, {userId: this.userId})
 
 

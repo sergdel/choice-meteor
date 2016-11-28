@@ -26,9 +26,7 @@ Template.groupList.helpers({
 });
 Template.bsModalPrompt.events({
     'click .groupCancelApply'(e, instance){
-        console.log('groupCancelApply')
         Meteor.call('groupCancelApply', $(e.currentTarget).data('group-id'), function (err, res) {
-            console.log(err, res)
             BootstrapModalPrompt.hide()
         })
     },
@@ -36,7 +34,6 @@ Template.bsModalPrompt.events({
 Template.groupList.events({
 
     'click .applyGroup'(e, instance){
-        console.log('click .applyGroup', instance)
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
         const content =  (this.requirements || ' ') + (this.requirements && this.other ? ' <br>' : '') + (this.other || ' ')
         const cancelButton= groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="'+this._id+'">Cancel application <i class="fa fa-trash"></i></button>' : ''
@@ -57,9 +54,9 @@ Template.groupList.events({
             btnOkText: 'Save'
         }, (data) => {
             if (data) {
-                console.log('click applyGroup', this, data)
                 Meteor.call('groupApply', this._id, data, function (err, res) {
-                    console.log(err, res)
+                    if (err)
+                        console.err('groupApply',err)
                 })
             }
             else {
@@ -80,12 +77,13 @@ Template.groupList.events({
                 "meteormethod": "groupNew",
                 id: 'groupNew',
                 buttonContent: false,
+                omitFields: ['requirements']
+
             },
             btnDismissText: 'Cancel',
             btnOkText: 'Save'
         }, function (data) {
             if (data) {
-                console.log(data)
                 FlowRouter.go('groupEdit', {groupId: data})
             }
             else {

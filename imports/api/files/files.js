@@ -7,7 +7,6 @@ Files = new FilesCollection({
         if (file.size <= 10485760 && /png|jpg|jpeg|pdf/i.test(file.extension)) {
             return true;
         } else {
-            console.log('return false');
             return 'Please upload image, with size equal or less than 5 Mb !';
         }
     }

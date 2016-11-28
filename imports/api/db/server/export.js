@@ -10,14 +10,14 @@ const backupDB = function () {
     let command = `mongodump --db choicehomestay --collection users --out  ./assets/app/db_backups/${file}`;
     exec(command, function (error, stdout, stderr) {
         if (error) {
-            console.log('Error0: ', error);
+            console.error('Error0: ', error);
             future.return(false);
             return
         }
         command = `tar -cvf ./assets/app/db_backups/${file}.tar ./assets/app/db_backups/${file}/`;
         exec(command, function (error, stdout, stderr) {
             if (error) {
-                console.log('Error1: ', error);
+                console.error('Error1: ', error);
                 future.return(false);
                 return
             }
@@ -25,7 +25,7 @@ const backupDB = function () {
             fs = require('fs');
             fs.readFile(`./assets/app/db_backups/${file}.tar`, function (error, contents) {
                 if (error) {
-                    console.log('Error3: ', error);
+                    console.error('Error3: ', error);
                     future.return(false);
                     return
                 }
@@ -35,7 +35,7 @@ const backupDB = function () {
                         future.return(true);
                     })
                     .catch(function (error) {
-                        console.log('Error4: ', error);
+                        console.error('Error4: ', error);
                         future.return(false);
 
                     })

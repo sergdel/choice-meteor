@@ -5,7 +5,7 @@
 
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             {{#accordionPanel title="Parents" id="parents"}}
-                {{>afQuickField name="parents" minCount=1 initialCount=2 }}
+                {{>afQuickField name="parents" minCount=1 initialCount=2 omitFields=omitFields}}
                 {{>buttonSubmit new=new edit=edit}}
             {{/accordionPanel}}
 
@@ -34,12 +34,13 @@
                 </div>
             {{/accordionPanel}}
             {{#accordionPanel title="Children" id="children"}}
-                {{>afQuickField name="children" minCount=1 initialCount=2 }}
+                {{>afQuickField name="children" minCount=1 initialCount=2  omitFields=omitFields}}
                 {{>buttonSubmit new=new edit=edit}}
 
             {{/accordionPanel}}
             {{#accordionPanel title="Guests" id="guests"}}
-                {{>afQuickField name="guests" minCount=1 initialCount=1 }}
+                {{omitFields}}
+                {{>afQuickField name="guests" minCount=1 initialCount=1  omitFields=omitFields}}
                 {{>buttonSubmit new=new edit=edit}}
 
             {{/accordionPanel}}
@@ -63,15 +64,14 @@
                 {{>buttonSubmit new=new edit=edit}}
 
             {{/accordionPanel}}
-            {{#accordionPanel title="Photos" id="files"}}
-                {{>afQuickField name="files"}}
-                {{>buttonSubmit new=new edit=edit}}
 
-            {{/accordionPanel}}
+            {{#if isInRole 'admin,staff' }}
+                {{#accordionPanel title="Photos" id="files"}}
+                    {{>afQuickField name="files"}}
+                    {{>buttonSubmit new=new edit=edit}}
 
-
-
-
+                {{/accordionPanel}}
+            {{/if}}
 
 
         </div>

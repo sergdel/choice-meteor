@@ -41,7 +41,6 @@ Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
     selector = _.extend(selector, {roles: 'family'})
-    console.log(' Meteor.users.find', selector)
     return Meteor.users.find(selector, options)
 }
 Families.findOne = (_id, options) => {
@@ -54,7 +53,7 @@ Families.insert = function (email, options) {
     Audit.insert({type: 'create', docId: familyId, userId: options.userId})
     return familyId
 }
-Families.update = function (_id, modifier, options, callback) {
+Families.update = function (_id, modifier, options = {}, callback) {
     const oldDoc = Meteor.users.findOne(_id)
     const updated = Meteor.users.update(_id, modifier, options, callback)
     if (!updated) throw new Meteor.Error(404, 'Family not found', '_id: ' + _id)
@@ -65,13 +64,10 @@ Families.update = function (_id, modifier, options, callback) {
     let time = new Date().getTime()
 
     setBlueCardStatus(newDoc)
-    console.log(1, time - new Date().getTime())
-    insertBluecards(newDoc)
-    console.log(2, time - new Date().getTime())
+    insertBlueCards(newDoc)
     Meteor.users.update(_id, newDoc, options)
-    console.log(3, time - new Date().getTime())
-    Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
-    console.log(4, time - new Date().getTime())
+    if (options.userId)
+        Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
     return true
 }
 Families.upsert = function (_id, modifier, options, callback) {
@@ -261,15 +257,21 @@ export const setBlueCardStatus = function (family) {
     for (let type of ['parents', 'children', 'guests']) {
         if (Array.isArray(family[type])) {
             for (let i in family[type]) {
+                if (!(family && family[type] && family[type][i]))
+                    continue
                 family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
-                if ((family[type][i].blueCard.expiryDate && family[type][i].blueCard.expiryDate <= new Date()) || !family[type][i].blueCard.expiryDate) {
-                    family[type][i].blueCard.status = "expired"
-                }
-                if (!family[type][i].blueCard.number) {
+
+                if (!family[type][i].blueCard.expiryDate || !family[type][i].blueCard.number) {
                     family[type][i].blueCard.status = "apply"
                 }
                 if (family[type][i].birthOfDate && family[type][i].birthOfDate > moment().subtract(17.5, 'years')) {
                     family[type][i].blueCard.status = "n/a"
+                }
+                if ((family[type][i].blueCard.expiryDate && family[type][i].blueCard.expiryDate <= new Date())) {
+                    family[type][i].blueCard.status = "expired"
+                }
+                if (family[type][i].blueCard.expiryDate >= new Date() && family[type][i].blueCard.number) {
+                    family[type][i].blueCard.status = "approved"
                 }
                 // calc the minumin of status for set in generalstatus
                 const level = _.indexOf(map, family[type][i].blueCard.status)
@@ -282,14 +284,13 @@ export const setBlueCardStatus = function (family) {
     family.blueCardStatus = map[min]
     return family
 }
-
-
-export const insertBluecards = function (family) {
+export const insertBlueCards = function (family) {
     BlueCard.remove({familyId: family._id})
     for (let type of ['parents', 'children', 'guests']) {
         if (Array.isArray(family[type])) {
             for (let i in family[type]) {
-                const member = family[type]
+                const member = family[type][i]
+                if (!member) continue
                 let surname = member.surname
                 if (type == 'children') surname = family.parents && family.parents[0] && family.parents[0].surname
                 const blueCard = {

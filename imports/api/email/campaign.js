@@ -96,7 +96,6 @@ export const campaignAutoTable = new AutoTable({
         }
     },
     publish: function () {
-        console.log('publish ', this.userId, Roles.userIsInRole(this.userId, 'admin'))
         return Roles.userIsInRole(this.userId, 'admin')
     }
 

@@ -32,7 +32,7 @@ Template.familyEdit.onDestroyed(function () {
 Template.familyEdit.helpers({
     omitFields: () => {
         if (Roles.userIsInRole(Meteor.userId(), ['family'])) {
-            return ['adult.score','adult.status']
+            return ['adult.score', 'adult.status']
         }
         return []
     },
@@ -50,7 +50,7 @@ Template.familyEdit.helpers({
             const family = Meteor.users.findOne(FlowRouter.getParam("familyId"));
             let currentStatus = (family && family.office && family.office.familyStatus );
             if (currentStatus === undefined)
-                currentStatus =0
+                currentStatus = 0
             return function () {
                 const filtered = _.filter(familyStatus, function (val) {
                     return _.indexOf(familyStatus[currentStatus].map, val.id) >= 0
@@ -79,6 +79,7 @@ AutoForm.hooks({
         before: {
             "method-update": function (modifier) {
                 // if familyStatus is being changed
+                this.currentDoc.office = this.currentDoc.office || {}
                 if (modifier && modifier.$set && modifier.$set["office.familyStatus"] && this.currentDoc.office.familyStatus != modifier.$set["office.familyStatus"]) {
                     const newFamilyStatus = modifier.$set["office.familyStatus"];
                     const status = familyStatus[newFamilyStatus];

@@ -77,7 +77,6 @@ Template.emailTemplatesList.helpers({
 
 Template.emailTemplatesList.events({
     'click a.td'(e, instance){
-        console.log(this)
         instance.id.set(this._id)
     }
 });

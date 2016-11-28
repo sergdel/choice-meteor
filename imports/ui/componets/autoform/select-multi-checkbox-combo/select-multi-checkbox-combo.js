@@ -58,7 +58,6 @@ Template.afSelectMultiCheckboxCombo.helpers({
         return AutoForm.getFormSchema().schema(this.name).label
     },
     selected: function () {
-        console.log('Template.afSelectMultiCheckboxCombo.helpers selected',this.value)
         return !!( Array.isArray(this.value) && this.value.length > 0)
     },
     atts: function selectedAttsAdjust() {

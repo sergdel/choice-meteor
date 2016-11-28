@@ -5,7 +5,6 @@ import {Families} from '/imports/api/family/family'
 Meteor.methods({
     adultEdit(modifier, familyId){
         this.unblock()
-        console.log(modifier)
         if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         if (Roles.userIsInRole(this.userId, ['family'])) {
             if (familyId != this.userId)
