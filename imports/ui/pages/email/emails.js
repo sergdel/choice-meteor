@@ -7,11 +7,18 @@ import {Template} from 'meteor/templating'
 
 Template.emails.helpers({
     tabs: function () {
-        return [
-            {id: 'template', title: 'Templates', template:  'emailTemplatesList' },
-            {id: 'campaign', title: 'Campaign', template: 'emailsCampaign'},
-            {id: 'reports', title: 'Reports', template: 'emailsReports'}
-        ]
+        if (Roles.userIsInRole(Meteor.userId(),['admin'])){
+            return [
+                {id: 'template', title: 'Templates', template:  'emailTemplatesList' },
+                {id: 'campaign', title: 'Campaign', template: 'emailsCampaign'},
+                {id: 'reports', title: 'Reports', template: 'emailsReports'}
+            ]
+        }else{
+            return [
+                {id: 'reports', title: 'Reports', template: 'emailsReports'}
+            ]
+        }
+
     },
     template: () => {
 

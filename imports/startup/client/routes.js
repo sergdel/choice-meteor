@@ -324,7 +324,7 @@ familyRoutes.route('/adult/edit/:familyId', {
 /*** email templates ***/
 
 
-const emailTemplatesRoutes = adminRoleRoutes.group({
+const emailTemplatesRoutes = staffRoleRoutes.group({
     prefix: '/email'
 });
 

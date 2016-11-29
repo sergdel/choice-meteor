@@ -34,8 +34,12 @@
                             {{#if isInRole 'admin' }}
                                 <li><a href="{{pathFor 'staffList'}}">Staff</a></li>
                                 <li><a href="{{pathFor 'auditList'}}">Log</a></li>
+
+                            {{/if}}
+                            {{#if isInRole 'admin,staff' }}
                                 <li><a href="{{pathFor 'email'}}">Emails</a></li>
                             {{/if}}
+
                             {{#if isInRole 'family' }}
 
                                 <!--li><a href="{{pathFor 'userProfile' familyId=currentUser._id }}">Profile</a></li-->
