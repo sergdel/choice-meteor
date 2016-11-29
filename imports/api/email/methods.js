@@ -8,6 +8,10 @@ import {Families} from "/imports/api/family/family";
 import {check} from "meteor/check";
 
 Meteor.methods({
+    updateEmailsCampaignReportNote: function (emailId, notes) {
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update notes')
+        console.log(Email.update(emailId, {$set: {notes: notes}}))
+    },
     emailTemplateUpdate: function (modifier, id) {
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can update email templates')
         const res = EmailTemplates.update(id, modifier)
@@ -35,13 +39,13 @@ Meteor.methods({
             text,
             "h:Reply-To": doc.email
         };
-         Email.send(options);
-         if (doc.copy){
-             options.from='Choice Homestay <emailus@choicehomestay.com>'
-             options.to=doc.email
-             options.subject = 'Thank you for contacting Choice Homestay'
-             Email.send(options);
-         }
+        Email.send(options);
+        if (doc.copy) {
+            options.from = 'Choice Homestay <emailus@choicehomestay.com>'
+            options.to = doc.email
+            options.subject = 'Thank you for contacting Choice Homestay'
+            Email.send(options);
+        }
 
 
     },
@@ -89,6 +93,7 @@ Meteor.methods({
                     "parent1": user.parents && user.parents[0] && user.parents[0].firstName,
                     "parent2": user.parents && user.parents[1] && user.parents[1].firstName,
                     "surname": user.parents && user.parents[0] && user.parents[0].surname,
+                    "mobilePhone": user.parents && user.parents[0] && user.parents[0].mobilePhone,
                     'city': user.contact && user.contact.address && user.contact.address.city,
                     'suburb': user.contact && user.contact.address && user.contact.address.suburb,
                     'campaign': doc.name,
@@ -116,27 +121,6 @@ Meteor.methods({
         }
 
     },
-    testSendEmail:function () {
-        const t=new Date().getTime()
-        for (let i=0;i<=50;i++){
-            var options = {
-                to: 'cesar@imagenproactiva.com',
-                from: 'no-replay@choicehomestay.com',
-                subject: 'Probando ' + i,
-                "parent1": "parent1",
-                "parent2": "parent2",
-                "surname": "surname",
-                'city': 'city',
-                'suburb':'suburb',
-                'campaign':'campaign',
-                "loggedAt": "loggedAt",
-                "userId": "userId",
-                status: 'sent',
-                text: i +'lskdlkasmdklasmldkmsalkdmaslkdmlsakmdlaskmdlkasmdlskamdlksm lk aslask dlkasdlksadlkas',
-                html: i +'lskdlka smdklasmldkmsal <a>cesar</a>kdmaslkdmlsakmdlaskmdlkasmdlskamdlksm lk aslask dlkasdlksadlkas',
-            };
-            Email.send(options);
-        }
-    }
+
 })
 

@@ -19,10 +19,10 @@ export const officeSchema = new SimpleSchema({
         allowedValues: _.pluck(familyStatus, 'id'),
         type: Number,
         autoform: {
-            options:function () {
-              return _.map(familyStatus,(status)=>{
-                  return {label: status.label, value: status.id}
-              })
+            options: function () {
+                return _.map(familyStatus, (status) => {
+                    return {label: status.label, value: status.id}
+                })
             },
             firstOption: false,
             afFieldInput: {
@@ -36,7 +36,7 @@ export const officeSchema = new SimpleSchema({
 
     familySubStatus: {
         optional: true,
-        allowedValues: ["unreliable","active", "inactive"],
+        allowedValues: ["unreliable", "active", "inactive"],
         type: String,
         autoform: {
             options: "allowed",
@@ -58,7 +58,7 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
-                hints:hints,
+                hints: hints,
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-4',
@@ -75,7 +75,7 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
-                hints:hints,
+                hints: hints,
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-4',
@@ -91,8 +91,8 @@ export const officeSchema = new SimpleSchema({
         autoform: {
             type: 'raty',
             ratyOptions: {
-                hints:hints,
-                readOnly    : true
+                hints: hints,
+                readOnly: true
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-4',
@@ -102,9 +102,9 @@ export const officeSchema = new SimpleSchema({
     },
     tags: {
         optional: true,
-        type: [String],
+        type: String,
         autoform: {
-            type: "select2",
+            type: 'typeahead',
             afFieldInput: {
                 multiple: true,
                 select2Options: {placeholder: 'foo', tags: true, theme: "bootstrap"},

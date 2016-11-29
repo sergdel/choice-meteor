@@ -2,6 +2,16 @@
  * Created by cesar on 15/11/16.
  */
 Email = new Mongo.Collection('emails')
+Email.deny({
+    insert:()=>true,
+    update:()=>true,
+    remove:()=>true,
+})
+Email.allow({
+    insert:()=>false,
+    update:()=>false,
+    remove:()=>false,
+})
 Email.send = function (options) {
     options.sentAt = new Date()
     const emailId = Email.insert(options)

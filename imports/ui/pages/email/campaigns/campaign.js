@@ -1,6 +1,7 @@
 /**
  * Created by cesar on 18/11/16.
  */
+import './notes'
 import './campign.html'
 import {Template} from 'meteor/templating'
 import {campaignSchema} from '/imports/api/email/campaign'

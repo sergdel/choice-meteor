@@ -42,18 +42,24 @@ Migrations.add({
     },
 })
 
+
 Migrations.add({
     version: 3,
-    name: 'update bedrooms numberOfDesk to desk" ',
+    name: 'Update phone in emails reports" ',
     up: function () {//code to migrate up to version 1}
-         Meteor.users.update({
-            "roles": "family"
-        },{ $rename: { "bedrooms.numberOfDesk": "bedrooms.desk" } })
-        const cursor = Meteor.users.update({"bedrooms.desk": {$exists: true}},{$set: {"bedrooms.$.desk": true}})
-
+        let cursor
+        cursor = Email.find({})
+        cursor.forEach((email) => {
+            const family = Meteor.users.findOne(email.userId)
+            if (family)
+                Email.update(email._id, {$set: {mobilePhone: family.parents[0].mobilePhone}})
+            else
+                console.log('email.userId',email.userId)
+        })
         return true
     },
 })
+
 
 
 

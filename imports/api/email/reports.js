@@ -17,11 +17,24 @@ const reportFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
+    mobilePhone: {
+        type: String,
+        optional: true,
+    },
+
     to: {
         type: String,
         optional: true,
     },
     subject: {
+        type: String,
+        optional: true,
+    },
+    city: {
+        type: String,
+        optional: true,
+    },
+    suburb: {
         type: String,
         optional: true,
     },
@@ -61,6 +74,8 @@ const reportFilterSchema = new SimpleSchema({
         optional: true
     }
 })
+
+
 const operators = [
     {
         label: 'Equal',
@@ -92,7 +107,7 @@ export const reportsAutoTable = new AutoTable({
     id: 'reportAutoTable',
     collection: Email,
     schema: reportFilterSchema,
-    publishExtraFields: ['userId','html'],
+    publishExtraFields: ['userId', 'html'],
     settings: {
         options: {
             columnsSort: true,
@@ -102,11 +117,12 @@ export const reportsAutoTable = new AutoTable({
         }
     },
     columns: [
-        {key: 'parent1', label: 'Parent 1'},
-        {key: 'parent2', label: 'Parent 2'},
-        {key: 'surname', label: 'Surname'},
-        {key: 'city', label: 'City'},
-        {key: 'suburb', label: 'Suburb'},
+        {key: 'parent1', label: 'Parent 1', operator: '$regex'},
+        {key: 'parent2', label: 'Parent 2', operator: '$regex'},
+        {key: 'mobilePhone', label: 'Phone', operator: '$regex'},
+        {key: 'surname', label: 'Surname', operator: '$regex'},
+        {key: 'city', label: 'City', operator: '$regex'},
+        {key: 'suburb', label: 'Suburb', operator: '$regex'},
         {key: 'to', label: 'To', operator: '$regex'},
         {key: 'subject', label: 'Subject ', operator: '$regex'},
         {key: 'campaign', label: 'Campaign ', operator: '$regex'},
@@ -117,6 +133,10 @@ export const reportsAutoTable = new AutoTable({
         {
             key: 'loggedAt', label: 'Last login', operator: '$eq',
             operators
+        },
+        {
+            key: 'notes', label: 'Notes', operator: '$regex',
+            template: 'emailCampaignNotes'
         },
         {
             key: 'action', label: 'Action',
@@ -135,6 +155,7 @@ export const reportsAutoTable = new AutoTable({
                         return entityMap[s];
                     });
                 }
+
                 const btn1 = '<a  data-toggle="modal" data-target="#body" class="btn btn-xs btn-default" role="button"  data-content="' + escapeHtml(this.html) + '"><i class="fa fa-envelope"></i></a>'
                 const btn2 = '<a target="_blank"  href="' + FlowRouter.path('familyEdit', {familyId: this.userId}) + '" class="btn btn-xs btn-default"><i class="fa fa-external-link"></i></a>'
                 return btn1 + btn2
@@ -143,8 +164,9 @@ export const reportsAutoTable = new AutoTable({
         },
 
     ],
-    link: function(doc,key){
-        return  FlowRouter.path('familyEdit', {familyId: doc.userId})
+    link: function (doc, key) {
+        if (key != 'notes')
+            return FlowRouter.path('familyEdit', {familyId: doc.userId})
     }
 
 })

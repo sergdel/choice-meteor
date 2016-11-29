@@ -56,6 +56,9 @@ Families.insert = function (email, options) {
 }
 Families.update = function (_id, modifier, options = {}, callback) {
     const oldDoc = Meteor.users.findOne(_id)
+
+
+
     const updated = Meteor.users.update(_id, modifier, options, callback)
     if (!updated) throw new Meteor.Error(404, 'Family not found', '_id: ' + _id)
     const newDoc = Meteor.users.findOne(_id)
@@ -67,6 +70,16 @@ Families.update = function (_id, modifier, options = {}, callback) {
     setBlueCardStatus(newDoc)
     insertBlueCards(newDoc)
     Meteor.users.update(_id, newDoc, options)
+    //todo hacer esto con joins probablemente con un helper https://guide.meteor.com/collections.html#collection-helpers
+    //una  moificacion al autotable donde permita custom publish
+    // y
+    Email.update({userId: _id},{$set:{
+        mobilePhone: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].mobilePhone,
+        parent1: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].firstName,
+        paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[0].firstName,
+        surname: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].surname
+    }},{multi:true})
+
     if (options.userId)
         Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
     return true
