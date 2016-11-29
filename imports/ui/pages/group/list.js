@@ -1,9 +1,9 @@
-import "./table.html"
 import "./list.html"
 import {Template} from "meteor/templating"
 import {FlowRouter} from "meteor/kadira:flow-router"
 import {Groups} from "/imports/api/group/group"
 import {moment} from 'meteor/momentjs:moment'
+import {Families} from '/imports/api/family/family'
 
 Template.groupList.onCreated(function () {
 
@@ -21,12 +21,23 @@ Template.groupList.helpers({
     autoTableStaff: Groups.autoTableStaff,
     autoTableFamilyAvailable: Groups.autoTableFamilyAvailable,
     autoTableFamilyApplied: Groups.autoTableFamilyApplied,
-    customQueryAvailable: {"familiesApplying.familyId": {$ne: Meteor.userId()}},
-    customQueryApplied: {"familiesApplying.familyId": {$eq: Meteor.userId()}},
+    customQueryAvailable: function () {
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
+            return {"familiesApplying.familyId": {$ne: FlowRouter.getParam('familyId')}}
+        else
+            return {"familiesApplying.familyId": {$ne: Meteor.userId()}}
+    },
+    customQueryApplied: function () {
+
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
+            return {"familiesApplying.familyId": {$eq: FlowRouter.getParam('familyId')}}
+        else
+            return {"familiesApplying.familyId": {$eq: Meteor.userId()}}
+    },
 });
 Template.bsModalPrompt.events({
     'click .groupCancelApply'(e, instance){
-        Meteor.call('groupCancelApply', $(e.currentTarget).data('group-id'), function (err, res) {
+        Meteor.call('groupCancelApply', $(e.currentTarget).data('group-id'), $(e.currentTarget).data('family-id'), function (err, res) {
             BootstrapModalPrompt.hide()
         })
     },
@@ -34,12 +45,28 @@ Template.bsModalPrompt.events({
 Template.groupList.events({
 
     'click .applyGroup'(e, instance){
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
-        const content =  (this.requirements || ' ') + (this.requirements && this.other ? ' <br>' : '') + (this.other || ' ')
-        const cancelButton= groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="'+this._id+'">Cancel application <i class="fa fa-trash"></i></button>' : ''
+        let familyId
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
+            familyId = FlowRouter.getParam('familyId')
+        else
+            familyId = Meteor.userId()
+        let groupApply = _.findWhere(this.familiesApplying, {familyId: familyId})
+        if (!groupApply) {
+            //if there is'nt a group apply is because in creating a new one in this case in take te values from the last application
+            const family=Families.findOne(familyId)
+            groupApply=family && family.profile && family.profile.groupApplyDefaults
+            console.log('seek defauklts',groupApply)
+        }
+        const moment1 = this.dates && this.dates[0] && moment(this.dates[0])
+        const moment2 = this.dates && this.dates[1] && moment(this.dates[1])
+        const dates = moment1 && moment2 && moment1.isValid() && moment2.isValid() ? `(${moment1.format('Do MMM YY')} to ${moment2.format('Do MMM YY')})` : ""
+        const location = this.location ? `(Location: ${this.location})` : ""
+        const title = `Welcome guests from ${this.name} group ${dates} ${location}`
+        const content = (this.requirements || ' ') + (this.requirements && this.other ? ' <br>' : '') + (this.other || ' ')
+        const cancelButton = groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + this._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
         BootstrapModalPrompt.prompt({
             attachTo: instance.firstNode,
-            title: "Apply for a group",
+            title,
             content: content,
             content1: cancelButton,
             autoform: {
@@ -53,14 +80,16 @@ Template.groupList.events({
             btnDismissText: 'Cancel',
             btnOkText: 'Save'
         }, (data) => {
+            const familyId = FlowRouter.getParam('familyId')
             if (data) {
-                Meteor.call('groupApply', this._id, data, function (err, res) {
+                console.log(familyId)
+                Meteor.call('groupApply', this._id, familyId, data, function (err, res) {
                     if (err)
-                        console.err('groupApply',err)
+                        console.err('groupApply', err)
                 })
             }
             else {
-
+                console.log(familyId)
             }
         });
 

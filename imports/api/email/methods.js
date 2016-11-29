@@ -55,9 +55,7 @@ Meteor.methods({
 
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
-        if (families.count() > 1) {
-            throw new Meteor.Error('hay mas de un email con la cuena de cesar ramos')
-        }
+
 
         if (doc.template == "enrollAccount") {
             families.forEach((user) => {

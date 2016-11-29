@@ -1,9 +1,11 @@
 <template name="blueCardList">
-    <h1>Blue Cards
-        <!--a class="btn btn-primary btn-lg" href="{{pathFor 'blueCardNew'}}"><div class="fa fa-plus"></div></a-->
-    </h1>
-    {{>atTable at=autoTable collection=collection settings=settings}}
-
+    {{#if isActiveRoute 'blueCardList'}}
+        <h1>Blue Cards
+        </h1>
+    {{/if}}
+    {{#if isInRole 'admin,staff' }}
+        {{>atTable at=autoTable collection=collection settings=settings customQuery=customQuery}}
+    {{/if}}
 </template>
 
 

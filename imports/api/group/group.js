@@ -47,9 +47,7 @@ class GroupCollection extends Mongo.Collection {
 const groupApplySchema = new SimpleSchema({
     familyId: {
         type: String,
-        autoValue: function () {
-            return this.userId
-        }
+        optional: true,
     },
     guests: {
         label: 'Guests',
@@ -693,6 +691,7 @@ columnsFamilyApplied.push({
     label: 'Gender Pref',
     render: function (val, path) {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        if (!groupApply) return
         return capitalize(groupApply.gender)
     }
 
@@ -702,6 +701,7 @@ columnsFamilyApplied.push({
     label: 'Guest Pref',
     render: function (val, path) {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        if (!groupApply) return
         return capitalize(groupApply.guests)
     }
 })
@@ -710,6 +710,7 @@ columnsFamilyApplied.push({
     label: 'Welcome guests',
     render: function () {
         const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        if (!groupApply) return
         if (groupApply.minimum == groupApply.maximum) {
             return groupApply.minimum
         }

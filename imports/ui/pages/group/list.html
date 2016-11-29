@@ -1,17 +1,23 @@
 <template name="groupList">
+
+
     {{#if isInRole 'admin,staff' }}
-        <h1>Groups
-            <button class="btn btn-primary btn-lg groupNew">
-                <div class="fa fa-plus"></div>
-            </button>
-        </h1>
-        {{>atTable at=autoTableStaff }}
+        {{#if isActiveRoute 'groupList'}}
+            <h1>Groups
+                <button class="btn btn-primary btn-lg groupNew">
+                    <div class="fa fa-plus"></div>
+                </button>
+            </h1>
+            {{>atTable at=autoTableStaff }}
+        {{/if}}
     {{/if}}
-    {{#if isInRole 'family' }}
-        <h3>Available</h3>
-        {{>atTable at=autoTableFamilyAvailable customQuery=customQueryAvailable }}
-        <h3>Applied</h3>
-        {{>atTable at=autoTableFamilyApplied customQuery=customQueryApplied }}
+    {{#if isInRole 'family,admin,staff' }}
+        {{#if isNotActiveRoute 'groupList'}}
+            <h3>Available</h3>
+            {{>atTable at=autoTableFamilyAvailable customQuery=customQueryAvailable }}
+            <h3>Applied</h3>
+            {{>atTable at=autoTableFamilyApplied customQuery=customQueryApplied }}
+        {{/if}}
     {{/if}}
 
 </template>

@@ -15,22 +15,24 @@
                 {{family.parents.[0].surname}} </h1>
             <div>
                 <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab"
+                                                              data-toggle="tab">Profile</a></li>
+                    <li role="presentation" class=""><a href="#groups" aria-controls="profile" role="tab"
+                                                        data-toggle="tab">Groups</a></li>
+
+
                     {{#if isInRole 'family'}}
-                        <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab">Profile</a></li>
-                        <li role="presentation" class=""><a href="#groups" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab">Groups</a></li>
                         <li role="presentation" class=""><a href="#accounts" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab">Accounts</a></li>
+                                                            data-toggle="tab">Accounts</a></li>
                         <li role="presentation" class=""><a href="#qa" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab"> Questions & Answers</a></li>
+                                                            data-toggle="tab"> Questions & Answers</a></li>
                         <li role="presentation" class=""><a href="#contactTab" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab">Contact Choice Staff</a></li>
+                                                            data-toggle="tab">Contact Choice Staff</a></li>
+
                     {{/if}}
                     {{#if isInRole 'staff'}}
-                        <li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab"
-                                                                  data-toggle="tab">Profile</a></li>
-
+                        <li role="presentation" class=""><a href="#bluecards" aria-controls="profile" role="tab"
+                                                            data-toggle="tab">Blue Cards</a></li>
                         <li role="presentation"><a href="#office" aria-controls="office" role="tab"
                                                    data-toggle="tab">Office Only</a></li>
 
@@ -55,18 +57,21 @@
                                 familyStatusOptions=familyStatusOptions }}
 
                     </div>
+                    <div role="tabpanel" class="tab-pane " id="groups">
+                        <h3>Groups</h3>
+                        {{>groupList}}
+                    </div>
+
                     {{#if isInRole 'family'}}
-                        <div role="tabpanel" class="tab-pane " id="groups">
-                            <h3>Groups</h3>
-                            {{>groupList}}
-                        </div>
+
                         <div role="tabpanel" class="tab-pane " id="accounts">
                             <h3>Accounts</h3>
                             <h4>Coming soon</h4>
                         </div>
                         <div role="tabpanel" class="tab-pane " id="qa">
                             <h3>Questions & Answers</h3>
-                            <h4>Coming soon</h4>
+
+                            {{>qa}}
 
                         </div>
                         <div role="tabpanel" class="tab-pane " id="contactTab">
@@ -75,6 +80,10 @@
                         </div>
                     {{/if}}
                     {{#if isInRole 'staff'}}
+                        <div role="tabpanel" class="tab-pane " id="bluecards">
+                            <h3>Blue Cards</h3>
+                            {{>blueCardList}}
+                        </div>
                         <div role="tabpanel" class="tab-pane " id="office">
                             <br>
                             <h3>Office only</h3>

@@ -1,6 +1,7 @@
 import "./form";
 import "./adult.css";
 import "./edit.html";
+import "../../pages/public/qa.html";
 import "/imports/ui/componets/button-submit"
 import {Template} from "meteor/templating";
 import {AutoForm} from "meteor/aldeed:autoform";

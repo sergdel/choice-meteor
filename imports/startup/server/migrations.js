@@ -27,7 +27,6 @@ Migrations.add({
         return true
     },
 })
-
 Migrations.add({
     version: 2,
     name: 'Update blue card status" ',
@@ -39,6 +38,19 @@ Migrations.add({
         cursor.forEach((family) => {
             Families.update(family._id, {$set: {version: 11}})
         })
+        return true
+    },
+})
+
+Migrations.add({
+    version: 3,
+    name: 'update bedrooms numberOfDesk to desk" ',
+    up: function () {//code to migrate up to version 1}
+         Meteor.users.update({
+            "roles": "family"
+        },{ $rename: { "bedrooms.numberOfDesk": "bedrooms.desk" } })
+        const cursor = Meteor.users.update({"bedrooms.desk": {$exists: true}},{$set: {"bedrooms.$.desk": true}})
+
         return true
     },
 })

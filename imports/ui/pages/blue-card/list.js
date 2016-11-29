@@ -1,12 +1,7 @@
 import "./list.html"
-import "./search-form"
-//import {ReactiveVar} from "meteor/reactive-var"
 import {Template} from "meteor/templating"
-import {FlowRouter} from "meteor/kadira:flow-router"
-//import {rowsByPage} from "/imports/api/globals";
 import {BlueCard} from "/imports/api/blue-card/blue-card";
-//import {moment} from 'meteor/momentjs:moment'
-
+import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"
 Template.blueCardList.onCreated(function () {
 
 });
@@ -20,10 +15,30 @@ Template.blueCardList.onDestroyed(function () {
 
 
 Template.blueCardList.helpers({
-    autoTable: BlueCard.autoTable
-});
+    autoTable: BlueCard.autoTable,
+    settings: function () {
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff'])) {
+            return {}
+        } else {
+            return {
+                options: {
+                    filters: false,
+                }
+            }
+        }
+    },
+    customQuery: function () {
+        let familyId = FlowRouter.getParam('familyId')
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff'])) {
+            if (familyId){
+                return {familyId}
+            }else{
+                return {}
+            }
+        }
+    }
+})
+;
 
-Template.blueCardList.events({
-
-});
+Template.blueCardList.events({});
 

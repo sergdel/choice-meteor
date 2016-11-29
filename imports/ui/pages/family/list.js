@@ -2,6 +2,7 @@ import "./list.html"
 import {Template} from "meteor/templating"
 import {familiesAutoTableAdmin,familiesAutoTableStaff} from "/imports/api/family/auto-table";
 import {emailSchema} from "/imports/api/family/family"
+import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"
 Template.familyList.onCreated(function () {
 
 });

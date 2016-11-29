@@ -40,6 +40,7 @@ export const Families = {}
 Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
+    console.log('Families.find selctor options', selector, options)
     selector = _.extend(selector, {roles: 'family'})
     return Meteor.users.find(selector, options)
 }

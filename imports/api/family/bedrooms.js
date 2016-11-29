@@ -15,9 +15,10 @@ export const  bedroomSchema = new SimpleSchema({
             }
         }
     },
-    numberOfDesk: {
+    desk: {
+        'label':'Desk',
         optional: true,
-        type: Number,
+        type: Boolean,
         autoform: {
             afFormGroup: {
                 "formgroup-class": 'col-sm-3',

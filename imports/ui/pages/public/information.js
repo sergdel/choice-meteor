@@ -1,4 +1,5 @@
 import './information.html'
+import './qa.html'
 Template.information.helpers({
     //add you helpers here
 });

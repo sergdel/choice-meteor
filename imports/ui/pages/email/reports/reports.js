@@ -17,7 +17,13 @@ Template.emailsReports.onCreated(function () {
 });
 
 Template.emailsReports.onRendered(function () {
-    //add your statement here
+    $('#body').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget)
+        const content = button.data('content')
+        const modal = $(this)
+
+        modal.find('.modal-body').html(content)
+    })
 });
 
 Template.emailsReports.onDestroyed(function () {
