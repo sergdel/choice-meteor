@@ -112,7 +112,7 @@ export const officeSchema = new SimpleSchema({
             type: 'select2',
             afFieldInput: {
                 multiple: true,
-                select2Options: {placeholder: '', tags: true, theme: "bootstrap"}
+                select2Options: {placeholder: '', tags: true, theme: "bootstrap", allowClear: true}
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-12',

@@ -276,7 +276,7 @@ export const setBlueCardStatus = function (family) {
             for (let i in family[type]) {
                 if (!(family && family[type] && family[type][i]))
                     continue
-                family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
+                //family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
 
                 if (!family[type][i].blueCard.expiryDate || !family[type][i].blueCard.number) {
                    // family[type][i].blueCard.status = "apply"
