@@ -435,11 +435,12 @@ const columns = [
         operator: '$regex',
     },
     {
-        key: 'dates.1',
+        key: 'dates.0',
         label: 'From',
         operator: '$eq',
         operators,
         render: function (val) {
+            console.log()
             const m = moment(val)
             if (!m.isValid()) return val
             return m.format('Do MMM YYYY')
@@ -447,7 +448,7 @@ const columns = [
 
     },
     {
-        key: 'dates.2',
+        key: 'dates.1',
         label: 'To',
         operator: '$eq',
         operators,
@@ -630,7 +631,7 @@ Groups.autoTableStaff = new AutoTable(
         }
     }
 )
-const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.1', 'dates.2', 'nights', 'ages', 'city', 'location'])
+const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.0', 'dates.1', 'nights', 'ages', 'city', 'location'])
 columnsFamilyAvailable.push({
     key: 'guest.home',
     label: 'Guest/home',
@@ -671,7 +672,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
     }
 )
 
-const columnsFamilyApplied = columnsKeys(['id', 'name', 'nationality', 'dates.1', 'dates.2', 'nights', 'ages', 'city', 'location'])
+const columnsFamilyApplied = columnsKeys(['id', 'name', 'nationality', 'dates.0', 'dates.1', 'nights', 'ages', 'city', 'location'])
 const capitalize = function (str) {
     if (typeof str == 'string')
         return str.charAt(0).toUpperCase() + str.slice(1);

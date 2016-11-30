@@ -132,3 +132,10 @@ AccountsTemplates.configure({
 
 
 
+T9n.map('en',{
+    error:{
+        accounts:{
+            "Token expired": "Token expired. <br>Please sign in with you email and password  <a href='https://www.choicehomestay.com/sign-in'>here</a>"
+        }
+    }
+})

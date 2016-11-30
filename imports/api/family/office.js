@@ -4,6 +4,7 @@
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {familyStatus} from "/imports/api/family/family-status";
 import {hints} from'/imports/api/globals'
+import {Tags} from'/imports/api/tags/tags'
 
 export const officeSchema = new SimpleSchema({
     familyStatusEmailTemplate: {
@@ -102,12 +103,16 @@ export const officeSchema = new SimpleSchema({
     },
     tags: {
         optional: true,
-        type: String,
+        type: [String],
         autoform: {
-            type: 'typeahead',
+            options:function(){
+                console.log('Tags.options()',Tags.options())
+                return Tags.options()
+            },
+            type: 'select2',
             afFieldInput: {
                 multiple: true,
-                select2Options: {placeholder: 'foo', tags: true, theme: "bootstrap"},
+                select2Options: {placeholder: '', tags: true, theme: "bootstrap"}
             },
             afFormGroup: {
                 "formgroup-class": 'col-sm-12',

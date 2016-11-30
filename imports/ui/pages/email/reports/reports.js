@@ -1,6 +1,7 @@
 /**
  * Created by cesar on 18/11/16.
  */
+import './notes'
 import './reports.html'
 import {reportsAutoTable} from '/imports/api/email/reports'
 

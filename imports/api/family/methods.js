@@ -28,10 +28,12 @@ Meteor.methods({
     familyEdit: function (modifier, familyId) {
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
-
+        console.log('******',modifier.$set.parents)
 
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            console.log('Roles.userIsInRole')
             if (familyId == this.userId) {
+                console.log('Roles.userIsInRole')
                 modifier = _.omit(modifier,['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
             } else {
                 throw new Meteor.Error(403, 'Access forbidden', 'Users can only edit their own profile')
@@ -53,16 +55,17 @@ Meteor.methods({
                         }
                         //if there's not family is becaouse is anew email and i have to send the verification email
                         if (!family) {
-                            sendVerificationEmailTemplateForFamily(familyId, parent.email)
+                           // sendVerificationEmailTemplateForFamily(familyId, parent.email)
                         }
                     }
                 })
             }
             if (modifier.$set && modifier.$set.office && modifier.$set.office.familyStatusEmailTemplate) {
-                sendUpdateFamilyStatusEmail(familyId, modifier.$set.office.familyStatusEmailTemplate);
+                //sendUpdateFamilyStatusEmail(familyId, modifier.$set.office.familyStatusEmailTemplate);
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
+        console.log('---',modifier.$set.parents)
         Families.update(familyId, modifier, {userId: this.userId})
 
 

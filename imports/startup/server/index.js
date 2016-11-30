@@ -28,5 +28,7 @@ import "/imports/api/email/templates"
 import "/imports/api/email/campaign"
 import "/imports/api/email/reports"
 import "/imports/api/email/methods"
+import "/imports/api/tags/tags"
+import "/imports/api/tags/server/publication"
 
 

@@ -17,6 +17,7 @@ import {_} from "meteor/underscore";
 import {moment} from "meteor/momentjs:moment";
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Audit} from '/imports/api/audit/audit'
+import {Tags} from '/imports/api/tags/tags'
 
 export const emailSchema = new SimpleSchema({
     email: {
@@ -79,6 +80,8 @@ Families.update = function (_id, modifier, options = {}, callback) {
         paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[0].firstName,
         surname: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].surname
     }},{multi:true})
+
+    Tags.insert(newDoc && newDoc.office && newDoc.office.tags)
 
     if (options.userId)
         Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
@@ -276,16 +279,16 @@ export const setBlueCardStatus = function (family) {
                 family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
 
                 if (!family[type][i].blueCard.expiryDate || !family[type][i].blueCard.number) {
-                    family[type][i].blueCard.status = "apply"
+                   // family[type][i].blueCard.status = "apply"
                 }
                 if (family[type][i].birthOfDate && family[type][i].birthOfDate > moment().subtract(17.5, 'years')) {
-                    family[type][i].blueCard.status = "n/a"
+                   // family[type][i].blueCard.status = "n/a"
                 }
                 if ((family[type][i].blueCard.expiryDate && family[type][i].blueCard.expiryDate <= new Date())) {
-                    family[type][i].blueCard.status = "expired"
+                  //  family[type][i].blueCard.status = "expired"
                 }
                 if (family[type][i].blueCard.expiryDate >= new Date() && family[type][i].blueCard.number) {
-                    family[type][i].blueCard.status = "approved"
+                   // family[type][i].blueCard.status = "approved"
                 }
                 // calc the minumin of status for set in generalstatus
                 const level = _.indexOf(map, family[type][i].blueCard.status)
