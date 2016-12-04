@@ -4,6 +4,8 @@
 import {AutoTable} from 'meteor/cesarve:auto-table'
 import {Email} from 'meteor/email'
 import {FlowRouter} from 'meteor/kadira:flow-router'
+import {Families} from '/imports/api/family/family'
+
 const reportFilterSchema = new SimpleSchema({
     parent1: {
         type: String,
@@ -50,6 +52,10 @@ const reportFilterSchema = new SimpleSchema({
         type: Date,
         optional: true
     },
+    notes: {
+        type: String,
+        optional: true
+    },
     status: {
         type: [String],
         optional: true,
@@ -69,6 +75,7 @@ const reportFilterSchema = new SimpleSchema({
             ]
         }
     },
+
     loggedAt: {
         type: Date,
         optional: true
@@ -108,6 +115,13 @@ export const reportsAutoTable = new AutoTable({
     collection: Email,
     schema: reportFilterSchema,
     publishExtraFields: ['userId', 'html'],
+    publishExtraCollection:function(reports){
+        let familiesIds=reports.map((rep)=>{
+            return rep.userId
+        })
+        familiesIds=_.uniq(familiesIds)
+        return Meteor.users.find({_id: {$in: familiesIds }},{fields: {groups: 1, roles: 1}})
+    },
     settings: {
         options: {
             columnsSort: true,
@@ -127,17 +141,37 @@ export const reportsAutoTable = new AutoTable({
         {key: 'subject', label: 'Subject ', operator: '$regex'},
         {key: 'campaign', label: 'Campaign ', operator: '$regex'},
         {
-            key: 'sentAt', label: 'Sent at', operator: '$eq', operators
+            key: 'sentAt', label: 'Sent at', operator: '$eq', operators,
+            render: function (val) {
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY H:mm')
+            },
         },
         {key: 'status', label: 'Status', operator: '$in'},
         {
             key: 'loggedAt', label: 'Last login', operator: '$eq',
+            render: function (val) {
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY H:mm')
+            },
             operators
+        },
+        {
+            key: 'Groups',
+            label: 'Groups',
+            render: function (val, path) {
+                const family= Families.findOne(this.userId)
+                console.log('familgroups y',family)
+                return family && family.groups &&  family.groups.applied &&  family.groups.applied.length
+            },
         },
         {
             key: 'notes', label: 'Notes', operator: '$regex',
             template: 'emailCampaignNotes'
         },
+
         {
             key: 'action', label: 'Action',
             render: function () {

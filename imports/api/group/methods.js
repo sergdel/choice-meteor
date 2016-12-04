@@ -40,7 +40,7 @@ Meteor.methods({
         }
         console.log('groupCancelApply', familyId)
         check(groupId, String)
-        Groups.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+       return Groups.cancelApply(groupId,familyId)
     },
     groupApply: function (groupId, familyId, data) {
         console.log('groupApply', familyId)
@@ -55,10 +55,9 @@ Meteor.methods({
         data.familyId = familyId
         check(data, Groups.schemas.apply)
         check(groupId, String)
-        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+
         //todo maybe this code has to be in group class., maybe in a method apply
-        Families.update(familyId, {$set: {"profile.groupApplyDefaults": data}})
-        Groups.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
-        return Groups.update(groupId, {$addToSet: {familiesApplying: data}}, {filter: false})
+        return Groups.apply(groupId,familyId,data)
+
     }
 })

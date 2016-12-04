@@ -25,10 +25,15 @@ Template.familyForm.helpers({
 });
 
 Template.familyForm.events({
-    //add your events here
+    'change [name="office.tags"]'(){
+        console.log('111data-select2-tag',e,o,this)
+    }
 });
 
 Template.familyForm.onCreated(function () {
+    $('[name="office.tags"]').change((e,o)=>{
+        console.log('data-select2-tag',e,o,this)
+    })
     this.autorun(()=>{
         if (Roles.userIsInRole(Meteor.userId(),['admin','staff'])){
             this.subscribe('tags')

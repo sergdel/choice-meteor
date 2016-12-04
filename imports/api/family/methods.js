@@ -13,28 +13,39 @@ import {
 } from "/imports/api/utilities";
 import {Random} from 'meteor/random'
 import {_} from 'lodash'
+import {check} from 'meteor/check'
 
 
 Meteor.methods({
 
     createToken: function (familyId) {
+        check(familyId,String)
         if (!Roles.userIsInRole(this.userId, ['admin'])) {
-            Meteor.Error(403, 'Access forbidden', 'Only admin can create tokens')
+            throw new Meteor.Error(403, 'Access forbidden', 'Only admin can create tokens')
         }
         LoginToken.setExpiration(60 * 1000)
         return LoginToken.createTokenForUser(familyId);
 
     },
+    familyRemove: function (familyId) {
+        check(familyId, String)
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            throw new Meteor.Error(403, 'Access forbidden', 'Only admin can remove profiles')
+        }
+        Families.remove(familyId, {userId: this.userId})
+    },
     familyEdit: function (modifier, familyId) {
+        check(familyId,String)
+        check(modifier,Object)
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
-        console.log('******',modifier.$set.parents)
+        console.log('******', modifier.$set.parents)
 
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             console.log('Roles.userIsInRole')
             if (familyId == this.userId) {
                 console.log('Roles.userIsInRole')
-                modifier = _.omit(modifier,['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
+                modifier = _.omit(modifier, ['$set.office', '$unset.office', '$set.adult.status', '$set.adult.score', '$unset.adult.status', '$unset.adult.score'])
             } else {
                 throw new Meteor.Error(403, 'Access forbidden', 'Users can only edit their own profile')
             }
@@ -46,8 +57,11 @@ Meteor.methods({
             familySchema.clean(modifier, {isModifier: true});
             //if the modifier are setting parents checks the email
             if (modifier.$set && modifier.$set.parents) {
+                console.log('modifier', modifier)
+
                 modifier.$set.parents.forEach(function (parent) {
-                    if (parent.email) {
+                    console.log('parent', parent)
+                    if (parent && parent.email) {
                         //if are not my email throw error
                         const family = Accounts.findUserByEmail(parent.email);
                         if (family && family._id != familyId) {
@@ -55,7 +69,8 @@ Meteor.methods({
                         }
                         //if there's not family is becaouse is anew email and i have to send the verification email
                         if (!family) {
-                           // sendVerificationEmailTemplateForFamily(familyId, parent.email)
+                            Accounts.addEmail(familyId, parent.email)
+                            // sendVerificationEmailTemplateForFamily(familyId, parent.email)
                         }
                     }
                 })
@@ -65,12 +80,14 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-        console.log('---',modifier.$set.parents)
+        console.log('---', modifier.$set.parents)
         Families.update(familyId, modifier, {userId: this.userId})
 
 
     },
     emailExist: function (email, isNotThisFamilyId) {
+        check(email,String)
+
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         let query = {$or: [{emails: {$elemMatch: {address: email}}}, {parents: {$elemMatch: {email}}}]};
         if (isNotThisFamilyId)
@@ -78,6 +95,7 @@ Meteor.methods({
         return Meteor.users.find(query).count() > 0
     },
     familyNew: function (doc) {
+        check(doc,Object)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             throw new Meteor.Error(403, 'Access forbidden', 'Only staff and admin can create new families')
 

@@ -18,7 +18,6 @@ import {moment} from "meteor/momentjs:moment";
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Audit} from '/imports/api/audit/audit'
 import {Tags} from '/imports/api/tags/tags'
-
 export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
@@ -41,7 +40,6 @@ export const Families = {}
 Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
-    console.log('Families.find selctor options', selector, options)
     selector = _.extend(selector, {roles: 'family'})
     return Meteor.users.find(selector, options)
 }
@@ -90,9 +88,10 @@ Families.update = function (_id, modifier, options = {}, callback) {
 Families.upsert = function (_id, modifier, options, callback) {
     return //
 }
-Families.remove = function (selector) {
-    return //
-    //return Meteor.users.find(selector,options)
+Families.remove = function (_id,options) {
+    console.log('Families.removem',_id)
+    Audit.insert({type: 'remove', docId: _id, userId: options.userId})
+    return Meteor.users.remove(_id)
 }
 export const familySchema = new SimpleSchema({
     createdAt: {
@@ -101,6 +100,9 @@ export const familySchema = new SimpleSchema({
     },
     parents: {
         minCount: 1,
+        autoform: {
+            initialCount: 1,
+        },
         type: [Object],
     },
     "parents.$": {

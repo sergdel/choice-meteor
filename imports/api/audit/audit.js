@@ -70,6 +70,17 @@ class AuditCollection extends Mongo.Collection {
                 timestamp: new Date()
             });
         }
+        if (type == 'remove') {
+            return super.insert({
+                type,
+                where,
+                docId,
+                role,
+                name,
+                userId,
+                timestamp: new Date()
+            });
+        }
         throw new Meteor.Error('Audit type not recognise ')
     }
 
@@ -101,9 +112,10 @@ const AuditFilterSchema = new SimpleSchema({
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
-                {label: 'Access', value: 'access'},
-                {label: 'Update', value: 'update'},
-                {label: 'Created', value: 'create'}
+                {label: 'Accessed', value: 'access'},
+                {label: 'Updated', value: 'update'},
+                {label: 'Created', value: 'create'},
+                {label: 'Removed', value: 'remove'}
             ]
         }
     },

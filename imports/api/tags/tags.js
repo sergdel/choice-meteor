@@ -21,7 +21,7 @@ class TagsClass extends Mongo.Collection {
     }
 
     options() {
-        return super.find({},{sort:{count: -1}}).fetch().map((tag) => ({value: tag._id, label: `${tag._id}  (${tag.count})`}))
+        return super.find({},{ sort:{count: -1}}).fetch().map((tag) => ({value: tag._id, label: `${tag._id}  (${tag.count})`}))
     }
 }
 

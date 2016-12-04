@@ -25,9 +25,15 @@ Meteor.methods({
 
     },
     contact: function (doc) {
-        Meteor._sleepForMs(300 * Meteor.isDeveloment)
         this.unblock()
-        const text = `Name: ${doc.name}\nEmail: ${doc.email}\nPhone: ${doc.phone}\nSuburb: ${doc.suburb}\nSchool Drop-off & Pick-up  : ${doc.school}\nAvailability: ${doc.availability}\n\nMessage: ${doc.message}\n`
+        let text = ''
+        text += doc.name ? `Name: ${doc.name}\n` : ''
+        text += doc.email ? `Email: ${doc.email}\n` : ''
+        text += doc.phone ? `Phone: ${doc.phone}\n` : ''
+        text += doc.suburb ? `Suburb: ${doc.suburb}\n` : ''
+        text += doc.school ? `School Drop-off & Pick-up: ${doc.school}\n` : ''
+        text += doc.availability ? `Availability: ${doc.availability}\n` : ''
+        text += doc.message ? `Message: ${doc.message}\n` : ''
         var options = {
             to: 'emailus@choicehomestay.com',
             from: 'newcontact@choicehomestay.com',
@@ -99,6 +105,7 @@ Meteor.methods({
                     'campaign': doc.name,
                     "loggedAt": user.loggedAt,
                     "userId": user._id,
+
                     status: 'sent',
                 };
 

@@ -3,6 +3,7 @@
  */
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {AutoTable} from "meteor/cesarve:auto-table";
+import {Families} from "/imports/api/family/family";
 export const BlueCard = new Mongo.Collection('bluecard');
 /*
  firstName
@@ -176,12 +177,27 @@ BlueCard.autoTable = new AutoTable({
             key: 'registered',
             operator: '$in',
         },
+        {
+            key: 'Groups',
+            label: 'Groups',
+            render: function (val, path) {
+                const family= Families.findOne(this.familyId)
+                return family && family.groups &&  family.groups.applied &&  family.groups.applied.length
+            },
+        },
 
     ],
     id: 'BlueCards',
     schema: BlueCard.filterSchema,
     query: {$or: [{dateOfBirth: {$lte: moment().subtract(17.5, 'years').toDate()}}, {dateOfBirth: {$not: {$type: 9}}}]},
     collection: BlueCard,
+    publishExtraCollection:function(blueCards){
+        let familiesIds=blueCards.map((bc)=>{
+            return bc.familyId
+        })
+        familiesIds=_.uniq(familiesIds)
+        return Meteor.users.find({_id: {$in: familiesIds }},{fields: {groups: 1, roles: 1}})
+    },
     settings: {
         options: {
             columnsSort: true,

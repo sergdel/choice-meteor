@@ -125,6 +125,10 @@ AccountsTemplates.configure({
         },
         button: {
             enrollAccount: "Save password",
+        },
+        info:{
+            pwdSet: "Password set.<br> Redirecting to profile <i class='fa fa-spinner fa-spin fa-fw'></i>",
+            pwdReset: "Password set.<br> Redirecting to profile <i class='fa fa-spinner fa-spin  fa-fw'></i>",
         }
     },
 

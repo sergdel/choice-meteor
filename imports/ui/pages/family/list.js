@@ -1,13 +1,13 @@
 import "./list.html"
 import {Template} from "meteor/templating"
-import {familiesAutoTableAdmin,familiesAutoTableStaff} from "/imports/api/family/auto-table";
+import {familiesAutoTableAdmin, familiesAutoTableStaff} from "/imports/api/family/auto-table";
 import {emailSchema} from "/imports/api/family/family"
 import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"
 Template.familyList.onCreated(function () {
 
 });
 Template.familyList.onRendered(function () {
-
+    this.subscribe('tags')
 
 });
 
@@ -17,13 +17,13 @@ Template.familyList.onDestroyed(function () {
 
 
 Template.familyList.helpers({
-   autoTable:()=>{
-       if (Roles.userIsInRole(Meteor.userId(),'admin')){
-           return familiesAutoTableAdmin
-       }else{
-           return familiesAutoTableStaff
-       }
-   }
+    autoTable: () => {
+        if (Roles.userIsInRole(Meteor.userId(), 'admin')) {
+            return familiesAutoTableAdmin
+        } else {
+            return familiesAutoTableStaff
+        }
+    }
 });
 
 Template.familyList.events({
