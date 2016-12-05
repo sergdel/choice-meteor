@@ -30,5 +30,6 @@ import "/imports/api/email/reports"
 import "/imports/api/email/methods"
 import "/imports/api/tags/tags"
 import "/imports/api/tags/server/publication"
+import "/imports/api/account/account"
 
 

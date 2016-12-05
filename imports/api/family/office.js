@@ -6,6 +6,8 @@ import {familyStatus} from "/imports/api/family/family-status";
 import {hints} from'/imports/api/globals'
 import {Tags} from'/imports/api/tags/tags'
 
+
+
 export const officeSchema = new SimpleSchema({
     familyStatusEmailTemplate: {
         optional: true,
@@ -105,8 +107,7 @@ export const officeSchema = new SimpleSchema({
         optional: true,
         type: [String],
         autoform: {
-            options:function(){
-                console.log('Tags.options()',Tags.options())
+            options: function(){
                 return Tags.options()
             },
             type: 'select2',

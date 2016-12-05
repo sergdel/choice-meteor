@@ -1,5 +1,5 @@
 <template name="contact">
-    <div class="container">
+    {{#if isActiveRoute 'home'}}
         <div class="row">
             <div class="col-xs-12 text-center">
                 <h2>CONTACT</h2>
@@ -7,20 +7,23 @@
                 <p>Use this form to send a general enquiry or register your interest in the Choice Homestay program.</p>
             </div>
         </div>
-        <div class=" shading">
-        {{#autoForm id="contactForm" schema=contactSchema type="method" meteormethod="contact" buttonContent=false
+    {{/if}}
+
+    <div class=" shading">
+        {{#autoForm id="contactForm" schema=contactSchema doc=doc type="method" meteormethod="contact"
+                    buttonContent=false
                     validation="submitThenKeyup"}}
             <div class="row text-left">
                 <div class="col-xs-12">
                     {{#each afFieldNames}}
-                        {{> afQuickField name=this.name options=afOptionsFromSchema}}
+                        {{> afQuickField name=this.name type=type options=afOptionsFromSchema}}
                     {{/each}}
                 </div>
             </div>
             <div class="clearfix"></div>
             <div class="row text-left">
                 <div class="col-md-8 col-lg-offset-2">
-                    <div class="alert alert-success success" role="alert" style="display: none">
+                    <div class="alert alert-success successContact" role="alert" style="display: none">
                         <i class="fa fa-check"></i>
                         Thank you for contacting us. One of the team will review your enquiry and respond soon
                     </div>
@@ -28,13 +31,12 @@
             </div>
             <div class="row text-right">
                 <div class="col-xs-12">
-                    <button type="submit" class="btn btn-primary pull-right btn-lg"
-                    >SEND MESSAGE
+                    <button type="submit" class="btn btn-primary pull-right btn-lg">
+                        SEND MESSAGE
                     </button>
                 </div>
             </div>
         {{/autoForm}}
-    </div>
     </div>
     <br><br>
 </template>

@@ -39,7 +39,7 @@
                         <li role="presentation"><a href="#adult" aria-controls="adult" role="tab" data-toggle="tab">Adults
                             Groups</a></li>
                     {{/if}}
-                    {{#if isInRole 'admin'}}
+                    {{#if isInRole 'admin,staff'}}
                         <li role="presentation"><a href="#audit" aria-controls="audit" role="tab"
                                                    data-toggle="tab">Logs</a>
                         </li>
@@ -55,7 +55,10 @@
                         <h3>Profile</h3>
                         {{>familyForm formType="method-update" formMethod="familyEdit" doc=family resetOnSuccess=false
                                 familyStatusOptions=familyStatusOptions }}
-
+                        {{#if isInRole 'admin'}}
+                            <button type="button" class="btn btn-danger btn-xs removeFamily">Remove profile <i
+                                    class="fa fa-trash"></i></button>
+                        {{/if}}
                     </div>
                     <div role="tabpanel" class="tab-pane " id="groups">
                         <h3>Groups</h3>
@@ -66,7 +69,7 @@
 
                         <div role="tabpanel" class="tab-pane " id="accounts">
                             <h3>Accounts</h3>
-                            <h4>Coming soon</h4>
+                            {{>accountList}}
                         </div>
                         <div role="tabpanel" class="tab-pane " id="qa">
                             <h3>Questions & Answers</h3>
@@ -76,7 +79,7 @@
                         </div>
                         <div role="tabpanel" class="tab-pane " id="contactTab">
                             <h3>Contact Choice Staff</h3>
-                            <h4>Coming soon</h4>
+                            {{>contact}}
                         </div>
                     {{/if}}
                     {{#if isInRole 'staff'}}
@@ -211,7 +214,7 @@
                             {{/autoForm}}
                         </div>
                     {{/if}}
-                    {{#if isInRole 'admin'}}
+                    {{#if isInRole 'admin,staff'}}
                         <div role="tabpanel" class="tab-pane" id="audit">
                             <br>
                             <h3>Logs</h3>
@@ -231,8 +234,11 @@
                             {{/autoForm}}
                         </div>
                     {{/if}}
+
                 </div>
+
             </div>
+
         {{else}}
             {{>notFound}}
         {{/if}}

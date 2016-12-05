@@ -2,9 +2,8 @@
  * Created by cesar on 22/11/16.
  */
 import {AutoTable} from "meteor/cesarve:auto-table";
-import {Families} from "./family";
-import {familySchema} from "./family";
 import {familyStatus} from "./family-status";
+import {Tags} from "/imports/api/tags/tags";
 
 const operators = [  // Optional Array works for option filter
     {
@@ -132,8 +131,14 @@ export const familyFilterSchema = new SimpleSchema({
         optional: true,
     },
     'office.tags': {
-        type: String,
+        type: [String],
         optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options:function(){
+                return Tags.options()
+            }
+        },
     },
     'office.familyStatus': {
         type: [Number],

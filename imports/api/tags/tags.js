@@ -10,8 +10,8 @@ class TagsClass extends Mongo.Collection {
                 if (super.find(tag).count() == 0) {
                     super.insert({_id: tag, count: 0})
                 }
-                //const count=Families.find({"office.tags":tag}).count()
-                //super.update(tag, {$inc: {count}})
+                const count=Families.find({"office.tags":tag}).count()
+                super.update(tag, {$inc: {count}})
             }
         }
     }
@@ -21,7 +21,7 @@ class TagsClass extends Mongo.Collection {
     }
 
     options() {
-        return super.find({},{sort:{count: -1}}).fetch().map((tag) => ({value: tag._id, label: `${tag._id}`}))
+        return super.find({},{sort:{count: -1}}).fetch().map((tag) => ({value: tag._id, label: `${tag._id}  (${tag.count})`}))
     }
 }
 

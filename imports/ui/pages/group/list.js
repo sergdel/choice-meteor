@@ -54,7 +54,7 @@ Template.groupList.events({
         if (!groupApply) {
             //if there is'nt a group apply is because in creating a new one in this case in take te values from the last application
             const family=Families.findOne(familyId)
-            groupApply=family && family.profile && family.profile.groupApplyDefaults
+            groupApply=family && family.groups && family.groups.groupApplyDefaults
             console.log('seek defauklts',groupApply)
         }
         const moment1 = this.dates && this.dates[0] && moment(this.dates[0])
@@ -85,7 +85,7 @@ Template.groupList.events({
                 console.log(familyId)
                 Meteor.call('groupApply', this._id, familyId, data, function (err, res) {
                     if (err)
-                        console.err('groupApply', err)
+                        console.error('groupApply', err)
                 })
             }
             else {

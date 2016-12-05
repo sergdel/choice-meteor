@@ -10,6 +10,7 @@ import {familyStatus} from "/imports/api/family/family-status";
 import {_} from "meteor/underscore";
 import {familySchema} from "/imports/api/family/family";
 import {emailTemplateSchema} from "/imports/api/family/email-template";
+import '/imports/ui/pages/account/list'
 
 
 AutoForm.debug();
@@ -66,7 +67,25 @@ Template.familyEdit.helpers({
 ;
 
 Template.familyEdit.events({
-    'click [href="#audit"]': function (e, instance) {
+    'click .removeFamily'(e, instance) {
+        BootstrapModalPrompt.prompt({
+            title: 'Please confirm',
+            content: 'Are you sure to remove this family profile?<br>This action can not be undo.',
+            btnDismissTextClass: 'btn-default',
+            btnOkTextClass: 'btn-danger',
+            btnDismissText: 'Cancel',
+            btnOkText: 'Yes, I\'m sure.',
+        }, (data) => {
+            if (data) {
+                console.log(this)
+                Meteor.call('familyRemove', this.familyId)
+                FlowRouter.go('familyList')
+            } else {
+
+            }
+        })
+    },
+    'click [href="#audit"]'(e, instance) {
         const $node = instance.$('#audit_container')
         if ($node.html() == '') {
             Blaze.renderWithData(Template.auditList, {familyId: this.familyId}, $node.get(0))

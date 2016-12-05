@@ -5,6 +5,7 @@ import {blueCards} from './aproved-blue-card'
 import {_} from 'lodash'
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Families} from '/imports/api/family/family'
+import {Groups} from '/imports/api/group/group'
 import {Meteor} from 'meteor/meteor'
 import {Migrations} from 'meteor/percolate:migrations'
 Migrations.config({
@@ -54,12 +55,46 @@ Migrations.add({
             if (family)
                 Email.update(email._id, {$set: {mobilePhone: family.parents[0].mobilePhone}})
             else
-                console.log('email.userId',email.userId)
+                console.log('email.userId', email.userId)
         })
         return true
     },
 })
 
 
+Migrations.add({
+    version: 4,
+    name: 'Update information groups on families" ',
+    up: function () {//code to migrate up to version 1}
+        let cursor
+        cursor = Groups.find({})
+        cursor.forEach((group) => {
+            const familiesApplying = group.familiesApplying || []
+            for (let applied of familiesApplying) {
+                Families.update(applied.familyId, {$addToSet: {"groups.applied": group._id}})
+            }
 
+        })
+        return true
+    },
+})
+
+Migrations.add({
+    version: 6,
+    name: 'Update information groups on families" ',
+    up: function () {//code to migrate up to version 1}
+        let cursor
+        cursor = Groups.find({})
+        cursor.forEach((group) => {
+            const availablePlacements = (group.familiesApplying && group.familiesApplying.length) || 0
+            Groups.attachSchema(Groups.schemas.edit, {replace: true})
+            console.log('availablePlacements','availablePlacements')
+            if (availablePlacements){
+                Groups.update(group._id, {$set: {availablePlacements}})
+
+            }
+        })
+        return true
+    },
+})
 

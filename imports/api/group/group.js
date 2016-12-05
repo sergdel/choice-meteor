@@ -2,6 +2,9 @@ import  {LocalCollection} from 'meteor/minimongo'
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {moment} from 'meteor/momentjs:moment'
+import {Families} from '/imports/api/family/family'
+import {FlowRouter} from 'meteor/kadira:flow-router'
+
 
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
@@ -9,18 +12,26 @@ const custom = function () {
     }
     return true
 }
-
+const renderGuest = function () {
+    console.log('renderGuest', this)
+    const guestsTo = this.guestsTo || ''
+    const guestsFrom = this.guestsFrom || ''
+    if (guestsTo == guestsFrom) {
+        return guestsTo
+    }
+    return guestsFrom + ' to ' + guestsTo
+}
 class GroupCollection extends Mongo.Collection {
     insert(group, callback) {
+        Groups.attachSchema(Groups.schemas.new, {replace: true})
         group.requirements = ["Share time and talk with guests each day", "Provide three quality meals and snacks each day", "Provide drop-off and pick-up to & from school each day", "Provide each guest with an individual comfortable bed (no bunks)", "Don't have other student of the same nationality in the home during their visit"]
         return super.insert(group, callback);
     }
-
     remove(_id, callback) {
         return super.remove(_id, callback);
     }
-
-    update(_id, modifier, callback) {
+    update(_id, modifier, options) {
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
         const group = super.findOne(_id)
         if (!group) {
             throw new Meteor.Error(404, 'Group not found!')
@@ -34,12 +45,29 @@ class GroupCollection extends Mongo.Collection {
             const date1 = moment(group.dates[1])
             modifier.$set.nights = date1.diff(date0, 'days')
         }
-        if (group.adults || group.students) {
-            group.adults = group.adults || 0
-            group.students = group.students || 0
-            modifier.$set.availablePlacements = group.students + group.adults
-        }
-        return super.update(_id, modifier, callback);
+console.log('modifier',modifier)
+        return super.update(_id, modifier, options);
+    }
+
+    apply(groupId, familyId,data) {
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        Families.update(familyId, {$set: {"groups.groupApplyDefaults": data}, $addToSet: {"groups.applied": groupId}})
+        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+         super.update(groupId, {$addToSet: {familiesApplying: data}}, {filter: false})
+        const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
+        const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
+        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        return
+    }
+
+    cancelApply(groupId, familyId) {
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        Families.update(familyId, {$pull: {"groups.applied": groupId}})
+        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
+        const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
+        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        return
     }
 
 }
@@ -82,6 +110,14 @@ const groupApplySchema = new SimpleSchema({
             if (this.value < this.field('minimum').value) {
                 return "maximumMismatch";
             }
+        }
+    },
+    comments:{
+        label: 'Comments (optional)',
+        type: String,
+        optional: true,
+        autoform:{
+            rows:4,
         }
     }
 })
@@ -204,6 +240,16 @@ const schemaObject = {
         type: Number,
         min: 1,
     },
+    payments: {
+        label: 'Payment',
+        type: String,
+        optional: true,
+        autoform: {
+            rows: 4,
+
+        },
+
+    },
     guestsTo: {
         label: 'To guests/home',
         type: Number,
@@ -244,12 +290,11 @@ const schemaObject = {
     },
     availablePlacements: {
         type: Number,
+        label: 'Available',
         autoform: {
             type: 'readonly',
             class: 'readonly-bordered',
-            afFormGroup: {
-                //"formgroup-class": 'col-sm-3',
-            }
+
         },
         autoValue: function () {
             if (this.isInsert) {
@@ -334,11 +379,12 @@ const schemaObject = {
     "familiesApplying.$": {
         type: groupApplySchema,
         optional: true,
-    }
+    },
+
 }
 
-const newObj=(_.pick(schemaObject, 'id','name'))
-newObj.requirements={
+const newObj = (_.pick(schemaObject, 'id', 'name'))
+newObj.requirements = {
     optional: true,
     type: [String]
 }
@@ -461,28 +507,30 @@ const columns = [
 
     },
     {
-        key: 'nights',
+        key: 'availablePlacements',
+        label: 'Available',
         operator: '$eq',
-        operators
+        operators,
+    },
+    {
+        key: 'nights',
+        operator: '$regex',
 
     },
     {
         key: 'ages',
-        operator: '$eq',
-        operators
+        operator: '$regex',
 
     },
     {
         key: 'city',
-        operator: '$eq',
-        operators
+        operator: '$regex',
 
     },
     {
         key: 'location',
         label: 'Study Location',
-        operator: '$eq',
-        operators
+        operator: '$regex',
 
     },
     {
@@ -499,24 +547,24 @@ const columns = [
 
     },
     {
-        key: 'guestsFrom',
-        label: 'From guests/home',
-        operator: '$eq',
-        operators,
-
-    },
-    {
-        key: 'guestsTo',
-        label: 'To guests/home',
-        operator: '$eq',
-        operators,
-
+        key: 'guestsFromTo',
+        label: 'Guests/home',
+        render: renderGuest
     },
 
     {
         key: 'placed',
         operator: '$eq',
         operators
+    },
+    {
+        key: 'status',
+        operator: '$in',
+    },
+    {
+        key: 'payments',
+        label: 'Payment',
+        operator: '$regex',
     },
 
 ]
@@ -566,14 +614,7 @@ let groupFilterSchema = new SimpleSchema({
 
 
     },
-    guestsTo: {
-        type: Number,
-        optional: true,
-    },
-    guestsFrom: {
-        type: Number,
-        optional: true,
-    },
+
     status: {
         type: String,
         optional: true,
@@ -592,10 +633,15 @@ let groupFilterSchema = new SimpleSchema({
         optional: true,
     },
     availablePlacements: {
+        label: 'Available',
         type: Number,
         optional: true,
     },
-
+    payments: {
+        label: 'Payment',
+        type: String,
+        optional: true,
+    }
 
 })
 
@@ -614,6 +660,7 @@ Groups.autoTableStaff = new AutoTable(
         id: 'groupStaff',
         collection: Groups,
         columns,
+        publishExtraFields: ['guestsTo', 'guestsFrom'],
         schema: groupFilterSchema,
         settings: {
             options: {
@@ -635,18 +682,15 @@ const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.
 columnsFamilyAvailable.push({
     key: 'guest.home',
     label: 'Guest/home',
-    render: function () {
-        if (this.guestsTo == this.guestsFrom) {
-            return this.guestsTo
-        }
-        return this.guestsFrom + ' to ' + this.guestsTo
-    }
+    render: renderGuest
 })
+columnsFamilyAvailable.push(columnsKeys(['payments'])[0])
 columnsFamilyAvailable.push({
     key: 'action',
     label: 'Action',
     render: () => '<button class="btn btn-default btn-xs applyGroup  pull-right">Apply <i class="fa fa-hand-o-down"></i></button>'
 })
+
 Groups.autoTableFamilyAvailable = new AutoTable(
     {
         id: 'groupFamilyAvailable',
@@ -656,10 +700,10 @@ Groups.autoTableFamilyAvailable = new AutoTable(
         publishExtraFields: ['familiesApplying', 'guestsTo', 'guestsFrom'],
         settings: {
             options: {
-                columnsSort: false,
+                columnsSort: true,
                 columnsDisplay: false,
                 showing: true,
-                filters: false,
+                filters: true,
             },
             msg: {
                 noRecordsCriteria: 'There are not any groups available at this time',
@@ -680,28 +724,23 @@ const capitalize = function (str) {
 columnsFamilyApplied.push({
     key: 'guest.home',
     label: 'Guest/home',
-    render: function () {
-        if (this.guestsTo == this.guestsFrom) {
-            return this.guestsTo
-        }
-        return this.guestsFrom + ' to ' + this.guestsTo
-    }
+    render: renderGuest
 })
 columnsFamilyApplied.push({
-    key: 'groupApplied.gender',
+    key: 'familiesApplying.gender',
     label: 'Gender Pref',
     render: function (val, path) {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         return capitalize(groupApply.gender)
     }
 
 })
 columnsFamilyApplied.push({
-    key: 'groupApplied.guests',
+    key: 'familiesApplying.guests',
     label: 'Guest Pref',
     render: function (val, path) {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') ||Meteor.userId()})
         if (!groupApply) return
         return capitalize(groupApply.guests)
     }
@@ -710,7 +749,7 @@ columnsFamilyApplied.push({
     key: 'guest.welcome',
     label: 'Welcome guests',
     render: function () {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: Meteor.userId()})
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') ||Meteor.userId()})
         if (!groupApply) return
         if (groupApply.minimum == groupApply.maximum) {
             return groupApply.minimum
@@ -718,6 +757,7 @@ columnsFamilyApplied.push({
         return groupApply.minimum + ' to ' + groupApply.maximum
     }
 })
+columnsFamilyApplied.push(columnsKeys(['payments'])[0])
 columnsFamilyApplied.push({
     key: 'action',
     label: 'Action',
@@ -732,10 +772,10 @@ Groups.autoTableFamilyApplied = new AutoTable(
         publishExtraFields: ['familiesApplying', 'guestsTo', 'guestsFrom'],
         settings: {
             options: {
-                columnsSort: false,
+                columnsSort: true,
                 columnsDisplay: false,
                 showing: true,
-                filters: false,
+                filters: true,
             },
             msg: {
                 noRecordsCriteria: 'You haven\'t apply for any groups yet',

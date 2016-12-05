@@ -97,14 +97,39 @@ const contactSchema = new SimpleSchema({
 
 AutoForm.addHooks('contactForm', {
     onSuccess: function (formType, result) {
-        const $success = $('.success').slideDown()
+
         Meteor.setTimeout(() => {
-            $success.slideUp()
-        }, 7000)
+            const $success = $('.successContact').slideDown()
+            console.log('$success', $success)
+            Meteor.setTimeout(() => {
+                console.log('$success', $success)
+                $success.slideUp()
+            }, 6000)
+
+        }, 200)
+        return false
+    },
+    onSubmit: function (doc) {
+        this.done(null, doc);
+        return false
     },
 })
 Template.contact.helpers({
-    contactSchema: contactSchema
+    contactSchema: contactSchema,
+    doc: function () {
+        const user = Meteor.user()
+        if (Roles.userIsInRole(Meteor.userId(), ['family'])) {
+            return {
+                email: user.emails[0].address,
+                phone: user.parents[0].mobilePhone,
+            }
+        }
+    },
+    type: function () {
+        if (!ActiveRoute.name('home') && this.name != 'message' && this.name != 'copy') {
+            return 'hidden'
+        }
+    },
 });
 
 Template.contact.events({
