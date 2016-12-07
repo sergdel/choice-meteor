@@ -3,7 +3,10 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
+import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {FlowRouter} from 'meteor/kadira:flow-router'
+import {Audit} from '/imports/api/audit/audit'
+import {Email} from 'meteor/email'
 
 
 const custom = function () {
@@ -13,7 +16,6 @@ const custom = function () {
     return true
 }
 const renderGuest = function () {
-    console.log('renderGuest', this)
     const guestsTo = this.guestsTo || ''
     const guestsFrom = this.guestsFrom || ''
     if (guestsTo == guestsFrom) {
@@ -21,15 +23,31 @@ const renderGuest = function () {
     }
     return guestsFrom + ' to ' + guestsTo
 }
+export const updateGroupCount = function (familyId) {
+    const family = Families.findOne(familyId, {fields: {groups: 1}})
+    const groups = (family && family.groups && family.groups.applied && family.groups.applied.length) || 0
+    BlueCard.update({familyId}, {$set: {groups: groups}}, {multi: true})
+    Email.update({userId: familyId}, {$set: {groups: groups}}, {multi: true})
+}
 class GroupCollection extends Mongo.Collection {
+    find(selector, options) {
+        if (_.isObject(selector)) {
+            selector = _.extend(selector, {status: {$ne: "removed"}})
+        }
+        return super.find(selector, options);
+    }
+
     insert(group, callback) {
         Groups.attachSchema(Groups.schemas.new, {replace: true})
         group.requirements = ["Share time and talk with guests each day", "Provide three quality meals and snacks each day", "Provide drop-off and pick-up to & from school each day", "Provide each guest with an individual comfortable bed (no bunks)", "Don't have other student of the same nationality in the home during their visit"]
         return super.insert(group, callback);
     }
-    remove(_id, callback) {
-        return super.remove(_id, callback);
+
+    remove(groupId, callback) {
+        Families.removeGroups(groupId)
+        return super.update(groupId, {$set: {status: "removed"}});
     }
+
     update(_id, modifier, options) {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         const group = super.findOne(_id)
@@ -45,28 +63,57 @@ class GroupCollection extends Mongo.Collection {
             const date1 = moment(group.dates[1])
             modifier.$set.nights = date1.diff(date0, 'days')
         }
-console.log('modifier',modifier)
+        console.log('modifier', modifier)
         return super.update(_id, modifier, options);
     }
 
-    apply(groupId, familyId,data) {
+    apply(groupId, familyId, data, userId) {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
-        Families.update(familyId, {$set: {"groups.groupApplyDefaults": data}, $addToSet: {"groups.applied": groupId}})
-        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
-         super.update(groupId, {$addToSet: {familiesApplying: data}}, {filter: false})
+        Families.addGroup(familyId, groupId, data)
+
+        const groupOld = super.findOne({_id: groupId, "familiesApplying.familyId": familyId}) || {}
+        const groupExists = !_.isEmpty(groupOld)
+        console.log('groupExists', groupExists)
+        const oldData = _.findWhere(groupOld.familiesApplying || [], {familyId}) || {}
+        super.update({
+            _id: groupId,
+            status: {$ne: "removed"}
+        }, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {familiesApplying: data}}, {filter: false})
         const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
         const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        console.log('apply userId', userId)
+        Audit.insert({
+            userId: userId,
+            type: groupExists ? 'update' : 'create',
+            docId: groupId,
+            newDoc: data,
+            oldDoc: oldData,
+            where: 'groups'
+        })
+        updateGroupCount(familyId)
         return
     }
 
-    cancelApply(groupId, familyId) {
+    cancelApply(groupId, familyId, userId) {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
-        Families.update(familyId, {$pull: {"groups.applied": groupId}})
-        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        Families.removeGroup(familyId, groupId)
         const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
+        const oldData = _.findWhere(group.familiesApplying || [], {familyId}) || {}
+        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+
         const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        Audit.insert({
+            userId: userId,
+            type: 'remove',
+            docId: groupId,
+            newDoc: {},
+            oldDoc: oldData,
+            where: 'groups'
+        })
+        updateGroupCount(familyId)
         return
     }
 
@@ -112,12 +159,12 @@ const groupApplySchema = new SimpleSchema({
             }
         }
     },
-    comments:{
+    comments: {
         label: 'Comments (optional)',
         type: String,
         optional: true,
-        autoform:{
-            rows:4,
+        autoform: {
+            rows: 4,
         }
     }
 })
@@ -262,9 +309,13 @@ const schemaObject = {
     },
     status: {
         type: String,
-        allowedValues: ["potential", "confirmed", "cancelled"],
+        allowedValues: ["potential", "confirmed", "cancelled", "removed"],
         autoform: {
-            options: "allowed",
+            options: [
+                {value: "potential", label: "potential"},
+                {value: "confirmed", label: "confirmed"},
+                {value: "cancelled", label: "cancelled"},
+            ],
             capitalize: true,
             defaultValue: "potential",
             afFormGroup: {
@@ -740,7 +791,7 @@ columnsFamilyApplied.push({
     key: 'familiesApplying.guests',
     label: 'Guest Pref',
     render: function (val, path) {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') ||Meteor.userId()})
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         return capitalize(groupApply.guests)
     }
@@ -749,7 +800,7 @@ columnsFamilyApplied.push({
     key: 'guest.welcome',
     label: 'Welcome guests',
     render: function () {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') ||Meteor.userId()})
+        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         if (groupApply.minimum == groupApply.maximum) {
             return groupApply.minimum

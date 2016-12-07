@@ -8,6 +8,7 @@ import {Families} from '/imports/api/family/family'
 import {Groups} from '/imports/api/group/group'
 import {Meteor} from 'meteor/meteor'
 import {Migrations} from 'meteor/percolate:migrations'
+import {updateGroupCount} from '/imports/api/group/group'
 Migrations.config({
     log: true
 });
@@ -88,8 +89,8 @@ Migrations.add({
         cursor.forEach((group) => {
             const availablePlacements = (group.familiesApplying && group.familiesApplying.length) || 0
             Groups.attachSchema(Groups.schemas.edit, {replace: true})
-            console.log('availablePlacements','availablePlacements')
-            if (availablePlacements){
+            console.log('availablePlacements', 'availablePlacements')
+            if (availablePlacements) {
                 Groups.update(group._id, {$set: {availablePlacements}})
 
             }
@@ -97,4 +98,43 @@ Migrations.add({
         return true
     },
 })
+
+
+Migrations.add({
+    version: 7,
+    name: 'Update files to aws3" ',
+    up: function () {//code to migrate up to version 1}
+        const version = 3
+        const files = Files.collection.find()
+        files.forEach((file) => {
+            var filePath = 'files/' + file._id + '-original.' + file.extension
+            const upd = {$set: {}}
+            var cfdomain = 'https://dn369dd0j6qea.cloudfront.net'; // <-- Change to your Cloud Front Domain
+            upd['$set']["versions.original.meta.pipeFrom"] = cfdomain + '/' + filePath;
+            upd['$set']["versions.original.meta.pipePath"] = filePath;
+            upd['$set']["version"] = version;
+            const update = Files.collection.update(file._id, upd)
+        })
+        return true
+    },
+})
+
+
+
+
+
+
+Migrations.add({
+    version: 8,
+    name: 'Update groups information in bluecards and emails reports" ',
+    up: function () {//code to migrate up to version 1}
+            const families = Families.find({"groups.applied.0": {$exists: 1}})
+        console.log('--->>', families.count())
+        families.forEach((family) => {
+           updateGroupCount(family._id)
+        })
+        return true
+    },
+})
+
 

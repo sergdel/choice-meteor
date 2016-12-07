@@ -115,13 +115,6 @@ export const reportsAutoTable = new AutoTable({
     collection: Email,
     schema: reportFilterSchema,
     publishExtraFields: ['userId', 'html'],
-    publishExtraCollection:function(reports){
-        let familiesIds=reports.map((rep)=>{
-            return rep.userId
-        })
-        familiesIds=_.uniq(familiesIds)
-        return Meteor.users.find({_id: {$in: familiesIds }},{fields: {groups: 1, roles: 1}})
-    },
     settings: {
         options: {
             columnsSort: true,
@@ -159,13 +152,10 @@ export const reportsAutoTable = new AutoTable({
             operators
         },
         {
-            key: 'Groups',
-            label: 'Groups',
-            render: function (val, path) {
-                const family= Families.findOne(this.userId)
-                console.log('familgroups y',family)
-                return family && family.groups &&  family.groups.applied &&  family.groups.applied.length
-            },
+            key: 'groups',
+            label: 'groups',
+            operator: '$eq',
+            operators,
         },
         {
             key: 'notes', label: 'Notes', operator: '$regex',

@@ -35,7 +35,7 @@ Meteor.publish('families', function (limit, query = {}, sort = {}) {
 });
 Meteor.publish('family', function (familyId) {
     const user = Meteor.users.findOne(this.userId); //I don't want to user Roles packages at this tiem because then probably you have to use meteor.users.find 3 times.
-    if (!user){
+    if (!user) {
         return this.ready()
     }
     const userRoles = user.roles;
@@ -47,11 +47,14 @@ Meteor.publish('family', function (familyId) {
             office: 0,
         }
     }//is family role
-    const cursor = Families.find(familyId, {fields,userId: this.userId})
+    const cursor = Families.find(familyId, {fields, userId: this.userId})
+
     const family = cursor.fetch()[0]
+    if (!family)
+        return this.ready()
     const familyFiles = (family.files || [])
     const adultFiles = (family.adult && family.adult.files || [])
-    const officeFiles = (family.office && family.office.files ||  [])
+    const officeFiles = (family.office && family.office.files || [])
     const files = _.union(familyFiles, adultFiles, officeFiles)
     return [cursor, Files.collection.find({_id: {$in: files}})]
 });

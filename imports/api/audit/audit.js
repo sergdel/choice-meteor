@@ -11,16 +11,13 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 
 class AuditCollection extends Mongo.Collection {
     insert({userId, type, docId, newDoc, oldDoc, where = 'families'}) {
-        let res
+        console.log('AuditCollection insert userId', userId)
         const user = Meteor.users.findOne(userId)
-        const name = user.firstName
+        const name = (user.firstName && user.surname) ? user.firstName + ' ' + user.surname : false || ((user.parents && user.parents[0] && user.parents[0].surname) + ' ' + (user.parents && user.parents[0] && user.parents[0].firstName))
         const role = user.roles.pop()
-        if (type == 'update') {
+        if (type == 'update' || type == 'create' || type == 'remove') {
             let result = diff.getDiff(oldDoc, newDoc)
-
-
             for (let key in result) {
-
                 let path = key.replace(/\//g, '.').substr(1)
                 const regex = /\.(\d*)\./g
                 result[key].path = path
@@ -32,7 +29,6 @@ class AuditCollection extends Mongo.Collection {
                 path = path.replace(/\[\.|\]](\d)$/, '[$1]')
                 result[key].before = _.get(oldDoc, path)
                 result[key].after = _.get(newDoc, path)
-
             }
             if (!_.isEmpty(result)) {
                 return super.insert({
@@ -47,8 +43,7 @@ class AuditCollection extends Mongo.Collection {
                 });
             }
             return 0
-        }
-        if (type == 'access') {
+        } else {
             return super.insert({
                 type,
                 where,
@@ -59,29 +54,6 @@ class AuditCollection extends Mongo.Collection {
                 timestamp: new Date()
             });
         }
-        if (type == 'create') {
-            return super.insert({
-                type,
-                where,
-                docId,
-                role,
-                name,
-                userId,
-                timestamp: new Date()
-            });
-        }
-        if (type == 'remove') {
-            return super.insert({
-                type,
-                where,
-                docId,
-                role,
-                name,
-                userId,
-                timestamp: new Date()
-            });
-        }
-        throw new Meteor.Error('Audit type not recognise ')
     }
 
     update() {
@@ -130,10 +102,7 @@ const AuditFilterSchema = new SimpleSchema({
                 {label: 'Family', value: 'family'}],
         }
     },
-    name: {
-        type: String,
-        optional: true,
-    },
+
     userId: {
         label: 'Staff',
         type: [String],
@@ -147,30 +116,64 @@ const AuditFilterSchema = new SimpleSchema({
                 })
             }
         }
+    },
+    timestamp: {
+        type: Date,
+        label: 'Time',
+        optional: true,
+    },
+    where: {
+        type: String,
+        label: 'Where',
+        optional: true,
     }
 })
+const operators = [  // Optional Array works for option filter
+    {
+        label: 'More than',
+        shortLabel: '>',
+        operator: '$gt',
+    },
+    {
+        label: 'Less than',
+        shortLabel: '<',
+        operator: '$lt',
+    },
+
+]
 
 export const AuditAutoTable = new AutoTable({
     id: 'Audit',
     columns: [
-        {key: 'name', operator: '$regex', label: 'Name'},
+        {
+            key: 'userId', operator: '$in', label: 'Staff',
+            render: function (val, path) {
+                return this.name
+            }
+        },
         {key: 'type', operator: '$in', label: 'Type'},
         {key: 'role', operator: '$in', label: 'Role'},
         {
-            key: 'userId', operator: '$in', label: 'Staff', render: function (val, path) {
-            return this.name
-        }
+            key: 'timestamp', operator: '$gt', label: 'Time', operators,
+            render: function (val) {
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY H:mm')
+            },
         },
+        {key: 'where', operator: '$regex', label: 'Where'},
     ],
     collection: Audit,
     schema: AuditFilterSchema,
     settings: {
         options: {
+            columnsDisplay: true,
+            columnsSort: true,
             filters: true,
             showing: true,
         },
     },
-    publishExtraFields: ['result', 'docId'],
+    publishExtraFields: ['result', 'docId', 'name'],
     publish: function () {
         return true
         if (!Roles.userIsInRole(this.userId, 'admin')) {

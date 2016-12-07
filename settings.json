@@ -8,5 +8,9 @@
   "mailgun":{
     "api_key":"key-99107b6bbac759ca5e1ee811e959323f",
     "domain":"choicehomestay.com"
+  },
+  "aws":{
+    "AWSAccessKeyId":"AKIAIDADQQMM3JAINESA",
+    "AWSSecretKey":"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"
   }
 }

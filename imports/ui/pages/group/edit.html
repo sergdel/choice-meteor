@@ -127,6 +127,10 @@
 
                             {{>buttonSubmit edit=true}}
                         {{/autoForm}}
+                        {{#with group}}
+                        <button type="button" class="btn btn-danger btn-xs groupRemove">Remove group <i
+                                class="fa fa-trash"></i></button>
+                        {{/with}}
                     </div>
                     <div role="tabpanel" class="tab-pane  fade " id="office">
                         <br>
@@ -146,6 +150,7 @@
                     </div>
                 </div>
             </div>
+
         {{else}}
             {{>notFound}}
         {{/if}}

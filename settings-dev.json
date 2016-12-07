@@ -12,5 +12,9 @@
   "kadira": {
     "appId": "gD4YdjZBaoptgpfiH",
     "appSecret": "f8751bf5-c225-47ee-9629-9d0742bb6ddc"
+  },
+  "aws":{
+    "AWSAccessKeyId":"AKIAIDADQQMM3JAINESA",
+    "AWSSecretKey":"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"
   }
 }

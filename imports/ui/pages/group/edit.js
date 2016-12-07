@@ -33,6 +33,24 @@ Template.groupEdit.helpers({
 })
 ;
 
-Template.groupEdit.events({});
+Template.groupEdit.events({
+    'click .groupRemove'(e, instance) {
+        BootstrapModalPrompt.prompt({
+            title: 'Please confirm',
+            content: 'Are you sure to remove this Group?<br>This action can not be undo.',
+            btnDismissTextClass: 'btn-default',
+            btnOkTextClass: 'btn-danger',
+            btnDismissText: 'Cancel',
+            btnOkText: 'Yes, I\'m sure.',
+        }, (data) => {
+            if (data) {
+                Meteor.call('groupRemove', this._id)
+                FlowRouter.go('groupList')
+            } else {
+
+            }
+        })
+    },
+});
 
 

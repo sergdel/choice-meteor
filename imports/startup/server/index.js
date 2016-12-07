@@ -10,6 +10,7 @@ import "/imports/startup/server/mailgun"
 import "/imports/api/files/server/publication";
 import "/imports/api/files/files";
 import "/imports/api/blue-card/server/publication";
+import "/imports/api/blue-card/methods";
 import "/imports/api/family/server/publication";
 import "/imports/api/family/family";
 import "/imports/api/family/methods";

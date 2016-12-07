@@ -40,7 +40,7 @@ Meteor.methods({
         }
         console.log('groupCancelApply', familyId)
         check(groupId, String)
-       return Groups.cancelApply(groupId,familyId)
+        return Groups.cancelApply(groupId, familyId, this.userId)
     },
     groupApply: function (groupId, familyId, data) {
         console.log('groupApply', familyId)
@@ -56,8 +56,13 @@ Meteor.methods({
         check(data, Groups.schemas.apply)
         check(groupId, String)
 
-        //todo maybe this code has to be in group class., maybe in a method apply
-        return Groups.apply(groupId,familyId,data)
+        return Groups.apply(groupId, familyId, data, this.userId)
 
+    },
+    groupRemove:function(groupId){
+        if (!Roles.userIsInRole(this.userId, ['admin'])) {
+            throw new Meteor.Error(403, 'Access denied!', 'Only admin  can removes groups')
+        }
+        return Groups.remove(groupId)
     }
 })

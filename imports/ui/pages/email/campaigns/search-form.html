@@ -1,18 +1,18 @@
-<template name="searchFamilyListForm">
+<template name="searchCampaignListForm">
 
     <div class="row">
-        {{#autoForm  schema=searchSchema id="searchFamilyListForm" template="bootstrap3"
+        <div class="col-xs-12 ">
+        	<label>Query</label>
+        </div>
+        {{#autoForm  schema=searchSchema id="searchCampaignListForm" template="bootstrap3"
                      autosave=true
                      resetOnSuccess=false type="normal" autosaveOnKeyup=true trimStrings=false }}
 
-            <div class="col-xs-8 col-sm-3">
+            <div class="col-lg-3">
                 {{>afFieldInput name="address" value=address class="form-control"  type="googleplace" opts=optsGoogleplace placeholder="Sort by distance to:"}}
             </div>
-            <div class="col-xs-4 col-sm-1">
+            <div class="col-lg-1">
                 {{>afFieldInput name="distance" value=distance class="form-control"  }}
-            </div>
-            <div class="col-sm-4">
-                {{>afFieldInput name="queryContact" value=queryContact class="form-control"   placeholder="Email/Phone"}}
             </div>
         {{/autoForm}}
         {{#if isInRole 'admin'}}
