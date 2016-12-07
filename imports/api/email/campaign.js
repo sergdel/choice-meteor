@@ -50,7 +50,10 @@ const emailFamilyFilter = new SimpleSchema({
         optional: true,
         type: String,
     },
-
+    'groups.applied':{
+        type: Number,
+        optional: true,
+    }
 
 })
 export const campaignAutoTable = new AutoTable({
@@ -83,6 +86,14 @@ export const campaignAutoTable = new AutoTable({
             key: "contact.address.suburb",
             label: 'Suburb',
             operator: '$regex'
+        },
+        {
+            key: 'groups.applied', label: 'Applied', operator: '$size',
+            render: function (val) {
+                val=val || []
+                console.log('render',val,this)
+                return val.length
+            }
         },
     ],
     collection: Meteor.users,

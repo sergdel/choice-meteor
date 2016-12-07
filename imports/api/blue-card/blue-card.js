@@ -14,7 +14,33 @@ export const BlueCard = new Mongo.Collection('bluecard');
  status
  */
 
+const operators = [
+    {
+        label: 'Equal',
+        shortLabel: '=',
+        operator: '$eq',
+    },
 
+    {
+        label: 'More than',
+        shortLabel: '>',
+        operator: '$gt',
+    },
+    {
+        label: 'Less than',
+        shortLabel: '<',
+        operator: '$lt',
+    },
+    {
+        label: 'More or equal than',
+        shortLabel: '≥',
+        operator: '$gte',
+    },
+    {
+        label: 'Less or equal than',
+        shortLabel: '≤',
+        operator: '$lte',
+    }]
 BlueCard.filterSchema = new SimpleSchema({
     firstName: {
         type: String,
@@ -35,6 +61,10 @@ BlueCard.filterSchema = new SimpleSchema({
     expiryDate: {
         optional: true,
         type: Date,
+    },
+    groups: {
+        optional: true,
+        type: Number,
     },
     "status": {
         label: 'Status',
@@ -77,6 +107,10 @@ BlueCard.filterSchema = new SimpleSchema({
                 {label: 'Sponsored', value: 'sponsored'},
                 {label: 'Authorised', value: 'authorised'}],
         }
+    },
+    notes:{
+        type: String,
+        optional: true,
     }
 })
 BlueCard.autoTable = new AutoTable({
@@ -97,33 +131,7 @@ BlueCard.autoTable = new AutoTable({
                 return m.format('Do MMM YY')
             },
             operator: '$gte',
-            operators: [
-                {
-                    label: 'Equal',
-                    shortLabel: '=',
-                    operator: '$eq',
-                },
-
-                {
-                    label: 'More than',
-                    shortLabel: '>',
-                    operator: '$gt',
-                },
-                {
-                    label: 'Less than',
-                    shortLabel: '<',
-                    operator: '$lt',
-                },
-                {
-                    label: 'More or equal than',
-                    shortLabel: '≥',
-                    operator: '$gte',
-                },
-                {
-                    label: 'Less or equal than',
-                    shortLabel: '≤',
-                    operator: '$lte',
-                }]
+            operators
         },
         {
             key: 'number',
@@ -137,33 +145,7 @@ BlueCard.autoTable = new AutoTable({
                 if (!m.isValid()) return val
                 return m.format('Do MMM YY') + ' - ' + m.fromNow()
             },
-            operators: [
-                {
-                    label: 'Equal',
-                    shortLabel: '=',
-                    operator: '$eq',
-                },
 
-                {
-                    label: 'More than',
-                    shortLabel: '>',
-                    operator: '$gt',
-                },
-                {
-                    label: 'Less than',
-                    shortLabel: '<',
-                    operator: '$lt',
-                },
-                {
-                    label: 'More or equal than',
-                    shortLabel: '≥',
-                    operator: '$gte',
-                },
-                {
-                    label: 'Less or equal than',
-                    shortLabel: '≤',
-                    operator: '$lte',
-                }]
         },
         {
             key: 'status',
@@ -178,12 +160,15 @@ BlueCard.autoTable = new AutoTable({
             operator: '$in',
         },
         {
-            key: 'Groups',
+            key: 'groups',
             label: 'Groups',
-            render: function (val, path) {
-                const family= Families.findOne(this.familyId)
-                return family && family.groups &&  family.groups.applied &&  family.groups.applied.length
-            },
+            operator: '$eq',
+            operators
+
+        },
+        {
+            key: 'notes', label: 'Notes', operator: '$regex',
+            template: 'blueCardsNotes'
         },
 
     ],
@@ -191,13 +176,7 @@ BlueCard.autoTable = new AutoTable({
     schema: BlueCard.filterSchema,
     query: {$or: [{dateOfBirth: {$lte: moment().subtract(17.5, 'years').toDate()}}, {dateOfBirth: {$not: {$type: 9}}}]},
     collection: BlueCard,
-    publishExtraCollection:function(blueCards){
-        let familiesIds=blueCards.map((bc)=>{
-            return bc.familyId
-        })
-        familiesIds=_.uniq(familiesIds)
-        return Meteor.users.find({_id: {$in: familiesIds }},{fields: {groups: 1, roles: 1}})
-    },
+
     settings: {
         options: {
             columnsSort: true,
@@ -205,14 +184,19 @@ BlueCard.autoTable = new AutoTable({
             showing: true,
             filters: true,
         },
-        klass:{
+        klass: {
             tableWrapper: ''
         }
     },
     publishExtraFields: ['familyId'],
-    link: function (doc) {
+    link: function (doc, key) {
+        console.log('doc,11111',doc.familyId)
+        if (key != 'notes'){
+            console.log('link',doc.familyId)
+            return FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
+        }
 
-        return FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
+
     }
 })
 

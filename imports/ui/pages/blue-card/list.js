@@ -1,4 +1,5 @@
 import "./list.html"
+import "./notes"
 import {Template} from "meteor/templating"
 import {BlueCard} from "/imports/api/blue-card/blue-card";
 import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"

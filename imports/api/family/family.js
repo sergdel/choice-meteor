@@ -37,6 +37,26 @@ export const emailSchema = new SimpleSchema({
 })
 
 export const Families = {}
+Families.removeGroups = function (groupId) {
+    const affectedFamilies = Meteor.users.find({"groups.applied": groupId}, {fields: {_id: 1}}).fetch()
+
+    const ids = _.pluck(affectedFamilies, '_id')
+    Meteor.users.update({"groups.applied": groupId}, {$pull: {"groups.applied": groupId}})
+
+    BlueCard.update({familyId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
+    Email.update({userId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
+
+    return Meteor.users.update({}, {$pull: {"groups.applied": groupId}}, {multi: true})
+}
+Families.removeGroup = function (familyId, groupId) {
+    return Meteor.users.update(familyId, {$pull: {"groups.applied": groupId}})
+}
+Families.addGroup = function (familyId, groupId, data) {
+    return Meteor.users.update(familyId, {
+        $set: {"groups.groupApplyDefaults": data},
+        $addToSet: {"groups.applied": groupId}
+    })
+}
 Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
         Audit.insert({type: 'access', docId: selector, userId: options.userId})
@@ -44,7 +64,6 @@ Families.find = function (selector = {}, options) {
     return Meteor.users.find(selector, options)
 }
 Families.findOne = (_id, options) => {
-
     return Meteor.users.findOne({_id, roles: 'family'}, options)
 }
 Families.insert = function (email, options) {
@@ -55,7 +74,6 @@ Families.insert = function (email, options) {
 }
 Families.update = function (_id, modifier, options = {}, callback) {
     const oldDoc = Meteor.users.findOne(_id)
-
 
 
     const updated = Meteor.users.update(_id, modifier, options, callback)
@@ -72,12 +90,14 @@ Families.update = function (_id, modifier, options = {}, callback) {
     //todo hacer esto con joins probablemente con un helper https://guide.meteor.com/collections.html#collection-helpers
     //una  moificacion al autotable donde permita custom publish
     // y
-    Email.update({userId: _id},{$set:{
-        mobilePhone: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].mobilePhone,
-        parent1: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].firstName,
-        paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[0].firstName,
-        surname: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].surname
-    }},{multi:true})
+    Email.update({userId: _id}, {
+        $set: {
+            mobilePhone: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].mobilePhone,
+            parent1: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].firstName,
+            paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[0].firstName,
+            surname: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].surname
+        }
+    }, {multi: true})
 
     Tags.insert(newDoc && newDoc.office && newDoc.office.tags)
 
@@ -88,8 +108,8 @@ Families.update = function (_id, modifier, options = {}, callback) {
 Families.upsert = function (_id, modifier, options, callback) {
     return //
 }
-Families.remove = function (_id,options) {
-    console.log('Families.removem',_id)
+Families.remove = function (_id, options) {
+    console.log('Families.removem', _id)
     Audit.insert({type: 'remove', docId: _id, userId: options.userId})
     return Meteor.users.remove(_id)
 }
@@ -281,16 +301,16 @@ export const setBlueCardStatus = function (family) {
                 //family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
 
                 if (!family[type][i].blueCard.expiryDate || !family[type][i].blueCard.number) {
-                   // family[type][i].blueCard.status = "apply"
+                    // family[type][i].blueCard.status = "apply"
                 }
                 if (family[type][i].birthOfDate && family[type][i].birthOfDate > moment().subtract(17.5, 'years')) {
-                   // family[type][i].blueCard.status = "n/a"
+                    // family[type][i].blueCard.status = "n/a"
                 }
                 if ((family[type][i].blueCard.expiryDate && family[type][i].blueCard.expiryDate <= new Date())) {
-                  //  family[type][i].blueCard.status = "expired"
+                    //  family[type][i].blueCard.status = "expired"
                 }
                 if (family[type][i].blueCard.expiryDate >= new Date() && family[type][i].blueCard.number) {
-                   // family[type][i].blueCard.status = "approved"
+                    // family[type][i].blueCard.status = "approved"
                 }
                 // calc the minumin of status for set in generalstatus
                 const level = _.indexOf(map, family[type][i].blueCard.status)

@@ -68,6 +68,14 @@ const columns = [
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
+    {
+        key: 'groups.applied', label: 'Applied', operator: '$size',
+        render: function (val) {
+            val=val || []
+            console.log('render',val,this)
+            return val.length
+        }
+    },
 ]
 
 export const familyFilterSchema = new SimpleSchema({
@@ -135,7 +143,7 @@ export const familyFilterSchema = new SimpleSchema({
         optional: true,
         autoform: {
             type: 'select-multi-checkbox-combo',
-            options:function(){
+            options: function () {
                 return Tags.options()
             }
         },
@@ -188,6 +196,10 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true
     },
+    'groups.applied':{
+        type: Number,
+        optional: true,
+    }
 });
 
 

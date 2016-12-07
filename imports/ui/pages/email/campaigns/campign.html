@@ -1,4 +1,19 @@
 <template name="emailsCampaign">
     <h2>New Camapign</h2>
-    {{>quickForm id="campaignForm" type="method" meteormethod="sendCampaign" schema=campaignSchema }}
+
+
+
+    {{#autoForm id="campaignForm" type="method" template="bootstrap3" meteormethod="sendCampaign" schema=campaignSchema}}
+
+        {{> afQuickField name='name'  template="bootstrap3"}}
+        {{>searchCampaignListForm}}
+        {{> afQuickField name='query'   template="bootstrap3" label=false}}
+        {{> afQuickField name='template'  template="bootstrap3"}}
+    <div class="row">
+    	<div class="col-xs-12 text-right">
+            <button type="submit" class="btn btn-primary btn-lg">Send</button>
+
+        </div>
+    </div>
+    {{/autoForm}}
 </template>

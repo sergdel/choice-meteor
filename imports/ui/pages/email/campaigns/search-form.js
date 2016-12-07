@@ -3,17 +3,31 @@
  */
 import './search-form.html'
 import {optsGoogleplace} from "/imports/api/family/contact";
-import '/imports/ui/pages/family/export'
+
 AutoForm.hooks({
-    searchFamilyListForm: {
+    searchCampaignListForm: {
         onSubmit: function (search, modifier) {
-            if (search.address && search.address.geometry) {
-                Session.set('searchFamilyListForm.address', search.address);
-                Session.set('searchFamilyListForm.distance', search.distance);
+            let customQuery = {}
+            if (search  && search.address && search.address.geometry) {
+                
+                if (search.address) {
+                    customQuery = {
+                        "contact.address.geometry": {
+                            $near: {
+                                $geometry: search.address.geometry,
+                                $maxDistance: search.distance
+                            }
+                        }
+                    }
+
+                }
+                
+                Session.set('campaignList_customQuery',customQuery)
             } else {
-                Session.set('searchFamilyListForm.address', null)
+                Session.set('campaignList_customQuery',undefined)
+
             }
-            Session.set('searchFamilyListForm.queryContact', search.queryContact)
+            console.log('campaignList_customQuery success campaignList_customQuery',customQuery)
             return false;
         }
     }
@@ -85,44 +99,18 @@ export const searchSchema = new SimpleSchema({
         type: AddressSchema,
         optional: true,
     },
-    queryContact:{
-        type: String,
-        optional: true
-    }
 });
 
-Template.searchFamilyListForm.onCreated(function () {
-
+Template.searchCampaignListForm.onCreated(function () {
+    Session.setDefaultPersistent('searchCampaignListForm.query', {roles: 'family'})
 });
-Template.searchFamilyListForm.helpers({
+Template.searchCampaignListForm.helpers({
     searchSchema: searchSchema,
     optsGoogleplace: optsGoogleplace,
     distance: ()=> {
-        return Session.get('searchFamilyListForm.distance')
+        return Session.get('searchCampaignListForm.distance')
     },
     address: ()=> {
-        return Session.get('searchFamilyListForm.address')
+        return Session.get('searchCampaignListForm.address')
     },
-    queryContact: ()=> {
-        console.log("Session.get('searchFamilyListForm.queryContact')",Session.get('searchFamilyListForm.queryContact'))
-        return Session.get('searchFamilyListForm.queryContact')
-    },
-});
-
-Template.searchFamilyListForm.events({
-    'click .export'(e, instance){
-        BootstrapModalPrompt.prompt({
-            title: "Export to CSV",
-            template: Template.exportCVS,
-            btnDismissText: 'Cancel',
-            btnOkText: 'Export'
-        }, function (data) {
-            if (data) {
-
-            }
-            else {
-                console.log('cancel')
-            }
-        });
-    }
 });

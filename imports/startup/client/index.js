@@ -5,3 +5,4 @@ import "./token-login";
 import "../useraccounts-configuration";
 import "./autoform"
 import "./routes";
+import "/imports/api/blue-card/methods";
