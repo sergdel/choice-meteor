@@ -17,7 +17,7 @@ Template.emailTemplatesEdit.onRendered(function () {
 });
 
 Template.emailTemplatesEdit.helpers({
-    collection: EmailTemplates,
+    schema: EmailTemplates.schema.edit,
     doc: () => EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId')),
     settings: () => {
         const doc = EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId'))

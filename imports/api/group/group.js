@@ -63,7 +63,6 @@ class GroupCollection extends Mongo.Collection {
             const date1 = moment(group.dates[1])
             modifier.$set.nights = date1.diff(date0, 'days')
         }
-        console.log('modifier', modifier)
         return super.update(_id, modifier, options);
     }
 
@@ -73,7 +72,6 @@ class GroupCollection extends Mongo.Collection {
 
         const groupOld = super.findOne({_id: groupId, "familiesApplying.familyId": familyId}) || {}
         const groupExists = !_.isEmpty(groupOld)
-        console.log('groupExists', groupExists)
         const oldData = _.findWhere(groupOld.familiesApplying || [], {familyId}) || {}
         super.update({
             _id: groupId,
@@ -83,7 +81,6 @@ class GroupCollection extends Mongo.Collection {
         const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
         const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
-        console.log('apply userId', userId)
         Audit.insert({
             userId: userId,
             type: groupExists ? 'update' : 'create',
@@ -537,7 +534,6 @@ const columns = [
         operator: '$eq',
         operators,
         render: function (val) {
-            console.log()
             const m = moment(val)
             if (!m.isValid()) return val
             return m.format('Do MMM YYYY')

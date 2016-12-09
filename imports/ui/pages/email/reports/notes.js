@@ -7,7 +7,6 @@ Template.emailCampaignNotes.helpers({
 Template.emailCampaignNotes.events({
     'change textarea'(e,instance){
         const notes=$(e.currentTarget).val()
-        console.log('change textarea',this._id,notes)
         Meteor.call('updateEmailsCampaignReportNote',this._id,notes)
     }
 });

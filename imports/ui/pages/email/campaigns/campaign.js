@@ -6,7 +6,9 @@ import './search-form'
 import {Template} from 'meteor/templating'
 import {campaignSchema} from '/imports/api/email/campaign'
 
-
+Template.emailsCampaign.onCreated(function () {
+    this.subscribe('EmailTemplates')
+})
 Template.emailsCampaign.helpers({
     campaignSchema: campaignSchema,
 

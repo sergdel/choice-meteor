@@ -1,17 +1,24 @@
 <template name="emailTemplatesList">
 
     {{#unless id}}
-        <h1>Email Templates List</h1>
+        <h1>Email Templates List
+            {{#if isInRole 'admin'}}
+                <button class="btn btn-lg btn-primary templateNew"><i class="fa fa-plus"></i></button>
+            {{/if}}
+        </h1>
         {{>atTable at=autoTable }}
 
     {{else}}
-        <h1>Email Templates Edit <button class="btn btn-lg btn-primary back"><i class="fa fa-list"></i></button> </h1>
+        <h1>Email Templates Edit
+            <button class="btn btn-lg btn-primary back"><i class="fa fa-list"></i></button>
+        </h1>
 
         {{#if Template.subscriptionsReady}}
             <div class="autoform-clear">
 
 
-                {{#autoForm collection=collection id="emailTemplatesEdit" doc=doc   type="method-update" meteormethod="emailTemplateUpdate" template="bootstrap3"}}
+                {{#autoForm schema=schema id="emailTemplatesEdit" doc=doc   type="method-update"
+                            meteormethod="emailTemplateUpdate" template="bootstrap3"}}
                     {{> afQuickField name='description' template="bootstrap3"}}
                     {{> afQuickField name='subject' template="bootstrap3"}}
                     {{> afQuickField name='from' template="bootstrap3"}}

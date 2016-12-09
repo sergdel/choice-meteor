@@ -7,8 +7,12 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Families} from '/imports/api/family/family'
 import {Groups} from '/imports/api/group/group'
 import {Meteor} from 'meteor/meteor'
+import {Email} from 'meteor/email'
 import {Migrations} from 'meteor/percolate:migrations'
 import {updateGroupCount} from '/imports/api/group/group'
+import {insertBlueCards} from "/imports/api/family/family";
+import {emailTemplateFixtures} from "/imports/api/email/server/email-template-fixtures";
+import {EmailTemplates} from '/imports/api/email/templates'
 Migrations.config({
     log: true
 });
@@ -29,6 +33,8 @@ Migrations.add({
         return true
     },
 })
+
+
 Migrations.add({
     version: 2,
     name: 'Update blue card status" ',
@@ -55,8 +61,6 @@ Migrations.add({
             const family = Meteor.users.findOne(email.userId)
             if (family)
                 Email.update(email._id, {$set: {mobilePhone: family.parents[0].mobilePhone}})
-            else
-                console.log('email.userId', email.userId)
         })
         return true
     },
@@ -120,21 +124,171 @@ Migrations.add({
 })
 
 
-
-
-
-
 Migrations.add({
     version: 8,
     name: 'Update groups information in bluecards and emails reports" ',
     up: function () {//code to migrate up to version 1}
-            const families = Families.find({"groups.applied.0": {$exists: 1}})
+        const families = Families.find({"groups.applied.0": {$exists: 1}})
         console.log('--->>', families.count())
         families.forEach((family) => {
-           updateGroupCount(family._id)
+            updateGroupCount(family._id)
         })
         return true
     },
 })
 
+
+Migrations.add({
+    version: 9,
+    name: 'Update groups information in bluecards " ',
+    up: function () {//code to migrate up to version 1}
+        const families = Families.find({})
+        BlueCard.remove({})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+
+        Meteor.users.update({"parents.blueCard.id": {$exists: 1}}, {$unset: {"parents.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"children.blueCard.id": {$exists: 1}}, {$unset: {"children.$.blueCard.id": ""}}, {multi: true})
+        Meteor.users.update({"guests.blueCard.id": {$exists: 1}}, {$unset: {"guests.$.blueCard.id": ""}}, {multi: true})
+        families.forEach((family) => {
+            insertBlueCards(family)
+        })
+        return true
+    },
+})
+
+Migrations.add({
+    version: 10,
+    name: 'Update groups information in bluecards " ',
+    up: function () {//code to migrate up to version 1}
+        const families = Families.find({})
+        for (const template of emailTemplateFixtures) {
+            const exists = !!EmailTemplates.find(template._id).count()
+            if (!exists) {
+                EmailTemplates.insert(template)
+            }
+        }
+        EmailTemplates.update('enrollAccount', {$set: {type: "system", campaign: true}})
+        let ids = [
+            "resetPassword",
+            "verifyEmail",
+            "welcomeEmail",
+            "ReadyToProcess",
+            "BeingProcessed",
+            "Declined",
+            "Approved",
+            "NewApplication",
+            "Suspended"]
+        EmailTemplates.update({_id: {$in: ids}}, {$set: {type: "system", campaign: false}}, {multi: true})
+    }
+})
+
+
+
+Migrations.add({
+    version: 11,
+    name: 'Recreate token for emails campaing " ',
+    up: function () {
+
+        const cursor = Email.find({loggedAt: {$eq: null}}, {limit: 1})
+        cursor.forEach((email) => {
+            if (email.userId){
+                const user=Meteor.users.findOne(email.userId)
+                let token = email.text.match(/\[http:\/\/www\.choicehomestay\.com\/enroll\-account\/(\S*)\]/gi)
+                if (Array.isArray(token))
+                    token = token[0]
+                token = token.substr(46)
+                token = token.substr(0, token.length - 1)
+                var when = new Date();
+                var tokenRecord = {
+                    token: token,
+                    email: email.to,
+                    when: when,
+                    reason: 'enroll'
+                };
+                Meteor.users.update(email.userId, {
+                    $set: {
+                        "services.password.reset": tokenRecord
+                    }
+                });
+                // before passing to template, update user object with new token
+                Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
+            }
+
+        })
+    }
+})
+
+
+Migrations.add({
+    version: 12,
+    name: 'Recreate token for emails campaing " ',
+    up: function () {
+
+        const cursor = Email.find({loggedAt: {$eq: null}})
+        cursor.forEach((email) => {
+            if (email.userId){
+                const user=Meteor.users.findOne(email.userId)
+                let token = email.text.match(/\[http:\/\/www\.choicehomestay\.com\/enroll\-account\/(\S*)\]/gi)
+                if (Array.isArray(token))
+                    token = token[0]
+                token = token.substr(46)
+                token = token.substr(0, token.length - 1)
+                var when = new Date();
+                var tokenRecord = {
+                    token: token,
+                    email: email.to,
+                    when: when,
+                    reason: 'enroll'
+                };
+                Meteor.users.update(email.userId, {
+                    $set: {
+                        "services.password.reset": tokenRecord
+                    }
+                });
+                // before passing to template, update user object with new token
+                Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
+            }
+
+        })
+    }
+})
 

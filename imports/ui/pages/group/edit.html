@@ -6,150 +6,128 @@
             <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{group.parents.[0].firstName}}
                 {{group.id}} {{group.name}}
             </h1>
-            <div>
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#details" aria-controls="details" role="tab"
-                                                              data-toggle="tab">Group Details</a></li>
 
-                    <li role="presentation"><a href="#itinerary" aria-controls="itinerary" role="tab"
-                                               data-toggle="tab">Itinerary</a>
-                    </li>
-                    <li role="presentation"><a href="#placements" aria-controls="placements" role="tab"
-                                               data-toggle="tab">Placements</a></li>
-                    <li role="presentation"><a href="#payments" aria-controls="payments" role="tab" data-toggle="tab">Payments</a>
-                    </li>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#">Group Details</a></li>
 
-                </ul>
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane  fade in active" id="details">
-                        {{#autoForm formType="method-update"
-                                    id="groupEdit"
-                                    collection=collection
-                                    meteormethod="groupEdit"
-                                    type="method-update"
-                                    doc=group
-                                    resetOnSuccess=false
-                                    template='bootstrap3'
-                                    buttonContent=false
-                        }}
-                            <div class="row">
-                                <div class="col-sm-6 ">
-                                    {{> afQuickField name='id' autofocus=true}}
-                                </div>
-                                <div class="col-sm-6 ">
-                                    {{> afQuickField name='name'}}
-                                </div>
-                            </div>
+                <li><a href="#itinerary">Itinerary</a>
+                </li>
+                <li><a href="{{pathFor 'groupPlacements' groupId=groupId }}">Placements</a></li>
+                <li><a href="#payments">Payments</a>
+                </li>
 
+            </ul>
 
-                            <div class="row">
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='nationality'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='dates'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='nights'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='ages'}}
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='city'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='location'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='students'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='adults'}}
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                                <div class="col-sm-6 col-md-3">
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6">
-                                            {{> afQuickField name='guestsFrom'}}
-                                        </div>
-                                        <div class="col-sm-6 col-md-6">
-                                            {{> afQuickField name='guestsTo'}}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='status'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='placed'}}
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    {{> afQuickField name='availablePlacements'}}
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='notes'}}
-                                </div>
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='payments'}}
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='supervisorsName'}}
-                                </div>
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='supervisorsMobile'}}
-                                </div>
-
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='requirements'}}
-                                </div>
-                                <div class="col-sm-6">
-                                    {{> afQuickField name='other'}}
-                                </div>
-
-                            </div>
-
-                            {{>buttonSubmit edit=true}}
-                        {{/autoForm}}
-                        {{#with group}}
-                        <button type="button" class="btn btn-danger btn-xs groupRemove">Remove group <i
-                                class="fa fa-trash"></i></button>
-                        {{/with}}
+            {{#autoForm formType="method-update"
+                        id="groupEdit"
+                        collection=collection
+                        meteormethod="groupEdit"
+                        type="method-update"
+                        doc=group
+                        resetOnSuccess=false
+                        template='bootstrap3'
+                        buttonContent=false
+            }}
+                <div class="row">
+                    <div class="col-sm-6 ">
+                        {{> afQuickField name='id' autofocus=true}}
                     </div>
-                    <div role="tabpanel" class="tab-pane  fade " id="office">
-                        <br>
-                        <h1>Comming Soon</h1>
-                    </div>
-                    <div role="tabpanel" class="tab-pane fade " id="itinerary">
-                        <br>
-                        <h1>Comming Soon</h1>
-                    </div>
-                    <div role="tabpanel" class="tab-pane fade " id="placements">
-                        <br>
-                        <h1>Comming Soon</h1>
-                    </div>
-                    <div role="tabpanel" class="tab-pane fade " id="payments">
-                        <br>
-                        <h1>Comming Soon</h1>
+                    <div class="col-sm-6 ">
+                        {{> afQuickField name='name'}}
                     </div>
                 </div>
-            </div>
+
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='nationality'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='dates'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='nights'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='ages'}}
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='city'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='location'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='students'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='adults'}}
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6">
+                                {{> afQuickField name='guestsFrom'}}
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                {{> afQuickField name='guestsTo'}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='status'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='placed'}}
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        {{> afQuickField name='availablePlacements'}}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        {{> afQuickField name='notes'}}
+                    </div>
+                    <div class="col-sm-6">
+                        {{> afQuickField name='payments'}}
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        {{> afQuickField name='supervisorsName'}}
+                    </div>
+                    <div class="col-sm-6">
+                        {{> afQuickField name='supervisorsMobile'}}
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        {{> afQuickField name='requirements'}}
+                    </div>
+                    <div class="col-sm-6">
+                        {{> afQuickField name='other'}}
+                    </div>
+
+                </div>
+
+                {{>buttonSubmit edit=true}}
+            {{/autoForm}}
+            {{#with group}}
+                <button type="button" class="btn btn-danger btn-xs groupRemove">Remove group <i
+                        class="fa fa-trash"></i></button>
+            {{/with}}
+
 
         {{else}}
             {{>notFound}}

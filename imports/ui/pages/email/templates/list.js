@@ -51,7 +51,7 @@ Template.emailTemplatesList.onRendered(function () {
 Template.emailTemplatesList.helpers({
     id: () => Template.instance().id.get(),
     autoTable: EmailTemplates.autoTable,
-    collection: EmailTemplates,
+    schema: EmailTemplates.schema.edit,
     doc: () => EmailTemplates.findOne(Template.instance().id.get()),
     settings: () => {
         const doc = EmailTemplates.findOne(Template.instance().id.get())
@@ -76,6 +76,26 @@ Template.emailTemplatesList.helpers({
 });
 
 Template.emailTemplatesList.events({
+    'click .templateNew'(e,instance){
+        BootstrapModalPrompt.prompt({
+            title: "New template",
+            autoform: {
+                schema: EmailTemplates.schema.new,
+                type: "method",
+                meteormethod: "templateNew",
+                id: 'templateNew',
+                buttonContent: false,
+            },
+            btnDismissText: 'Cancel',
+            btnOkText: 'Save'
+        }, function (data) {
+            if (data) {
+                instance.id.set(data)
+            }
+            else {
+            }
+        });
+    },
     'click a.td'(e, instance){
         instance.id.set(this._id)
     },

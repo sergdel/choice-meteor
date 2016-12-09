@@ -11,7 +11,6 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 
 class AuditCollection extends Mongo.Collection {
     insert({userId, type, docId, newDoc, oldDoc, where = 'families'}) {
-        console.log('AuditCollection insert userId', userId)
         const user = Meteor.users.findOne(userId)
         const name = (user.firstName && user.surname) ? user.firstName + ' ' + user.surname : false || ((user.parents && user.parents[0] && user.parents[0].surname) + ' ' + (user.parents && user.parents[0] && user.parents[0].firstName))
         const role = user.roles.pop()

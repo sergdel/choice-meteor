@@ -33,32 +33,32 @@ export const blueCardSchema = new SimpleSchema({
         allowedValues: ['apply', 'reapply', 'reapply', 'sent', 'send', 'approved', 'excempt', 'declined', 'expired', 'n/a'],
         autoform: {
             options: function (x) {
-               /* const parent = this.name.replace('blueCard.status', 'dateOfBirth');
-                const dateOfBirth = AutoForm.getFieldValue(parent, AutoForm.getFormId());
-                if (!dateOfBirth) {
-                    return [
-                        {label: 'Apply', value: 'apply',},
-                        {label: 'Reapply', value: 'reapply'},
-                        {label: 'Sent', value: 'sent'},
-                        {label: 'Send', value: 'send'},
-                        {label: 'Approved', value: 'approved'},
-                        {label: 'Excempt', value: 'excempt'},
-                        {label: 'Declined', value: 'declined'},
-                        {label: 'Expired', value: 'expired' },
-                        {label: 'n/a', value: 'n/a'}]
-                }
-                if (dateOfBirth instanceof Date && moment(dateOfBirth).add(18, 'years').toDate() <= new Date()) {
-                    return [
-                        {label: 'Apply', value: 'apply'},
-                        {label: 'Reapply', value: 'reapply'},
-                        {label: 'Sent', value: 'sent'},
-                        {label: 'Send', value: 'send'},
-                        {label: 'Approved', value: 'approved'},
-                        {label: 'Excempt', value: 'excempt'},
-                        {label: 'Declined', value: 'declined'},
-                        {label: 'Expired', value: 'expired' },
-                        {label: 'n/a', value: 'n/a'}]
-                }*/
+                /* const parent = this.name.replace('blueCard.status', 'dateOfBirth');
+                 const dateOfBirth = AutoForm.getFieldValue(parent, AutoForm.getFormId());
+                 if (!dateOfBirth) {
+                 return [
+                 {label: 'Apply', value: 'apply',},
+                 {label: 'Reapply', value: 'reapply'},
+                 {label: 'Sent', value: 'sent'},
+                 {label: 'Send', value: 'send'},
+                 {label: 'Approved', value: 'approved'},
+                 {label: 'Excempt', value: 'excempt'},
+                 {label: 'Declined', value: 'declined'},
+                 {label: 'Expired', value: 'expired' },
+                 {label: 'n/a', value: 'n/a'}]
+                 }
+                 if (dateOfBirth instanceof Date && moment(dateOfBirth).add(18, 'years').toDate() <= new Date()) {
+                 return [
+                 {label: 'Apply', value: 'apply'},
+                 {label: 'Reapply', value: 'reapply'},
+                 {label: 'Sent', value: 'sent'},
+                 {label: 'Send', value: 'send'},
+                 {label: 'Approved', value: 'approved'},
+                 {label: 'Excempt', value: 'excempt'},
+                 {label: 'Declined', value: 'declined'},
+                 {label: 'Expired', value: 'expired' },
+                 {label: 'n/a', value: 'n/a'}]
+                 }*/
                 return [
                     {label: 'Apply', value: 'apply'},
                     {label: 'Reapply', value: 'reapply'},
@@ -67,7 +67,7 @@ export const blueCardSchema = new SimpleSchema({
                     {label: 'Approved', value: 'approved'},
                     {label: 'Excempt', value: 'excempt'},
                     {label: 'Declined', value: 'declined'},
-                    {label: 'Expired', value: 'expired' },
+                    {label: 'Expired', value: 'expired'},
                     {label: 'n/a', value: 'n/a'}]
             },
             afFieldInput: {
@@ -95,6 +95,20 @@ export const blueCardSchema = new SimpleSchema({
                 "formgroup-class": 'col-sm-6'
             }
         }
+    },
+    notes: {
+        type: String,
+        optional: true,
+        autoform: {
+            rows: 2,
+            afFieldInput: {
+                class: 'form-control'
+            },
+            afFormGroup: {
+                "formgroup-class": 'col-sm-12'
+            }
+        }
+
     }
 });
 /*

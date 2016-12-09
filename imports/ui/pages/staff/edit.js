@@ -39,7 +39,6 @@ Template.staffEdit.events({
                 })
             }
             else {
-                console.log('cancel')
             }
         });
     }

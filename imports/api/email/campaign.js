@@ -91,7 +91,6 @@ export const campaignAutoTable = new AutoTable({
             key: 'groups.applied', label: 'Applied', operator: '$size',
             render: function (val) {
                 val=val || []
-                console.log('render',val,this)
                 return val.length
             }
         },
@@ -131,7 +130,7 @@ export const campaignSchema = new SimpleSchema({
         type: String,
         autoform: {
             options: function () {
-                return EmailTemplates.find('enrollAccount').map((template) => {
+                return EmailTemplates.find({campaign: true}).map((template) => {
                     return {value: template._id, label: template.description}
                 })
             },

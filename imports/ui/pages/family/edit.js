@@ -11,6 +11,7 @@ import {_} from "meteor/underscore";
 import {familySchema} from "/imports/api/family/family";
 import {emailTemplateSchema} from "/imports/api/family/email-template";
 import '/imports/ui/pages/account/list'
+import {EmailTemplates} from '/imports/api/email/templates'
 
 
 AutoForm.debug();
@@ -77,7 +78,6 @@ Template.familyEdit.events({
             btnOkText: 'Yes, I\'m sure.',
         }, (data) => {
             if (data) {
-                console.log(this)
                 Meteor.call('familyRemove', this.familyId)
                 FlowRouter.go('familyList')
             } else {
@@ -105,28 +105,40 @@ AutoForm.hooks({
                     const status = familyStatus[newFamilyStatus];
                     //if i have to prompt for email template
                     if (status.emailTemlate && status.emailTemlate.type == 'editable') {
-                        BootstrapModalPrompt.prompt({
-                            title: 'Updating family status to ' + familyStatus[newFamilyStatus].label,
-                            content: 'Need to send  email',
-                            autoform: {
-                                id: 'emailTemplateSchema',
-                                doc: {body: familyStatus[newFamilyStatus].emailTemlate.text},
-                                type: 'normal',
-                                schema: emailTemplateSchema,
-                                buttonContent: false,
-                            },
-                            btnDismissTextClass: 'btn-danger',
-                            btnOkTextClass: 'btn-primary',
-                            btnDismissText: 'Not now',
-                            btnOkText: 'Update and send email',
-                        }, (data) => {
-                            if (data) {
-                                modifier.$set["office.familyStatusEmailTemplate"] = data.body;
-                                this.result(modifier)
-                            } else {
-                                this.result(false);
+                        let body = "Loading"
+                        const emailTemplateId = familyStatus[newFamilyStatus].emailTemlate.id
+                        const subscription = Meteor.subscribe('EmailTemplate', emailTemplateId, {
+                            onReady:  ()=> {
+                                const template = EmailTemplates.findOne(emailTemplateId)
+                                body = template && template.body
+                                BootstrapModalPrompt.prompt({
+                                    title: 'Updating family status to ' + familyStatus[newFamilyStatus].label,
+                                    content: 'Need to send  email',
+                                    autoform: {
+                                        id: 'emailTemplateSchema',
+                                        doc: {body},
+                                        type: 'normal',
+                                        schema: emailTemplateSchema,
+                                        buttonContent: false,
+                                    },
+                                    btnDismissTextClass: 'btn-danger',
+                                    btnOkTextClass: 'btn-primary',
+                                    btnDismissText: 'Not now',
+                                    btnOkText: 'Update and send email',
+                                }, (data) => {
+                                    subscription.stop()
+                                    if (data) {
+                                        modifier.$set["office.familyStatusEmailTemplate"] = data.body;
+                                        this.result(modifier)
+                                    } else {
+                                        //todo have to be this.result(false);
+                                        this.result(modifier);
+                                    }
+                                })
+
                             }
                         })
+
                     } else {
                         this.result(modifier)
                     }

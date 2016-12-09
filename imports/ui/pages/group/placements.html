@@ -1,0 +1,24 @@
+<template name="groupPlacements">
+    <br>
+    <br>
+{{#if Template.subscriptionsReady }}
+    {{#if found}}
+            <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{group.parents.[0].firstName}}
+                {{group.id}} {{group.name}}
+            </h1>
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li ><a href="{{pathFor 'groupEdit' groupId=groupId }}">Group Details</a></li>
+                <li><a href="#">Itinerary</a>
+                </li>
+                <li class="active"><a href="{{pathFor 'groupPlacements' groupId=groupId }}">Placements</a></li>
+                <li><a href="#">Payments</a>
+                </li>
+            </ul>
+
+
+
+    {{/if}}
+{{/if}}
+
+</template>

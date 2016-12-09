@@ -27,7 +27,6 @@ AutoForm.hooks({
                 Session.set('campaignList_customQuery',undefined)
 
             }
-            console.log('campaignList_customQuery success campaignList_customQuery',customQuery)
             return false;
         }
     }

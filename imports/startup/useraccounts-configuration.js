@@ -2,7 +2,7 @@ import {AccountsTemplates} from "meteor/useraccounts:core";
 import {FlowRouter} from 'meteor/kadira:flow-router'
 AccountsTemplates.configure({
     // Behavior
-    confirmPassword: false,
+    confirmPassword: true,
     enablePasswordChange: true,
     /**
      * No users creation from client
@@ -109,6 +109,10 @@ AccountsTemplates.configureRoute('resendVerificationEmail', {
     redirect: redirectToSignIn
 })
 
+Accounts.config({
+    passwordResetTokenExpirationInDays: 45,
+    passwordEnrollTokenExpirationInDays: 45,
+})
 
 AccountsTemplates.configure({
 

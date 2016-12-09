@@ -30,7 +30,6 @@ Meteor.methods({
 
     },
     groupCancelApply: function (groupId, familyId) {
-        console.log('groupCancelApply', familyId)
         this.unblock()
         if (!Roles.userIsInRole(this.userId, ['family', 'admin', 'staff'])) {
             throw new Meteor.Error(403, 'Access denied!', 'Only logged users can apply to groups')
@@ -38,12 +37,10 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             familyId = this.userId
         }
-        console.log('groupCancelApply', familyId)
         check(groupId, String)
         return Groups.cancelApply(groupId, familyId, this.userId)
     },
     groupApply: function (groupId, familyId, data) {
-        console.log('groupApply', familyId)
         this.unblock()
         if (!Roles.userIsInRole(this.userId, ['family', 'admin', 'staff'])) {
             throw new Meteor.Error(403, 'Access denied!', 'Only logged users can apply to groups')
@@ -51,7 +48,6 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             familyId = this.userId
         }
-        console.log('groupApply', familyId)
         data.familyId = familyId
         check(data, Groups.schemas.apply)
         check(groupId, String)

@@ -7,10 +7,17 @@ import {modifyEmailTemplates} from './server/initial-setup'
 import {Families} from "/imports/api/family/family";
 import {check} from "meteor/check";
 
+import htmlToText from 'html-to-text'
 Meteor.methods({
+    templateNew: function (doc) {
+        check(doc, EmailTemplates.schema.new)
+        if (!Roles.userIsInRole(this.userId, ['admin'])) throw new Meteor.Error('Access denied', 'Only admin can update notes')
+        const _id = EmailTemplates.insert(doc)
+        return _id
+    },
     updateEmailsCampaignReportNote: function (emailId, notes) {
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update notes')
-        console.log(Email.update(emailId, {$set: {notes: notes}}))
+        return Email.update(emailId, {$set: {notes: notes}})
     },
     emailTemplateUpdate: function (modifier, id) {
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can update email templates')
@@ -20,6 +27,7 @@ Meteor.methods({
             const emailTemplate = EmailTemplates.findOne(id)
             modifyEmailTemplates(emailTemplate)
         }
+        return true
     },
     saveCampaign: function (query, tempolate, Id) {
 
@@ -66,36 +74,45 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
 
-
-        if (doc.template == "enrollAccount") {
+        const template = EmailTemplates.findOne(doc.template)
+        if (template.campaign == true) {
+            if (families.count() > 3 && Meteor.isDevelopment)
+                throw new Error('mas de 3 solo probando')
             families.forEach((user) => {
-                var userId = user._id
-                var email = user.emails[0].address
-                var token = Random.secret();
-                var when = new Date();
-                var tokenRecord = {
-                    token: token,
-                    email: email,
-                    when: when,
-                    reason: 'enroll'
-                };
-                Meteor.users.update(userId, {
-                    $set: {
-                        "services.password.reset": tokenRecord
-                    }
-                });
+                const userId = user._id
+                const email = user.emails[0].address
+                let enrollAccountUrl = ''
+                if (template._id == "enrollAccount") {
 
-                // before passing to template, update user object with new token
-                Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
+                    const token = Random.secret();
+                    const when = new Date();
+                    const tokenRecord = {
+                        token: token,
+                        email: email,
+                        when: when,
+                        reason: 'enroll'
+                    };
+                    Meteor.users.update(userId, {
+                        $set: {
+                            "services.password.reset": tokenRecord
+                        }
+                    });
 
-                var enrollAccountUrl = Accounts.urls.enrollAccount(token);
+                    Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
+                    enrollAccountUrl = Accounts.urls.enrollAccount(token);
+                }
 
-                var options = {
+                const firstName = user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName || ''
+                const surname = user.surname ? user.surname : user.parents && user.parents[0] && user.parents[0].surname || ''
+
+                let body = template.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+                body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
+                body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</a>`)
+                const text = htmlToText.fromString(body)
+                const options = {
                     to: email,
-                    from: Accounts.emailTemplates.enrollAccount.from
-                        ? Accounts.emailTemplates.enrollAccount.from(user)
-                        : Accounts.emailTemplates.from,
-                    subject: Accounts.emailTemplates.enrollAccount.subject(user),
+                    from: `${template.fromName} <${template.from}>`,
+                    subject: template.subject,
                     "parent1": user.parents && user.parents[0] && user.parents[0].firstName,
                     "parent2": user.parents && user.parents[1] && user.parents[1].firstName,
                     "surname": user.parents && user.parents[0] && user.parents[0].surname,
@@ -105,29 +122,13 @@ Meteor.methods({
                     'campaign': doc.name,
                     "loggedAt": user.loggedAt,
                     "userId": user._id,
-
+                    html: body,
+                    text,
                     status: 'sent',
                 };
-
-                if (typeof Accounts.emailTemplates.enrollAccount.text === 'function') {
-                    options.text =
-                        Accounts.emailTemplates.enrollAccount.text(user, enrollAccountUrl);
-                }
-
-                if (typeof Accounts.emailTemplates.enrollAccount.html === 'function')
-                    options.html =
-                        Accounts.emailTemplates.enrollAccount.html(user, enrollAccountUrl);
-
-                if (typeof Accounts.emailTemplates.headers === 'object') {
-                    options.headers = Accounts.emailTemplates.headers;
-                }
                 Email.send(options);
-
-
             })
         }
-
     },
-
 })
 

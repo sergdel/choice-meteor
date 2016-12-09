@@ -6,7 +6,13 @@ export const emailTemplateSchema = new SimpleSchema({
     body: {
         type: String,
         autoform: {
-            rows: 8
+            afFieldInput: {
+                type: 'summernote',
+                class: 'editor', // optional
+                settings: {
+                    height: 250,
+                }// summernote options goes here
+            },
         }
     }
 });
@@ -17,6 +23,6 @@ AutoForm.addHooks('emailTemplateSchema', {
         this.done();
         return false;
     },
-    onSuccess(t,r){
+    onSuccess(t, r){
     }
-},false);
+}, false);

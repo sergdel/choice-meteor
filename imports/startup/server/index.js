@@ -32,5 +32,8 @@ import "/imports/api/email/methods"
 import "/imports/api/tags/tags"
 import "/imports/api/tags/server/publication"
 import "/imports/api/account/account"
+import "/imports/api/group/placement/placement"
+import "/imports/api/group/placement/methods"
+import "/imports/api/group/placement/server/publication"
 
 

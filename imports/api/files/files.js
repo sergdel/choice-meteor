@@ -39,7 +39,6 @@ Files = new FilesCollection({
         }
     },
     onAfterUpload: function (fileRef) {
-        console.log('onAfterUpload')
         // In onAfterUpload callback we will move file to AWS:S3
         var self = this;
         _.each(fileRef.versions, function (vRef, version) {
@@ -65,7 +64,6 @@ Files = new FilesCollection({
                             if (error) {
                                 console.error(error);
                             } else {
-                                console.log('upd',res)
                                 // Unlink original files from FS
                                 // after successful upload to AWS:S3
                                 self.unlink(self.collection.findOne(fileRef._id), version);
@@ -84,14 +82,12 @@ Files = new FilesCollection({
             // If file is moved to S3
             // We will pipe request to S3
             // So, original link will stay always secure
-            console.log('interceptDownload S3')
             Request({
                 url: path,
                 headers: _.pick(http.request.headers, 'range', 'accept-language', 'accept', 'cache-control', 'pragma', 'connection', 'upgrade-insecure-requests', 'user-agent')
             }).pipe(http.response);
             return true;
         } else {
-            console.log('interceptDownload FS')
             // While file is not yet uploaded to S3
             // We will serve file from FS
             return false;

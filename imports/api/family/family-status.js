@@ -12,7 +12,7 @@ export const familyStatus = [
         label: "Ready to process",
         map: [1, 2, 3, 4, 5],
         emailTemlate: {
-            text: "emailTemlate status 1",
+            id: "ReadyToProcess",
             type: "fixed"
         }
     },
@@ -21,7 +21,7 @@ export const familyStatus = [
         label: "Being processed",
         map: [2, 3, 4, 5],
         emailTemlate: {
-            text: "emailTemlate status 2",
+            id: "BeingProcessed",
             type: "editable"
         }
     },
@@ -30,7 +30,7 @@ export const familyStatus = [
         label: "Approved",
         map: [3, 4, 5],
         emailTemlate: {
-            text: "emailTemlate status 3",
+            id: "Approved",
             type: "editable"
         }
     },
@@ -39,7 +39,7 @@ export const familyStatus = [
         label: "Declined",
         map: [3, 4, 5],
         emailTemlate: {
-            text: "emailTemlate status 4",
+            id: "Declined",
             type: "editable"
         }
     },
@@ -48,7 +48,7 @@ export const familyStatus = [
         label: "Suspended",
         map: [3, 4, 5],
         emailTemlate: {
-            text: "emailTemlate status 5",
+            id: "Suspended",
             type: "editable"
         }
     }

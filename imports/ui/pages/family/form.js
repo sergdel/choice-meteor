@@ -18,7 +18,7 @@ Template.familyForm.helpers({
         if (Roles.userIsInRole(Meteor.userId(), ['staff', 'admin'])) {
             return []
         } else {
-            return ['parents.$.blueCard.status', 'parents.$.blueCard.registered', 'children.$.blueCard.status', 'children.$.blueCard.registered', 'guests.$.blueCard.status', 'guests.$.blueCard.registered']
+            return ['parents.$.blueCard.notes', 'parents.$.blueCard.status', 'parents.$.blueCard.registered', 'children.$.blueCard.status', 'children.$.blueCard.registered', 'guests.$.blueCard.status', 'guests.$.blueCard.registered']
         }
     }
 
@@ -57,7 +57,6 @@ AutoForm.addHooks('familyForm', {
             const $panel=$field.parents('.panel-collapse')
             if (i==0){
                 $panel.one('shown.bs.collapse',function(){
-                    console.log("$field.scrollTop()",$field.offset().top)
                     var body = $("html, body");
                     body.stop().animate({scrollTop: $field.offset().top-30}, 600,'swing');
 

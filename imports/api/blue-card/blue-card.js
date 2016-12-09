@@ -190,9 +190,7 @@ BlueCard.autoTable = new AutoTable({
     },
     publishExtraFields: ['familyId'],
     link: function (doc, key) {
-        console.log('doc,11111',doc.familyId)
         if (key != 'notes'){
-            console.log('link',doc.familyId)
             return FlowRouter.path('familyEdit', {familyId: doc.familyId}) + '#' + doc.type
         }
 

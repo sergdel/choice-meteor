@@ -104,7 +104,6 @@ Template.searchFamilyListForm.helpers({
         return Session.get('searchFamilyListForm.address')
     },
     queryContact: ()=> {
-        console.log("Session.get('searchFamilyListForm.queryContact')",Session.get('searchFamilyListForm.queryContact'))
         return Session.get('searchFamilyListForm.queryContact')
     },
 });
@@ -121,7 +120,6 @@ Template.searchFamilyListForm.events({
 
             }
             else {
-                console.log('cancel')
             }
         });
     }

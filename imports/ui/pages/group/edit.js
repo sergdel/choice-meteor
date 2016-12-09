@@ -22,6 +22,7 @@ Template.groupEdit.helpers({
         Groups.attachSchema(Groups.schemas.edit)
         return Groups
     },
+    groupId:()=>FlowRouter.getParam("groupId"),
     group: ()=> {
         return Groups.findOne(FlowRouter.getParam("groupId"))
     },

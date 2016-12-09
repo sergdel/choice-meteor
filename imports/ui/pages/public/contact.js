@@ -100,9 +100,7 @@ AutoForm.addHooks('contactForm', {
 
         Meteor.setTimeout(() => {
             const $success = $('.successContact').slideDown()
-            console.log('$success', $success)
             Meteor.setTimeout(() => {
-                console.log('$success', $success)
                 $success.slideUp()
             }, 6000)
 

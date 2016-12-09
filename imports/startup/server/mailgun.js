@@ -13,8 +13,6 @@ WebApp.connectHandlers.use(bodyParser.urlencoded({extended: true}))  // these tw
         //todo for security verify the token for insurance the info comes from mail gun, I don't think is import o a real problem but if we got the time i a good idea
         const emailId = req.body && req.body['my-custom-data'] || req.query['my-custom-data']
         const status = req.body && req.body.event
-        console.log('mailgun webhook **********************',emailId,status)
-
         if (emailId) {
             Fiber(function () {
                 Email.update(emailId, {$set: {status: status, last: new Date()}, $addToSet: {events: status}})

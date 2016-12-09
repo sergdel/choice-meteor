@@ -8,53 +8,101 @@ import {Mongo} from 'meteor/mongo'
 import {AutoTable} from 'meteor/cesarve:auto-table'
 import {SimpleSchema} from 'meteor/aldeed:simple-schema'
 import {FlowRouter} from 'meteor/kadira:flow-router'
-export const EmailTemplates = new Mongo.Collection('emailTemplates')
-
-EmailTemplates.schema = new SimpleSchema({
-    description: {
-        label: 'Description',
-        type: String,
-        autoform: {
-            afFieldInput: {
-                type: 'readonly',
-            }
-        }
-    },
-    subject: {
-        label: 'Subject',
-        type: String,
-    },
-    from: {
-        type: String,
-        autoform: {
-            afFieldInput: {
-                type: 'email',
-            }
-        }
-    },
-    fromName: {
-        optional: true,
-        type: String,
-    },
-    body: {
-        type: String,
-        autoform: {
-            afFieldInput: {
-                type: 'summernote',
-                class: 'editor', // optional
-                settings: {
-                    height: 350,
-                }// summernote options goes here
+class ClassEmailTemplates extends Mongo.Collection{
+    insert(doc){
+        doc.from = "no-replay@choicehomestay.com"
+        doc.fromName = "Choice Home Stay"
+        doc.type='user'
+        doc.campaign=true
+        doc.buttons = {
+            "FirstName": {
+                "contents": "First name",
+                "tooltip": "First Name",
+                "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >First name</div>"
             },
+            "surname": {
+                "contents": "Surname",
+                "tooltip": "Surname",
+                "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Surname</div>"
+            }
         }
-    },
-    buttons: {
-        optional: true,
-        type: Object,
-        blackbox: true,
+
+        return super.insert(doc)
     }
-})
-EmailTemplates.attachSchema(EmailTemplates.schema)
+}
+export const EmailTemplates = new ClassEmailTemplates('emailTemplates')
+
+
+EmailTemplates.schema = {
+    new: new SimpleSchema({
+        description: {
+            label: 'Description',
+            type: String,
+            unique: true,
+            custom: function () {
+                if (Meteor.isClient && this.isSet) {
+                    Meteor.call("emailExist", this.value, function (error, result) {
+                        if (result) {
+                            EmailTemplates.schema.new.namedContext("templateNew").addInvalidKeys([{name: "description", type: "notUnique"}]);
+                        }
+                    });
+                }
+            }
+        }
+    }),
+    edit:
+        new SimpleSchema({
+            description: {
+                label: 'Description',
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'readonly',
+                    }
+                }
+            },
+            subject: {
+                label: 'Subject',
+                type: String,
+            },
+            from: {
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'email',
+                    }
+                }
+            },
+            fromName: {
+                optional: true,
+                type: String,
+            },
+            body: {
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'summernote',
+                        class: 'editor', // optional
+                        settings: {
+                            height: 350,
+                        }// summernote options goes here
+                    },
+                }
+            },
+            buttons: {
+                optional: true,
+                type: Object,
+                blackbox: true,
+            }
+        })
+
+}
+EmailTemplates.schema.new.messages({
+    notUnique: "[label] already exist",
+});
+
+
+
 /*EmailTemplates.filterSchema = new SimpleSchema(EmailTemplates.schema.pick(['id', 'subject']), {
  body: {
  type: String,

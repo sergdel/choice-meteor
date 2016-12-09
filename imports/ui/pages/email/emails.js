@@ -20,12 +20,6 @@ Template.emails.helpers({
         }
 
     },
-    template: () => {
-
-    },
-    campaign: () => {
-        return ''
-    }
 });
 
 Template.emails.events({

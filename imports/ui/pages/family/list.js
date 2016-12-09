@@ -50,7 +50,6 @@ Template.familyList.helpers({
                     {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
                 ]
             }
-            console.log('customQuery', customQuery)
             return customQuery
         }
     }
@@ -76,7 +75,6 @@ Template.familyList.events({
                 FlowRouter.go('familyEdit', {familyId: data})
             }
             else {
-                console.log('cancel')
             }
         });
     },

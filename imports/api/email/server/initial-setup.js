@@ -1,8 +1,7 @@
 /**
  * Created by cesar on 15/11/16.
  */
-import {EmailTemplates} from '/imports/api/email/templates'
-import {emailTemplateFixtures} from  './email-template-fixtures'
+
 import htmlToText from 'html-to-text'
 import {Email} from 'meteor/email'
 
@@ -28,23 +27,10 @@ export const modifyEmailTemplates = function (emailTemplate) {
         Accounts.emailTemplates[emailTemplate._id].from = function () {
             return `${emailTemplate.fromName} <${emailTemplate.from}>`;
         };
-        console.log('ahora si modificadas')
     } else {
-        console.log('ahora NOOOO modificadas')
     }
 
 }
-Meteor.startup(() => {
-    const emailTemplate = EmailTemplates.find({})
-    if (emailTemplate.count() == 0) {
-        for (let i in emailTemplateFixtures) {
-            EmailTemplates.insert(emailTemplateFixtures[i])
-        }
-    }
-    emailTemplate.forEach((template) => {
-        modifyEmailTemplates(template)
-    })
-})
 
 //todo look for efficet way to do this
 // the problem is the list of campaign To be reactive and for sort

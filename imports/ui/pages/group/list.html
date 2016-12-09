@@ -3,11 +3,11 @@
 
     {{#if isInRole 'admin,staff' }}
         {{#if isActiveRoute 'groupList'}}
-            <h1>Groups
-                <button class="btn btn-primary btn-lg groupNew">
-                    <div class="fa fa-plus"></div>
-                </button>
+            <h1>Groups<button class="btn btn-primary btn-lg groupNew">
+                <div class="fa fa-plus"></div>
+            </button>
             </h1>
+
             {{>atTable at=autoTableStaff }}
         {{/if}}
     {{/if}}
@@ -23,3 +23,7 @@
 </template>
 
 
+<!--ul class="nav nav-tabs" >
+    <li class="active"><a href="" >Home</a></li>
+    <li ><a href="">Profile</a></li>
+</ul-->

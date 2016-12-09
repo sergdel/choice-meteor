@@ -24,6 +24,7 @@ import "/imports/ui/pages/audit/list";
 
 import "/imports/ui/pages/group/list";
 import "/imports/ui/pages/group/edit";
+import "/imports/ui/pages/group/placements.js";
 
 import "/imports/ui/pages/email/emails";
 
@@ -248,6 +249,12 @@ groupRoutes.route('/edit/:groupId/:limit?', {
     name: 'groupEdit',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'groupEdit'})
+    }
+})
+groupRoutes.route('/placements/:groupId', {
+    name: 'groupPlacements',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'groupPlacements'})
     }
 })
 
