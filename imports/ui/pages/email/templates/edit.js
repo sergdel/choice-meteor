@@ -4,11 +4,45 @@
 
 import {EmailTemplates}  from "/imports/api/email/templates"
 import './edit.html'
-//todo borrar toda esta pagiona quitarla pues esta y su html
+import domtoimage from 'dom-to-image'
+const createButtons = function (buttons) {
+    const res = {}
+    for (let key in buttons) {
+        res[key] = function (context) {
+            var ui = $.summernote.ui;
+            // create button
+            var button = ui.button({
+                contents: buttons[key].contents,
+                tooltip: buttons[key].tooltip,
+                click: function () {
+                    const node = $(buttons[key].insertText)
+                    context.invoke('editor.insertNode', node.get(0), () => alert());
+                    domtoimage.toPng(node.get(0))
+                        .then(function (dataUrl) {
+                            node.remove()
+                            var img = new Image();
+                            img.id = key
+                            img.src = dataUrl;
+                            document.body.appendChild(img);
+                            context.invoke('editor.insertNode', img);
+                        })
+                        .catch(function (error) {
+                            console.error('oops, something went wrong!', error);
+                        });
+
+                }
+            });
+            return button.render();   // return button as jquery object
+
+        }
+    }
+    return res
+}
+
 
 Template.emailTemplatesEdit.onCreated(function () {
     this.autorun(() => {
-        this.subscribe('EmailTemplate', FlowRouter.getParam('emailTemplateId'))
+        this.subscribe('EmailTemplate', this.data.id)
     })
 });
 
@@ -18,12 +52,12 @@ Template.emailTemplatesEdit.onRendered(function () {
 
 Template.emailTemplatesEdit.helpers({
     schema: EmailTemplates.schema.edit,
-    doc: () => EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId')),
+    doc: () => EmailTemplates.findOne(Template.instance().data.id),
     settings: () => {
-        const doc = EmailTemplates.findOne(FlowRouter.getParam('emailTemplateId'))
+        const doc = EmailTemplates.findOne(Template.instance().data.id)
         if (!doc) return {}
         const buttons = createButtons(doc.buttons)
-        const settings = {
+        const body = {
             height: 350,
             toolbar: [
                 ['style', ['bold', 'italic', 'underline', 'clear']],
@@ -37,7 +71,16 @@ Template.emailTemplatesEdit.helpers({
             ],
             buttons
         }
-        return settings
+        const subject = {
+            toolbar: [
+                ['Parameters', Object.keys(doc.buttons)]
+            ],
+            buttons
+        }
+        return {
+            body: body,
+            subject: subject
+        }
     }
 });
 

@@ -1,4 +1,34 @@
 <template name="emailTemplatesEdit">
 
+    <div class="autoform-clear">
 
+        {{#autoForm schema=schema id="emailTemplatesEdit" doc=doc   type="method-update"
+                    meteormethod="emailTemplateUpdate" template="bootstrap3"}}
+            {{> afQuickField name='description' template="bootstrap3"}}
+
+            <div class="form-group{{#if afFieldIsInvalid name='subject'}} has-error{{/if}}">
+                <label class="control-label">Subject
+                </label>
+                {{> afFieldInput name='subject' settings=settings.subject}}
+                {{#if afFieldIsInvalid name='body'}}
+                    <span class="help-block">{{afFieldMessage name='subject'}}</span>
+                {{/if}}
+            </div>
+            {{> afQuickField name='from' template="bootstrap3"}}
+            {{> afQuickField name='fromName' template="bootstrap3"}}
+            <div class="form-group{{#if afFieldIsInvalid name='body'}} has-error{{/if}}">
+                <label class="control-label">Body
+                </label>
+                {{> afFieldInput name='body' settings=settings.body}}
+                {{#if afFieldIsInvalid name='body'}}
+                    <span class="help-block">{{afFieldMessage name='body'}}</span>
+                {{/if}}
+            </div>
+            {{>buttonSubmit new=false edit=true}}
+
+        {{/autoForm}}
+        <!--button class="btn btn-danger send pull-left">Send</button-->
+
+        <div class="clearfix"></div>
+    </div>
 </template>

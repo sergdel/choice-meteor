@@ -68,13 +68,7 @@ const columns = [
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
-    {
-        key: 'groups.applied', label: 'Applied', operator: '$size',
-        render: function (val) {
-            val = val || []
-            return val.length
-        }
-    },
+    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
@@ -200,7 +194,7 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true
     },
-    'groups.applied': {
+    'groups': {
         type: Number,
         optional: true,
     }

@@ -5,8 +5,9 @@ import {Meteor} from 'meteor/meteor'
 import {EmailTemplates} from '/imports/api/email/templates'
 import {modifyEmailTemplates} from './server/initial-setup'
 import {Families} from "/imports/api/family/family";
+import {Groups} from "/imports/api/group/group";
 import {check} from "meteor/check";
-
+import {moment} from 'meteor/momentjs:moment'
 import htmlToText from 'html-to-text'
 Meteor.methods({
     templateNew: function (doc) {
@@ -32,6 +33,7 @@ Meteor.methods({
     saveCampaign: function (query, tempolate, Id) {
 
     },
+
     contact: function (doc) {
         this.unblock()
         let text = ''
@@ -70,7 +72,7 @@ Meteor.methods({
             query: Object
         })
         this.unblock()
-        console.log('sendCampaign',doc.query)
+        console.log('sendCampaign', doc.query)
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
 
@@ -83,7 +85,6 @@ Meteor.methods({
                 const email = user.emails[0].address
                 let enrollAccountUrl = ''
                 if (template._id == "enrollAccount") {
-
                     const token = Random.secret();
                     const when = new Date();
                     const tokenRecord = {
@@ -97,7 +98,6 @@ Meteor.methods({
                             "services.password.reset": tokenRecord
                         }
                     });
-
                     Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
                     enrollAccountUrl = Accounts.urls.enrollAccount(token);
                 }
@@ -105,14 +105,20 @@ Meteor.methods({
                 const firstName = user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName || ''
                 const surname = user.surname ? user.surname : user.parents && user.parents[0] && user.parents[0].surname || ''
 
+                let subject = template.subject.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+                subject = subject.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
+                subject = subject.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</td>`)
+                subject = htmlToText.fromString(subject)
+
                 let body = template.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
                 body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
-                body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</a>`)
+                body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</td>`)
+
                 const text = htmlToText.fromString(body)
                 const options = {
                     to: email,
                     from: `${template.fromName} <${template.from}>`,
-                    subject: template.subject,
+                    subject: subject,
                     "parent1": user.parents && user.parents[0] && user.parents[0].firstName,
                     "parent2": user.parents && user.parents[1] && user.parents[1].firstName,
                     "surname": user.parents && user.parents[0] && user.parents[0].surname,
@@ -129,6 +135,8 @@ Meteor.methods({
                 if (Meteor.isProduction) {
                     Email.send(options);
                 } else {
+                    options.to='c@imagenproactiva.com'
+                    Email.send(options);
                     console.log('email send', options.to)
                 }
             })

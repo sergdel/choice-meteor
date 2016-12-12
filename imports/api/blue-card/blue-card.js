@@ -62,7 +62,7 @@ BlueCard.filterSchema = new SimpleSchema({
         optional: true,
         type: Date,
     },
-    groups: {
+    applied: {
         optional: true,
         type: Number,
     },
@@ -160,8 +160,8 @@ BlueCard.autoTable = new AutoTable({
             operator: '$in',
         },
         {
-            key: 'groups',
-            label: 'Groups',
+            key: 'applied',
+            label: 'Applied',
             operator: '$eq',
             operators
 

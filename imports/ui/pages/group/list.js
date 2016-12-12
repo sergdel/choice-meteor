@@ -23,16 +23,15 @@ Template.groupList.helpers({
     autoTableFamilyApplied: Groups.autoTableFamilyApplied,
     customQueryAvailable: function () {
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-            return {"familiesApplying.familyId": {$ne: FlowRouter.getParam('familyId')}}
+            return {"families.familyId": {$ne: FlowRouter.getParam('familyId')}}
         else
-            return {"familiesApplying.familyId": {$ne: Meteor.userId()}}
+            return {"families.familyId": {$ne: Meteor.userId()}}
     },
     customQueryApplied: function () {
-
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-            return {"familiesApplying.familyId": {$eq: FlowRouter.getParam('familyId')}}
+            return {"families": {$elemMatch: {status:  "applied", familyId: FlowRouter.getParam('familyId')}}}
         else
-            return {"familiesApplying.familyId": {$eq: Meteor.userId()}}
+            return {"families": {$elemMatch: {status:  "applied", familyId: Meteor.userId()}}}
     },
 });
 Template.bsModalPrompt.events({
@@ -50,13 +49,13 @@ Template.groupList.events({
             familyId = FlowRouter.getParam('familyId')
         else
             familyId = Meteor.userId()
-        let groupApply = _.findWhere(this.familiesApplying, {familyId: familyId})
+        let groupApply = _.findWhere(this.families, {familyId: familyId})
         const cancelButton = groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + this._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
 
         if (!groupApply) {
             //if there is'nt a group apply is because in creating a new one in this case in take te values from the last application
             const family=Families.findOne(familyId)
-            groupApply=family && family.groups && family.groups.applied && family.groups.applied.pop()
+            groupApply=family && family.groups &&  _.where(family.groups,{status: 'applied'} ).pop()
         }
         const moment1 = this.dates && this.dates[0] && moment(this.dates[0])
         const moment2 = this.dates && this.dates[1] && moment(this.dates[1])
@@ -75,7 +74,7 @@ Template.groupList.events({
                 doc: groupApply,
                 id: 'applyGroup',
                 buttonContent: false,
-                omitFields: ['familyId']
+                omitFields: ['familyId','status']
             },
             btnDismissText: 'Cancel',
             btnOkText: 'Save'

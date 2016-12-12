@@ -1,5 +1,4 @@
 import './group.html'
-import './update-status'
 import {Template} from 'meteor/templating'
 import {Groups} from "/imports/api/group/group";
 

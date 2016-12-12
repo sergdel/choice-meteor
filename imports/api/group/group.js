@@ -9,6 +9,7 @@ import {Audit} from '/imports/api/audit/audit'
 import {Email} from 'meteor/email'
 
 
+
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
         return 'required'
@@ -43,7 +44,14 @@ class GroupCollection extends Mongo.Collection {
         return super.update(groupId, {$set: {status: "removed"}});
     }
 
+    updateBySelector(selector, modifier, options) {
+        return super.update(selector, modifier, options);
+    }
+
     update(_id, modifier, options) {
+        if (typeof _id != 'string') {
+            throw new Meteor.Error('Use only _id as selector for Groups collection, otherwise use updateBySelector')
+        }
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         const group = super.findOne(_id)
         if (!group) {
@@ -61,25 +69,47 @@ class GroupCollection extends Mongo.Collection {
         return super.update(_id, modifier, options);
     }
 
+    confirm(groupId, familyId, userId){
+        Families.confirmGroup(familyId, groupId)
+        super.update({
+            _id: groupId,
+            status: {$ne: "removed"},
+            "families.familyId":familyId,
+        }, {$set: {"families.$.status": 'confirmed'}})
+        const group = super.findOne(groupId, {fields: {families: 1}})
+        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
+        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        Audit.insert({
+            userId: userId,
+            type:  'update',
+            docId: groupId,
+            newDoc: {status: 'confirmed'},
+            oldDoc: {status: 'applied'},
+            where: 'groups'
+        })
+        //send the email
 
+
+    }
     apply(groupId, familyId, data, userId) {
+        data.status = 'applied'
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         //update the data into family table
-        Families.addGroup(familyId, groupId, data)
+        Families.applyGroup(familyId, groupId, data)
         //look for the old group (if exist)
-        const groupOld = super.findOne({_id: groupId, "familiesApplying.familyId": familyId}) || {}
+        const groupOld = super.findOne({_id: groupId, "families.familyId": familyId}) || {}
         const groupExists = !_.isEmpty(groupOld)
         //if exists this is the info
-        const oldData = _.findWhere(groupOld.familiesApplying || [], {familyId}) || {}
+        const oldData = _.findWhere(groupOld.families || [], {familyId}) || {}
         //remove the old data
         super.update({
             _id: groupId,
             status: {$ne: "removed"}
-        }, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        }, {$pull: {"families": {familyId: {$eq: familyId}}}}, {filter: false})
         //add the new data (is like update but works for edition and cretion
-        super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {familiesApplying: data}}, {filter: false})
-        const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
-        const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
+        super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {families: data}}, {filter: false})
+        const group = super.findOne(groupId, {fields: {families: 1}})
+        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
         Audit.insert({
             userId: userId,
@@ -95,12 +125,12 @@ class GroupCollection extends Mongo.Collection {
 
     cancelApply(groupId, familyId, userId) {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
-        Families.removeGroup(familyId, groupId)
-        const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
-        const oldData = _.findWhere(group.familiesApplying || [], {familyId}) || {}
-        super.update(groupId, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        Families.cancelGroup(familyId, groupId)
+        const group = super.findOne(groupId, {fields: {families: 1}})
+        const oldData = _.findWhere(group.families || [], {familyId}) || {}
+        super.update(groupId, {$pull: {"families": {familyId: familyId, status: 'applied'}}}, {filter: false})
 
-        const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
+        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
         Audit.insert({
             userId: userId,
@@ -114,7 +144,6 @@ class GroupCollection extends Mongo.Collection {
     }
 
 }
-
 const groupApplySchema = new SimpleSchema({
     familyId: {
         type: String,
@@ -161,6 +190,15 @@ const groupApplySchema = new SimpleSchema({
         optional: true,
         autoform: {
             rows: 4,
+        }
+    },
+    status: {
+        type: String,
+        optional: true,
+        autoValue: function () {
+            if (this.isInsert) {
+                return 'applied'
+            }
         }
     }
 })
@@ -418,8 +456,16 @@ const schemaObject = {
         },
 
     },
-    familiesApplying: {
+    families: {
         label: 'Are you happy to welcome',
+        type: Array,
+        optional: true,
+    },
+    "families.$": {
+        type: groupApplySchema,
+        optional: true,
+    },
+    "familiesApplying": {
         type: Array,
         optional: true,
     },
@@ -743,7 +789,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
         collection: Groups,
         columns: columnsFamilyAvailable,
         schema: groupFilterSchema,
-        publishExtraFields: ['familiesApplying', 'guestsTo', 'guestsFrom'],
+        publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
         settings: {
             options: {
                 columnsSort: true,
@@ -773,20 +819,20 @@ columnsFamilyApplied.push({
     render: renderGuest
 })
 columnsFamilyApplied.push({
-    key: 'familiesApplying.gender',
+    key: 'families.gender',
     label: 'Gender Pref',
     render: function (val, path) {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
+        const groupApply = _.findWhere(this.families, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         return capitalize(groupApply.gender)
     }
 
 })
 columnsFamilyApplied.push({
-    key: 'familiesApplying.guests',
+    key: 'families.guests',
     label: 'Guest Pref',
     render: function (val, path) {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
+        const groupApply = _.findWhere(this.families, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         return capitalize(groupApply.guests)
     }
@@ -795,7 +841,7 @@ columnsFamilyApplied.push({
     key: 'guest.welcome',
     label: 'Welcome guests',
     render: function () {
-        const groupApply = _.findWhere(this.familiesApplying, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
+        const groupApply = _.findWhere(this.families, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
         if (!groupApply) return
         if (groupApply.minimum == groupApply.maximum) {
             return groupApply.minimum
@@ -815,7 +861,7 @@ Groups.autoTableFamilyApplied = new AutoTable(
         collection: Groups,
         columns: columnsFamilyApplied,
         schema: groupFilterSchema,
-        publishExtraFields: ['familiesApplying', 'guestsTo', 'guestsFrom'],
+        publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
         settings: {
             options: {
                 columnsSort: true,

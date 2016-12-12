@@ -111,5 +111,12 @@ export const emailTemplateFixtures = [
         campaign: false,
         type: "system",
     },
+
    ]
+
+
+
+
+
+
 

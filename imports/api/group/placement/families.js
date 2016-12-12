@@ -4,7 +4,7 @@
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {familyStatus} from "/imports/api/family/family-status";
 import {Tags} from "/imports/api/tags/tags";
-
+import {Counts} from 'meteor/tmeasday:publish-counts'
 const operators = [  // Optional Array works for option filter
     {
         label: 'Equal',
@@ -68,30 +68,25 @@ const columns = [
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
-    {
-        key: 'groups.applied', label: 'Applied', operator: '$size',
-        render: function (val) {
-            val = val || []
-            return val.length
-        }
-    },
+    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
+
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
     },
-    {key: 'groups.applied.guests', label: 'Guests', operator: '$in',},
-    {key: 'groups.applied.gender', label: 'Gender', operator: '$in',},
-    {key: 'groups.applied.minimum', label: 'Min', operator: '$eq', operators},
-    {key: 'groups.applied.maximum', label: 'Max', operator: '$eq', operators},
+    {key: 'groups.0.guests', label: 'Guests', operator: '$in',},
+    {key: 'groups.0.gender', label: 'Gender', operator: '$in',},
+    {key: 'groups.0.minimum', label: 'Min', operator: '$eq', operators},
+    {key: 'groups.0.maximum', label: 'Max', operator: '$eq', operators},
     {
-        key: 'action', label: 'Status',template: 'groupUpdateStatus'
+        key: 'action', label: 'Status', template: 'groupUpdateStatus'
     }
 ]
 
 
 export const familyPlacementFilterSchema = new SimpleSchema({
 
-    'groups.applied.guests': {
+    'groups.$.guests': {
         label: 'Guests', type: String, optional: true,
         autoform: {
             type: 'select-multi-checkbox-combo',
@@ -104,7 +99,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
             }
         },
     },
-    'groups.applied.gender': {
+    'groups.$.gender': {
         label: 'Gender', type: String, optional: true,
         autoform: {
             type: 'select-multi-checkbox-combo',
@@ -115,8 +110,8 @@ export const familyPlacementFilterSchema = new SimpleSchema({
             }
         },
     },
-    'groups.applied.minimum': {label: 'Min', type: Number, optional: true,},
-    'groups.applied.maximum': {label: 'Max', type: Number, optional: true,},
+    'groups.$.minimum': {label: 'Min', type: Number, optional: true,},
+    'groups.$.maximum': {label: 'Max', type: Number, optional: true,},
     "parents.$.firstName": {
         type: String,
         optional: true,
@@ -233,20 +228,55 @@ export const familyPlacementFilterSchema = new SimpleSchema({
         type: String,
         optional: true
     },
-    'groups.applied': {
+    'groupsCount.applied': {
         type: Number,
         optional: true,
     }
 });
 
+const columnsKeysOmit = function (keys) {
+    const res = []
+    for (const column of columns) {
+        if (_.indexOf(keys, column.key) < 0)
+            res.push(column)
 
+    }
+    return res
+}
 export const familiesPlacementAppliedAutoTable = new AutoTable(
     {
         id: 'familiesPlacementAppliedAutoTable',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles'],
+        publishExtraFields: ['roles', 'groups'],
         columns,
+        publish: function (id, limit, query, sort) {
+            Counts.publish(this, 'atCounterfamiliesPlacementAppliedAutoTable', Meteor.users.find(query, {
+                limit,
+                sort
+            }), {noReady: true});
+            const groupId = query.groups.$elemMatch.groupId
+            const cursor = Meteor.users.find(query, {
+                fields: {
+                    parents: 1,
+                    "contact.address": 1,
+                    blueCardStatus: 1,
+                    office: 1,
+                    parentsCount: 1,
+                    childrenCount: 1,
+                    guestsCount: 1,
+                    bedroomsCount: 1,
+                    bedsCount: 1,
+                    roles: 1,
+                    "other.preferredGender": 1,
+                    "groupsCount": 1,
+                    groups: {$elemMatch: {groupId}}
+                }
+                , sort, limit
+            })
+            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
+            return cursor
+        },
         schema: familyPlacementFilterSchema,
         settings: {
             options: {
@@ -271,8 +301,35 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
         id: 'familiesPlacementConfirmedAutoTable',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles'],
+        publishExtraFields: ['roles', 'groups'],
         columns,
+        publish: function (id, limit, query, sort) {
+            Counts.publish(this, 'atCounterfamiliesPlacementConfirmedAutoTable', Meteor.users.find(query, {
+                limit,
+                sort
+            }), {noReady: true});
+            const groupId = query.groups.$elemMatch.groupId
+            const cursor = Meteor.users.find(query, {
+                fields: {
+                    parents: 1,
+                    "contact.address": 1,
+                    blueCardStatus: 1,
+                    office: 1,
+                    parentsCount: 1,
+                    childrenCount: 1,
+                    guestsCount: 1,
+                    bedroomsCount: 1,
+                    bedsCount: 1,
+                    roles: 1,
+                    "other.preferredGender": 1,
+                    "groupsCount": 1,
+                    groups: {$elemMatch: {groupId}}
+                }
+                , sort, limit
+            })
+            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
+            return cursor
+        },
         schema: familyPlacementFilterSchema,
         settings: {
             options: {
@@ -287,7 +344,7 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
         },
         link: function (row, path) {
             if (path != 'action')
-                return FlowRouter.path('familyEdit', {familyId: row._id})
+                return FlowRouter.path('atCounterfamiliesPlacementPotentialAutoTable', {familyId: row._id})
         }
     }
 )
@@ -298,9 +355,36 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
         id: 'familiesPlacementPotentialAutoTable',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles'],
-        columns,
+        publishExtraFields: ['roles', 'groups'],
+        columns: columnsKeysOmit(['groups.0.guests', 'groups.0.gender', 'groups.0.minimum', 'groups.0.maximum']),
         schema: familyPlacementFilterSchema,
+        publish: function (id, limit, query, sort) {
+            Counts.publish(this, 'atCounterfamiliesPlacementPotentialAutoTable', Meteor.users.find(query, {
+                limit,
+                sort
+            }), {noReady: true});
+            const groupId = query['groups.groupId'].$ne
+            const cursor = Meteor.users.find(query, {
+                fields: {
+                    parents: 1,
+                    "contact.address": 1,
+                    blueCardStatus: 1,
+                    office: 1,
+                    parentsCount: 1,
+                    childrenCount: 1,
+                    guestsCount: 1,
+                    bedroomsCount: 1,
+                    bedsCount: 1,
+                    roles: 1,
+                    "other.preferredGender": 1,
+                    "groupsCount": 1,
+                    groups: {$elemMatch: {groupId}}
+                }
+                , sort, limit
+            })
+            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
+            return cursor
+        },
         settings: {
             options: {
                 columnsSort: true,

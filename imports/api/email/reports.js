@@ -152,8 +152,8 @@ export const reportsAutoTable = new AutoTable({
             operators
         },
         {
-            key: 'groups',
-            label: 'groups',
+            key: 'applied',
+            label: 'Applied',
             operator: '$eq',
             operators,
         },

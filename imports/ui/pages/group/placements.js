@@ -1,4 +1,5 @@
 import './placements.html'
+import './update-status'
 import {familiesPlacementAppliedAutoTable,familiesPlacementConfirmedAutoTable,familiesPlacementPotentialAutoTable} from '/imports/api/group/placement/families'
 Template.groupPlacements.onCreated(function () {
     //add your statement here
@@ -17,14 +18,15 @@ Template.groupPlacements.helpers({
     familiesPlacementConfirmedAutoTable: ()=>familiesPlacementConfirmedAutoTable,
     familiesPlacementPotentialAutoTable: ()=>familiesPlacementPotentialAutoTable,
     applied:()=>{
-        return {"groups.applied.groupId": FlowRouter.getParam('groupId')}
+        return {"groups" : {$elemMatch: {groupId: FlowRouter.getParam('groupId'), status: 'applied' }}}
     },
     confirmed:()=>{
-        return {"groups.confirmed.groupId": FlowRouter.getParam('groupId')}
+        return {"groups" : {$elemMatch: {groupId: FlowRouter.getParam('groupId'), status: 'confirmed' }}}
+
     },
     potential:()=>{
         const groupId=FlowRouter.getParam('groupId')
-        return {"groups.applied.groupId": {$ne: groupId},"groups.confirmed.groupId": {$ne: groupId}}
+        return {"groups.groupId": {$ne: groupId}}
     },
 });
 

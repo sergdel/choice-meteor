@@ -37,9 +37,15 @@ export const emailSchema = new SimpleSchema({
 })
 
 export const Families = {}
-Families.findContact=function(familyId, userId){
+Families.findContact = function (familyId, userId) {
     Audit.insert({type: 'accessInfo', docId: familyId, userId})
-    return  Meteor.users.find(familyId, {fields: {"emails.address":1, "contact.homePhone'":1, "parents.mobilePhone": 1}})
+    return Meteor.users.find(familyId, {
+        fields: {
+            "emails.address": 1,
+            "contact.homePhone'": 1,
+            "parents.mobilePhone": 1
+        }
+    })
 }
 Families.updateNotes = function (blueCardId, notes) {
     Meteor.users.update({"parents.blueCard.id": blueCardId}, {$set: {"parents.$.blueCard.notes": notes}})
@@ -49,36 +55,45 @@ Families.updateNotes = function (blueCardId, notes) {
 }
 export const updateGroupCount = function (familyId) {
     const family = Families.findOne(familyId, {fields: {groups: 1}})
-    const groups = (family && family.groups && family.groups.applied && family.groups.applied.length) || 0
-    BlueCard.update({familyId}, {$set: {groups: groups}}, {multi: true})
-    Email.update({userId: familyId}, {$set: {groups: groups}}, {multi: true})
-    console.log('updateGroupCount',groups)
+    const appliedCount = (family && family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
+    const confirmedCount = (family && family.groups && _.where(family.groups, {status: 'confirmed'}).length) || 0
+    Meteor.users.update(familyId, {
+        $set: {
+            "groupsCount.applied": appliedCount,
+            "groupsCount.confirmed": confirmedCount
+        }
+    })
+    BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
+    Email.update({userId: familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
 }
 /** when a groups is removed**/
 Families.removeGroups = function (groupId) {
-    const affectedFamilies = Meteor.users.find({"groups.applied.groupId": groupId}, {fields: {_id: 1}}).fetch()
+    const affectedFamilies = Meteor.users.find({"groups": {$elemMatch: {groupId: groupId}}}, {fields: {_id: 1}}).fetch()
 
     const ids = _.pluck(affectedFamilies, '_id')
-    Meteor.users.update({"groups.applied.groupId": groupId}, {$pull: {"groups.applied": {groupId}}})
-
-    BlueCard.update({familyId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
-    Email.update({userId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
-
-    return Meteor.users.update({"groups.applied.groupId": groupId}, {$pull: {"groups.applied": {groupId}}}, {multi: true})
+    Meteor.users.update({"groups.groupId": groupId,}, {$pull: {"groups": {groupId}}})
+    affectedFamilies.forEach((family) => {
+        updateGroupCount(family._id)
+    })
+    return Meteor.users.update({"groups.groupId": groupId}, {$pull: {"groups": {groupId}}}, {multi: true})
 }
-Families.removeGroup = function (familyId, groupId) {
-    const result=Meteor.users.update(familyId, {$pull: {"groups.applied": {groupId}}})
-    console.log(familyId,groupId,result)
+Families.cancelGroup = function (familyId, groupId) {
+    const result = Meteor.users.update(familyId, {$pull: {"groups": {groupId}}})
     updateGroupCount(familyId)
     return result
 
 }
-Families.addGroup = function (familyId, groupId, data) {
-    const dataWithGroupId = _.clone(data)
-    dataWithGroupId.groupId = groupId
-    Meteor.users.update(familyId, {$pull: {"groups.applied": {groupId}}})
-    const result =Meteor.users.update(familyId, {
-        $addToSet: {"groups.applied": dataWithGroupId}
+Families.confirmGroup = function (familyId, groupId) {
+    Meteor.users.update({_id: familyId, "groups.groupId": groupId}, {$set: {"groups.$.status": "confirmed"}})
+    updateGroupCount(familyId)
+}
+Families.applyGroup = function (familyId, groupId, data) {
+    const dataWithData = _.clone(data)
+    dataWithData.groupId = groupId
+    dataWithData.status = 'applied'
+    Meteor.users.update(familyId, {$pull: {"groups": {groupId}}})
+    const result = Meteor.users.update(familyId, {
+        $addToSet: {"groups": dataWithData}
     })
     updateGroupCount(familyId)
     return result
@@ -371,7 +386,7 @@ export const insertBlueCards = function (family) {
                     registered: member.blueCard && member.blueCard.registered ? member.blueCard.registered : undefined,
                     notes: member.blueCard && member.blueCard.notes ? member.blueCard.notes : '',
                     type,
-                    groups: (family.groups && family.groups.applied && family.groups.applied.length) || 0
+                    applied: (family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
 
                 }
                 if (member.blueCard && member.blueCard.id) {

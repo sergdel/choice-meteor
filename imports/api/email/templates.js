@@ -10,11 +10,11 @@ import {SimpleSchema} from 'meteor/aldeed:simple-schema'
 import {FlowRouter} from 'meteor/kadira:flow-router'
 class ClassEmailTemplates extends Mongo.Collection{
     insert(doc){
-        doc.from = "no-replay@choicehomestay.com"
-        doc.fromName = "Choice Home Stay"
-        doc.type='user'
-        doc.campaign=true
-        doc.buttons = {
+        doc.from = doc.from || "no-replay@choicehomestay.com"
+        doc.fromName = doc.fromName  || "Choice Home Stay"
+        doc.type=doc.type || 'user'
+        doc.campaign=doc.campaign || true
+        doc.buttons =  doc.buttons || {
             "FirstName": {
                 "contents": "First name",
                 "tooltip": "First Name",
@@ -31,7 +31,6 @@ class ClassEmailTemplates extends Mongo.Collection{
     }
 }
 export const EmailTemplates = new ClassEmailTemplates('emailTemplates')
-
 
 EmailTemplates.schema = {
     new: new SimpleSchema({
@@ -64,6 +63,13 @@ EmailTemplates.schema = {
             subject: {
                 label: 'Subject',
                 type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'summernote',
+                        class: 'editor', // optional
+
+                    },
+                }
             },
             from: {
                 type: String,
@@ -94,6 +100,48 @@ EmailTemplates.schema = {
                 type: Object,
                 blackbox: true,
             }
+        }),
+    autoformGroupUpdateStatus:
+        new SimpleSchema({
+            subject: {
+                label: 'Subject',
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'summernote',
+                        class: 'editor', // optional
+                        settings: {
+                            toolbar:[],
+                            height: 30,
+                        }// summernote option
+                    },
+                }
+            },
+            from: {
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'email',
+                    }
+                }
+            },
+            fromName: {
+                optional: true,
+                type: String,
+            },
+            body: {
+                type: String,
+                autoform: {
+                    afFieldInput: {
+                        type: 'summernote',
+                        class: 'editor', // optional
+                        settings: {
+                            toolbar: [],
+                            height: 350,
+                        }// summernote options goes here
+                    },
+                }
+            },
         })
 
 }
