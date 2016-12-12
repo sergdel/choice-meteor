@@ -1,11 +1,8 @@
 /**
- * Created by cesar on 9/12/16.
- */
-/**
  * Created by cesar on 22/11/16.
  */
 import {AutoTable} from "meteor/cesarve:auto-table";
-import {familyStatus} from "./family-status";
+import {familyStatus} from "/imports/api/family/family-status";
 import {Tags} from "/imports/api/tags/tags";
 
 const operators = [  // Optional Array works for option filter
@@ -74,14 +71,52 @@ const columns = [
     {
         key: 'groups.applied', label: 'Applied', operator: '$size',
         render: function (val) {
-            val=val || []
+            val = val || []
             return val.length
         }
     },
+    {
+        key: 'contactInfo', label: 'Contact',
+        template: 'familyContact',
+    },
+    {key: 'groups.applied.guests', label: 'Guests', operator: '$in',},
+    {key: 'groups.applied.gender', label: 'Gender', operator: '$in',},
+    {key: 'groups.applied.minimum', label: 'Min', operator: '$eq', operators},
+    {key: 'groups.applied.maximum', label: 'Max', operator: '$eq', operators},
+    {
+        key: 'action', label: 'Status',template: 'groupUpdateStatus'
+    }
 ]
 
-export const familyFilterSchema = new SimpleSchema({
 
+export const familyPlacementFilterSchema = new SimpleSchema({
+
+    'groups.applied.guests': {
+        label: 'Guests', type: String, optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            allowedValues: [
+                'any guests', 'only adults', 'only students', 'pref adults', 'pref students'
+            ],
+            autoform: {
+                firstOption: false,
+                capitalize: true,
+            }
+        },
+    },
+    'groups.applied.gender': {
+        label: 'Gender', type: String, optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            allowedValues: ['any', 'only female', 'only male', 'pref female', 'pref male'],
+            autoform: {
+                firstOption: false,
+                capitalize: true,
+            }
+        },
+    },
+    'groups.applied.minimum': {label: 'Min', type: Number, optional: true,},
+    'groups.applied.maximum': {label: 'Max', type: Number, optional: true,},
     "parents.$.firstName": {
         type: String,
         optional: true,
@@ -198,21 +233,21 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true
     },
-    'groups.applied':{
+    'groups.applied': {
         type: Number,
         optional: true,
     }
 });
 
 
-export const familiesAutoTableStaff = new AutoTable(
+export const familiesPlacementAppliedAutoTable = new AutoTable(
     {
-        id: 'familyList',
+        id: 'familiesPlacementAppliedAutoTable',
         collection: Meteor.users,
         query: {roles: 'family'},
         publishExtraFields: ['roles'],
         columns,
-        schema: familyFilterSchema,
+        schema: familyPlacementFilterSchema,
         settings: {
             options: {
                 columnsSort: true,
@@ -221,36 +256,24 @@ export const familiesAutoTableStaff = new AutoTable(
                 filters: true,
             },
             klass: {
-                tableWrapper: ''
+                // tableWrapper: ''
             }
         },
-        link: function (row) {
-            return FlowRouter.path('familyEdit', {familyId: row._id})
+        link: function (row, path) {
+            if (path != 'action')
+                return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
 )
 
-columns.push({
-    key: 'emails.address',
-    operator: '$regex'
-})
-columns.push({
-    key: 'parents.mobilePhone',
-    operator: '$regex'
-})
-columns.push({
-    key: 'contact.homePhone',
-    operator: '$regex'
-})
-
-export const familiesAutoTableAdmin = new AutoTable(
+export const familiesPlacementConfirmedAutoTable = new AutoTable(
     {
-        id: 'familiesAutoTableAdmin',
+        id: 'familiesPlacementConfirmedAutoTable',
         collection: Meteor.users,
         query: {roles: 'family'},
         publishExtraFields: ['roles'],
         columns,
-        schema: familyFilterSchema,
+        schema: familyPlacementFilterSchema,
         settings: {
             options: {
                 columnsSort: true,
@@ -259,11 +282,39 @@ export const familiesAutoTableAdmin = new AutoTable(
                 filters: true,
             },
             klass: {
-                tableWrapper: ''
+                // tableWrapper: ''
             }
         },
-        link: function (row) {
-            return FlowRouter.path('familyEdit', {familyId: row._id})
+        link: function (row, path) {
+            if (path != 'action')
+                return FlowRouter.path('familyEdit', {familyId: row._id})
+        }
+    }
+)
+
+
+export const familiesPlacementPotentialAutoTable = new AutoTable(
+    {
+        id: 'familiesPlacementPotentialAutoTable',
+        collection: Meteor.users,
+        query: {roles: 'family'},
+        publishExtraFields: ['roles'],
+        columns,
+        schema: familyPlacementFilterSchema,
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: true,
+                showing: true,
+                filters: true,
+            },
+            klass: {
+                // tableWrapper: ''
+            }
+        },
+        link: function (row, path) {
+            if (path != 'action')
+                return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
 )

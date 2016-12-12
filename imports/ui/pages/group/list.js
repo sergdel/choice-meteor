@@ -51,10 +51,12 @@ Template.groupList.events({
         else
             familyId = Meteor.userId()
         let groupApply = _.findWhere(this.familiesApplying, {familyId: familyId})
+        const cancelButton = groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + this._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
+
         if (!groupApply) {
             //if there is'nt a group apply is because in creating a new one in this case in take te values from the last application
             const family=Families.findOne(familyId)
-            groupApply=family && family.groups && family.groups.groupApplyDefaults
+            groupApply=family && family.groups && family.groups.applied && family.groups.applied.pop()
         }
         const moment1 = this.dates && this.dates[0] && moment(this.dates[0])
         const moment2 = this.dates && this.dates[1] && moment(this.dates[1])
@@ -62,7 +64,6 @@ Template.groupList.events({
         const location = this.location ? `(Location: ${this.location})` : ""
         const title = `Welcome guests from ${this.name} group ${dates} ${location}`
         const content = (this.requirements || ' ') + (this.requirements && this.other ? ' <br>' : '') + (this.other || ' ')
-        const cancelButton = groupApply ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + this._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
         BootstrapModalPrompt.prompt({
             attachTo: instance.firstNode,
             title,

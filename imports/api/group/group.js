@@ -23,12 +23,7 @@ const renderGuest = function () {
     }
     return guestsFrom + ' to ' + guestsTo
 }
-export const updateGroupCount = function (familyId) {
-    const family = Families.findOne(familyId, {fields: {groups: 1}})
-    const groups = (family && family.groups && family.groups.applied && family.groups.applied.length) || 0
-    BlueCard.update({familyId}, {$set: {groups: groups}}, {multi: true})
-    Email.update({userId: familyId}, {$set: {groups: groups}}, {multi: true})
-}
+
 class GroupCollection extends Mongo.Collection {
     find(selector, options) {
         if (_.isObject(selector)) {
@@ -66,17 +61,22 @@ class GroupCollection extends Mongo.Collection {
         return super.update(_id, modifier, options);
     }
 
+
     apply(groupId, familyId, data, userId) {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        //update the data into family table
         Families.addGroup(familyId, groupId, data)
-
+        //look for the old group (if exist)
         const groupOld = super.findOne({_id: groupId, "familiesApplying.familyId": familyId}) || {}
         const groupExists = !_.isEmpty(groupOld)
+        //if exists this is the info
         const oldData = _.findWhere(groupOld.familiesApplying || [], {familyId}) || {}
+        //remove the old data
         super.update({
             _id: groupId,
             status: {$ne: "removed"}
         }, {$pull: {"familiesApplying": {familyId: {$eq: familyId}}}}, {filter: false})
+        //add the new data (is like update but works for edition and cretion
         super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {familiesApplying: data}}, {filter: false})
         const group = super.findOne(groupId, {fields: {familiesApplying: 1}})
         const availablePlacements = (group && group.familiesApplying && group.familiesApplying.length) || 0
@@ -89,7 +89,7 @@ class GroupCollection extends Mongo.Collection {
             oldDoc: oldData,
             where: 'groups'
         })
-        updateGroupCount(familyId)
+
         return
     }
 
@@ -110,7 +110,6 @@ class GroupCollection extends Mongo.Collection {
             oldDoc: oldData,
             where: 'groups'
         })
-        updateGroupCount(familyId)
         return
     }
 

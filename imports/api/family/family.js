@@ -37,31 +37,51 @@ export const emailSchema = new SimpleSchema({
 })
 
 export const Families = {}
+Families.findContact=function(familyId, userId){
+    Audit.insert({type: 'accessInfo', docId: familyId, userId})
+    return  Meteor.users.find(familyId, {fields: {"emails.address":1, "contact.homePhone'":1, "parents.mobilePhone": 1}})
+}
 Families.updateNotes = function (blueCardId, notes) {
-     Meteor.users.update({"parents.blueCard.id": blueCardId}, {$set: {"parents.$.blueCard.notes": notes}})
-     Meteor.users.update({"children.blueCard.id": blueCardId}, {$set: {"children.$.blueCard.notes": notes}})
+    Meteor.users.update({"parents.blueCard.id": blueCardId}, {$set: {"parents.$.blueCard.notes": notes}})
+    Meteor.users.update({"children.blueCard.id": blueCardId}, {$set: {"children.$.blueCard.notes": notes}})
     Meteor.users.update({"guests.blueCard.id": blueCardId}, {$set: {"guests.$.blueCard.notes": notes}})
     BlueCard.update(blueCardId, {$set: {notes: notes}})
 }
+export const updateGroupCount = function (familyId) {
+    const family = Families.findOne(familyId, {fields: {groups: 1}})
+    const groups = (family && family.groups && family.groups.applied && family.groups.applied.length) || 0
+    BlueCard.update({familyId}, {$set: {groups: groups}}, {multi: true})
+    Email.update({userId: familyId}, {$set: {groups: groups}}, {multi: true})
+    console.log('updateGroupCount',groups)
+}
+/** when a groups is removed**/
 Families.removeGroups = function (groupId) {
-    const affectedFamilies = Meteor.users.find({"groups.applied": groupId}, {fields: {_id: 1}}).fetch()
+    const affectedFamilies = Meteor.users.find({"groups.applied.groupId": groupId}, {fields: {_id: 1}}).fetch()
 
     const ids = _.pluck(affectedFamilies, '_id')
-    Meteor.users.update({"groups.applied": groupId}, {$pull: {"groups.applied": groupId}})
+    Meteor.users.update({"groups.applied.groupId": groupId}, {$pull: {"groups.applied": {groupId}}})
 
     BlueCard.update({familyId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
     Email.update({userId: {$in: ids}}, {$inc: {groups: -1}}, {multi: true})
 
-    return Meteor.users.update({}, {$pull: {"groups.applied": groupId}}, {multi: true})
+    return Meteor.users.update({"groups.applied.groupId": groupId}, {$pull: {"groups.applied": {groupId}}}, {multi: true})
 }
 Families.removeGroup = function (familyId, groupId) {
-    return Meteor.users.update(familyId, {$pull: {"groups.applied": groupId}})
+    const result=Meteor.users.update(familyId, {$pull: {"groups.applied": {groupId}}})
+    console.log(familyId,groupId,result)
+    updateGroupCount(familyId)
+    return result
+
 }
 Families.addGroup = function (familyId, groupId, data) {
-    return Meteor.users.update(familyId, {
-        $set: {"groups.groupApplyDefaults": data},
-        $addToSet: {"groups.applied": groupId}
+    const dataWithGroupId = _.clone(data)
+    dataWithGroupId.groupId = groupId
+    Meteor.users.update(familyId, {$pull: {"groups.applied": {groupId}}})
+    const result =Meteor.users.update(familyId, {
+        $addToSet: {"groups.applied": dataWithGroupId}
     })
+    updateGroupCount(familyId)
+    return result
 }
 Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
@@ -303,9 +323,8 @@ export const setBlueCardStatus = function (family) {
             for (let i in family[type]) {
                 if (!(family && family[type] && family[type][i]))
                     continue
-                //family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
-
-                if (!family[type][i].blueCard.expiryDate || !family[type][i].blueCard.number) {
+                family[type][i].blueCard = family[type][i].blueCard || {status: 'apply'}
+                if ((family[type][i].blueCard && !family[type][i].blueCard.expiryDate) || !family[type][i].blueCard.number) {
                     // family[type][i].blueCard.status = "apply"
                 }
                 if (family[type][i].birthOfDate && family[type][i].birthOfDate > moment().subtract(17.5, 'years')) {
@@ -318,6 +337,7 @@ export const setBlueCardStatus = function (family) {
                     // family[type][i].blueCard.status = "approved"
                 }
                 // calc the minumin of status for set in generalstatus
+
                 const level = _.indexOf(map, family[type][i].blueCard.status)
                 if (min <= level) {
                     min = level
@@ -332,7 +352,7 @@ export const setBlueCardStatus = function (family) {
 
 export const insertBlueCards = function (family) {
     //BlueCard.remove({familyId: family._id})
-    const blueCardIds=[]
+    const blueCardIds = []
     for (let type of ['parents', 'children', 'guests']) {
         if (Array.isArray(family[type])) {
             for (let i in family[type]) {
@@ -354,18 +374,18 @@ export const insertBlueCards = function (family) {
                     groups: (family.groups && family.groups.applied && family.groups.applied.length) || 0
 
                 }
-                if(member.blueCard && member.blueCard.id){
-                    BlueCard.update(member.blueCard.id,blueCard)
-                }else{
+                if (member.blueCard && member.blueCard.id) {
+                    BlueCard.update(member.blueCard.id, blueCard)
+                } else {
                     const blueCardId = BlueCard.insert(blueCard)
                     family[type][i].blueCard = family[type][i].blueCard || {}
                     family[type][i].blueCard.id = blueCardId
                 }
-                blueCardIds.push (family[type][i].blueCard.id)
+                blueCardIds.push(family[type][i].blueCard.id)
             }
         }
     }
-    BlueCard.remove({ _id: {$nin: blueCardIds}, familyId: family._id})
+    BlueCard.remove({_id: {$nin: blueCardIds}, familyId: family._id})
 }
 
 export const setArrayCount = function (family) {

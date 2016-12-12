@@ -1,24 +1,29 @@
 <template name="groupPlacements">
-    <br>
-    <br>
-{{#if Template.subscriptionsReady }}
-    {{#if found}}
-            <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{group.parents.[0].firstName}}
-                {{group.id}} {{group.name}}
-            </h1>
-
-            <ul class="nav nav-tabs" role="tablist">
-                <li ><a href="{{pathFor 'groupEdit' groupId=groupId }}">Group Details</a></li>
-                <li><a href="#">Itinerary</a>
-                </li>
-                <li class="active"><a href="{{pathFor 'groupPlacements' groupId=groupId }}">Placements</a></li>
-                <li><a href="#">Payments</a>
-                </li>
-            </ul>
-
-
-
+    {{#if Template.subscriptionsReady }}
+        {{#if found}}
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#applied" aria-controls="applied" role="tab"
+                                                              data-toggle="tab">Applied</a></li>
+                    <li role="presentation"><a href="#confirmed" aria-controls="confirmed" role="tab" data-toggle="tab">Confirmed</a>
+                    </li>
+                    <li role="presentation"><a href="#potential" aria-controls="potential" role="tab" data-toggle="tab">Potential</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="applied">
+                        <h3>Families applied</h3>
+                        {{>atTable at=familiesPlacementAppliedAutoTable customQuery=applied}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="confirmed">
+                        <h3>Families confirmed</h3>
+                        {{>atTable at=familiesPlacementConfirmedAutoTable customQuery=confirmed}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="potential">
+                        <h3>Families potential</h3>
+                        {{>atTable at=familiesPlacementPotentialAutoTable customQuery=potential}}
+                    </div>
+                </div>
+        {{/if}}
     {{/if}}
-{{/if}}
 
 </template>

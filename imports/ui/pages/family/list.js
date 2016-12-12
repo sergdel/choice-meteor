@@ -1,7 +1,8 @@
 import "./list.html"
+import "./contact"
 import "./search-form.js"
 import {Template} from "meteor/templating"
-import {familiesAutoTableAdmin, familiesAutoTableStaff} from "/imports/api/family/auto-table";
+import {familiesAutoTable} from "/imports/api/family/auto-table";
 import {emailSchema} from "/imports/api/family/family"
 import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"
 
@@ -19,13 +20,7 @@ Template.familyList.onDestroyed(function () {
 
 
 Template.familyList.helpers({
-    autoTable: () => {
-        if (Roles.userIsInRole(Meteor.userId(), 'admin')) {
-            return familiesAutoTableAdmin
-        } else {
-            return familiesAutoTableStaff
-        }
-    },
+    autoTable: () => familiesAutoTable,
     customQuery: function () {
         return () => {
             let customQuery = {}

@@ -70,7 +70,7 @@ Meteor.methods({
             query: Object
         })
         this.unblock()
-
+        console.log('sendCampaign',doc.query)
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
 
@@ -126,7 +126,11 @@ Meteor.methods({
                     text,
                     status: 'sent',
                 };
-                Email.send(options);
+                if (Meteor.isProduction) {
+                    Email.send(options);
+                } else {
+                    console.log('email send', options.to)
+                }
             })
         }
     },

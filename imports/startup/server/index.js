@@ -21,6 +21,7 @@ import "/imports/api/staff/server/publication";
 import "/imports/api/staff/staff";
 import "/imports/api/staff/methods";
 import "/imports/api/group/group";
+import "/imports/api/group/placement/families";
 import "/imports/api/group/methods";
 import "/imports/api/group/server/publication";
 import "/imports/api/email/server/initial-setup";
@@ -32,8 +33,5 @@ import "/imports/api/email/methods"
 import "/imports/api/tags/tags"
 import "/imports/api/tags/server/publication"
 import "/imports/api/account/account"
-import "/imports/api/group/placement/placement"
-import "/imports/api/group/placement/methods"
-import "/imports/api/group/placement/server/publication"
 
 

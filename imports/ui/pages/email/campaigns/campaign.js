@@ -24,6 +24,11 @@ AutoForm.addHooks('campaignForm', {
                 btnOkText: 'Send it'
             }, (data) => {
                 if (data) {
+                    doc.query=doc.query || {}
+                    const customQuery = Session.get('campaignList_customQuery')
+                    if (!_.isEmpty(customQuery)){
+                        doc.query=_.extend(doc.query,customQuery)
+                    }
                     this.result(doc)
                 }
                 else {

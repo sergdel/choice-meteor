@@ -120,7 +120,7 @@ export const campaignSchema = new SimpleSchema({
     query: {
         type: Object,
         blackbox: true,
-        //optional: true,
+        optional: true,
         autoform: {
             type: 'auto-table',
             at: campaignAutoTable,

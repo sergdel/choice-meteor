@@ -23,6 +23,7 @@ import "/imports/ui/layouts/errors.html";
 import "/imports/ui/pages/audit/list";
 
 import "/imports/ui/pages/group/list";
+import "/imports/ui/pages/group/group";
 import "/imports/ui/pages/group/edit";
 import "/imports/ui/pages/group/placements.js";
 
@@ -248,13 +249,13 @@ groupRoutes.route('/list/:limit?', {
 groupRoutes.route('/edit/:groupId/:limit?', {
     name: 'groupEdit',
     action(params, queryParams) {
-        BlazeLayout.render('layout', {yield: 'groupEdit'})
+        BlazeLayout.render('layout', {yield: 'group', internalTab: 'groupEdit'})
     }
 })
 groupRoutes.route('/placements/:groupId', {
     name: 'groupPlacements',
     action(params, queryParams) {
-        BlazeLayout.render('layout', {yield: 'groupPlacements'})
+        BlazeLayout.render('layout', {yield: 'group', internalTab: 'groupPlacements'})
     }
 })
 

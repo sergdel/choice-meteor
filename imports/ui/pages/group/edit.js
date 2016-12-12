@@ -3,13 +3,12 @@ import {Template} from "meteor/templating";
 import {Groups} from "/imports/api/group/group";
 import '/imports/ui/componets/autoform/readonly/readonly'
 Template.groupEdit.onCreated(function () {
-    this.autorun(()=> {
-        this.subscribe('group', FlowRouter.getParam("groupId"))
-    })
+    console.log('Template.groupEdit.onCreated', this)
+
 });
 
 Template.groupEdit.onRendered(function () {
-
+    console.log('Template.groupEdit.onRendered', this)
 });
 
 Template.groupEdit.onDestroyed(function () {
@@ -22,14 +21,6 @@ Template.groupEdit.helpers({
         Groups.attachSchema(Groups.schemas.edit)
         return Groups
     },
-    groupId:()=>FlowRouter.getParam("groupId"),
-    group: ()=> {
-        return Groups.findOne(FlowRouter.getParam("groupId"))
-    },
-    found: ()=> {
-        return !!Groups.findOne(FlowRouter.getParam("groupId"))
-    },
-
 
 })
 ;

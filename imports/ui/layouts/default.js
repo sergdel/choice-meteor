@@ -24,7 +24,7 @@ Template.layout.events({
 
 Template.layout.onRendered(function () {
     $('body').tooltip({
-        selector: '[title]:not(.raty)',
+        selector: '[title]:not(.raty , [data-toggle="popover"])',
         delay: 200
     });
 });

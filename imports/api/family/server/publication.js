@@ -33,6 +33,11 @@ Meteor.publish('families', function (limit, query = {}, sort = {}) {
     Counts.publish(this, 'familiesCounter', Meteor.users.find(query, {limit, sort}), {noReady: true});
     return Meteor.users.find(query, {limit, sort})
 });
+Meteor.publish('familyContactInfo', function (familyId) {
+    if (!Roles.userIsInRole(this.userId,['admin','staff']))
+        return this.ready()
+    return Families.findContact(familyId,this.userId)
+})
 Meteor.publish('family', function (familyId) {
     const user = Meteor.users.findOne(this.userId); //I don't want to user Roles packages at this tiem because then probably you have to use meteor.users.find 3 times.
     if (!user) {

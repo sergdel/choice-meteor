@@ -1,0 +1,26 @@
+<template name="group">
+    {{#if Template.subscriptionsReady }}
+        {{#if data.found}}
+            <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{data.group.parents.[0].firstName}}
+                {{data.group.id}} {{data.group.name}}
+            </h1>
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="{{#if isActiveRoute 'groupEdit'}}active{{/if}}"><a
+                        href="{{pathFor 'groupEdit' groupId=data.groupId }}">Group Details</a></li>
+                <li class="{{#if isActiveRoute 'groupItinerary'}}active{{/if}}"><a
+                        href="{{pathFor 'groupItinerary' groupId=data.groupId }}">Itinerary</a></li>
+                <li class="{{#if isActiveRoute 'groupPlacements'}}active{{/if}}"><a
+                        href="{{pathFor 'groupPlacements' groupId=data.groupId }}">Placements</a></li>
+                <li class="{{#if isActiveRoute 'groupPayments'}}active{{/if}}"><a
+                        href="{{pathFor 'groupPayments' groupId=data.groupId }}">Payments</a>
+                </li>
+            </ul>
+
+            {{>Template.dynamic template=internalTab data=data}}
+
+        {{/if}}
+    {{else}}
+        {{>loading}}
+    {{/if}}
+</template>

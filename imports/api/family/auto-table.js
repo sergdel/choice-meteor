@@ -71,10 +71,15 @@ const columns = [
     {
         key: 'groups.applied', label: 'Applied', operator: '$size',
         render: function (val) {
-            val=val || []
+            val = val || []
             return val.length
         }
     },
+    {
+        key: 'contactInfo', label: 'Contact',
+        template: 'familyContact',
+    }
+
 ]
 
 export const familyFilterSchema = new SimpleSchema({
@@ -195,14 +200,14 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true
     },
-    'groups.applied':{
+    'groups.applied': {
         type: Number,
         optional: true,
     }
 });
 
 
-export const familiesAutoTableStaff = new AutoTable(
+export const familiesAutoTable = new AutoTable(
     {
         id: 'familyList',
         collection: Meteor.users,
@@ -221,46 +226,9 @@ export const familiesAutoTableStaff = new AutoTable(
                 tableWrapper: ''
             }
         },
-        link: function (row) {
-            return FlowRouter.path('familyEdit', {familyId: row._id})
-        }
-    }
-)
-
-columns.push({
-    key: 'emails.address',
-    operator: '$regex'
-})
-columns.push({
-    key: 'parents.mobilePhone',
-    operator: '$regex'
-})
-columns.push({
-    key: 'contact.homePhone',
-    operator: '$regex'
-})
-
-export const familiesAutoTableAdmin = new AutoTable(
-    {
-        id: 'familiesAutoTableAdmin',
-        collection: Meteor.users,
-        query: {roles: 'family'},
-        publishExtraFields: ['roles'],
-        columns,
-        schema: familyFilterSchema,
-        settings: {
-            options: {
-                columnsSort: true,
-                columnsDisplay: true,
-                showing: true,
-                filters: true,
-            },
-            klass: {
-                tableWrapper: ''
-            }
-        },
-        link: function (row) {
-            return FlowRouter.path('familyEdit', {familyId: row._id})
+        link: function (row, path) {
+            if (path != 'contactInfo')
+                return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
 )
