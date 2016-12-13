@@ -10,7 +10,7 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 
 
 class AuditCollection extends Mongo.Collection {
-    insert({userId, type, docId, newDoc, oldDoc, where = 'families'}) {
+    insert({userId, type, docId, newDoc, oldDoc, familyId, description, where = 'families'}) {
         const user = Meteor.users.findOne(userId)
         const name = (user.firstName && user.surname) ? user.firstName + ' ' + user.surname : false || ((user.parents && user.parents[0] && user.parents[0].surname) + ' ' + (user.parents && user.parents[0] && user.parents[0].firstName))
         const role = user.roles.pop()
@@ -34,6 +34,8 @@ class AuditCollection extends Mongo.Collection {
                     type,
                     where,
                     docId,
+                    familyId,
+                    description,
                     result,
                     role,
                     name,
@@ -47,6 +49,8 @@ class AuditCollection extends Mongo.Collection {
                 type,
                 where,
                 docId,
+                familyId,
+                description,
                 role,
                 name,
                 userId,
@@ -55,8 +59,8 @@ class AuditCollection extends Mongo.Collection {
         }
     }
 
-    update() {
-        return
+    update(selector,modifier,options) {
+        return super.update(selector,modifier, options)
     }
 
     remove() {
@@ -161,6 +165,7 @@ export const AuditAutoTable = new AutoTable({
             },
         },
         {key: 'where', operator: '$regex', label: 'Where'},
+        {key: 'description', operator: '$regex', label: 'Detail'},
     ],
     collection: Audit,
     schema: AuditFilterSchema,
@@ -172,7 +177,7 @@ export const AuditAutoTable = new AutoTable({
             showing: true,
         },
     },
-    publishExtraFields: ['result', 'docId', 'name'],
+    publishExtraFields: ['result', 'docId', 'name','familyId'],
     publish: function () {
         return true
         if (!Roles.userIsInRole(this.userId, 'admin')) {

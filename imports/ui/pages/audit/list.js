@@ -16,9 +16,9 @@ Template.auditList.onDestroyed(function () {
 Template.auditList.helpers({
     insideView: ()=>!Template.instance().data.familyId,
     customQuery: function(){
-        const docId=Template.instance().data.familyId
-        if (docId){
-            return {docId}
+        const familyId=Template.instance().data.familyId
+        if (familyId){
+            return {familyId}
         }else{
             return {}
         }

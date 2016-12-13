@@ -206,7 +206,7 @@ export const familiesAutoTable = new AutoTable(
         id: 'familyList',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles'],
+        publishExtraFields: ['roles','emails'],
         columns,
         schema: familyFilterSchema,
         settings: {

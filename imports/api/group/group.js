@@ -69,22 +69,26 @@ class GroupCollection extends Mongo.Collection {
         return super.update(_id, modifier, options);
     }
 
-    confirm(groupId, familyId, userId){
-        Families.confirmGroup(familyId, groupId)
+    updateStatusTo(status,groupId, familyId, userId){
+
+        Families.updateGroupStatusTo(status,familyId, groupId)
         super.update({
             _id: groupId,
             status: {$ne: "removed"},
             "families.familyId":familyId,
-        }, {$set: {"families.$.status": 'confirmed'}})
+        }, {$set: {"families.$.status": status}})
         const group = super.findOne(groupId, {fields: {families: 1}})
+        const oldStatus=_.findWhere(group.families,{familyId}).status
         const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
         Audit.insert({
             userId: userId,
             type:  'update',
+            familyId: familyId,
             docId: groupId,
-            newDoc: {status: 'confirmed'},
-            oldDoc: {status: 'applied'},
+            description:  group.id + ' ' + group.name,
+            newDoc: {status: status},
+            oldDoc: {status: oldStatus},
             where: 'groups'
         })
         //send the email
@@ -92,6 +96,7 @@ class GroupCollection extends Mongo.Collection {
 
     }
     apply(groupId, familyId, data, userId) {
+        //todo better performance, insted find ans update 3 times, use $inc
         data.status = 'applied'
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         //update the data into family table
@@ -108,13 +113,15 @@ class GroupCollection extends Mongo.Collection {
         }, {$pull: {"families": {familyId: {$eq: familyId}}}}, {filter: false})
         //add the new data (is like update but works for edition and cretion
         super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {families: data}}, {filter: false})
-        const group = super.findOne(groupId, {fields: {families: 1}})
+        const group = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
         const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
         Audit.insert({
             userId: userId,
             type: groupExists ? 'update' : 'create',
             docId: groupId,
+            description:  group.id + ' ' + group.name,
+            familyId: familyId,
             newDoc: data,
             oldDoc: oldData,
             where: 'groups'
@@ -124,18 +131,21 @@ class GroupCollection extends Mongo.Collection {
     }
 
     cancelApply(groupId, familyId, userId) {
+        //todo better performance, insted find ans update 3 times, use $inc
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         Families.cancelGroup(familyId, groupId)
-        const group = super.findOne(groupId, {fields: {families: 1}})
+        const group = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
         const oldData = _.findWhere(group.families || [], {familyId}) || {}
         super.update(groupId, {$pull: {"families": {familyId: familyId, status: 'applied'}}}, {filter: false})
-
+        const groupNew = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
         const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
         super.update(groupId, {$set: {availablePlacements}}, {filter: false})
         Audit.insert({
             userId: userId,
             type: 'remove',
             docId: groupId,
+            description:  group.id + ' ' + group.name,
+            familyId: familyId,
             newDoc: {},
             oldDoc: oldData,
             where: 'groups'

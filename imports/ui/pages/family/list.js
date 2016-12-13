@@ -34,7 +34,6 @@ Template.familyList.helpers({
                         }
                     }
                 }
-
             }
             const queryContact = Session.get('searchFamilyListForm.queryContact')
             if (queryContact) {

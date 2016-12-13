@@ -12,6 +12,7 @@ import {updateGroupCount} from '/imports/api/family/family'
 import {insertBlueCards} from "/imports/api/family/family";
 import {emailTemplateFixtures} from "/imports/api/email/server/email-template-fixtures";
 import {EmailTemplates} from '/imports/api/email/templates'
+import {Audit} from '/imports/api/audit/audit'
 Migrations.config({
     log: true
 });
@@ -34,19 +35,19 @@ Migrations.add({
             for (let _id of groupsIds) {
 
                 const currentGroup = _.findWhere(groups, {_id})
-                if (currentGroup){
+                if (currentGroup) {
                     const familiesApplying = currentGroup.familiesApplying
                     const familyApplied = _.findWhere(familiesApplying, {familyId: family._id})
-                    familyApplied.groupId=_id
+                    familyApplied.groupId = _id
                     familyGroups.push(familyApplied)
-                }else{
-                    console.log(family._id,_id)
+                } else {
+                    console.log(family._id, _id)
                 }
 
 
             }
-            family.groups.applied=familyGroups
-            Meteor.users.update(family._id,family)
+            family.groups.applied = familyGroups
+            Meteor.users.update(family._id, family)
         })
     },
 })
@@ -57,29 +58,33 @@ Migrations.add({
     name: 'Update groups structure 2" ',
     up: function () {//code to migrate up to version 1}
 
-        Groups.updateBySelector({},{$rename: {"familiesApplying": "families"}},{multi: true, filter: false,validate: false})
-        Meteor.users.update({},{$rename: {"groups.applied": "groupsAux"}},{multi: true})
-        Meteor.users.update({},{$rename: {"groupsAux": "groups"}},{multi: true})
+        Groups.updateBySelector({}, {$rename: {"familiesApplying": "families"}}, {
+            multi: true,
+            filter: false,
+            validate: false
+        })
+        Meteor.users.update({}, {$rename: {"groups.applied": "groupsAux"}}, {multi: true})
+        Meteor.users.update({}, {$rename: {"groupsAux": "groups"}}, {multi: true})
 
-        let cursor=Groups.find({"families":{$exists: 1}})
-        cursor.forEach((group)=>{
-            let families=group.families
-            families=_.map(families,(family)=>{
-                family.status='applied'
+        let cursor = Groups.find({"families": {$exists: 1}})
+        cursor.forEach((group) => {
+            let families = group.families
+            families = _.map(families, (family) => {
+                family.status = 'applied'
                 return family
             })
-            group.families=families
-            Groups.updateBySelector(group._id,group,{validate: false})
+            group.families = families
+            Groups.updateBySelector(group._id, group, {validate: false})
         })
-        cursor=Meteor.users.find({"groups":{$exists: 1}})
-        cursor.forEach((family)=>{
-            let groups=family.groups
-            groups=_.map(groups,(group)=>{
-                group.status='applied'
+        cursor = Meteor.users.find({"groups": {$exists: 1}})
+        cursor.forEach((family) => {
+            let groups = family.groups
+            groups = _.map(groups, (group) => {
+                group.status = 'applied'
                 return group
             })
-            family.group=groups
-            Meteor.users.update(family._id,family)
+            family.group = groups
+            Meteor.users.update(family._id, family)
 
         })
     },
@@ -89,30 +94,28 @@ Migrations.add({
     version: 3,
     name: 'Update groups structure 2" ',
     up: function () {//code to migrate up to version 1}
-        Email.update({},{$rename: {"groups": "applied"}},{multi: true})
-        BlueCard.update({},{$rename: {"groups": "applied"}},{multi: true})
+        Email.update({}, {$rename: {"groups": "applied"}}, {multi: true})
+        BlueCard.update({}, {$rename: {"groups": "applied"}}, {multi: true})
     },
 })
 Migrations.add({
     version: 4,
     name: 'Update groups structure 3" ',
     up: function () {//code to migrate up to version 1}
-        cursor=Meteor.users.find({"groups":{$exists: 1}})
-        cursor.forEach((family)=>{
+        cursor = Meteor.users.find({"groups": {$exists: 1}})
+        cursor.forEach((family) => {
             updateGroupCount(family._id)
         })
     },
 })
 
 
-
-
 Migrations.add({
     version: 5,
     name: 'Add new confirm and cancel group templates " ',
     up: function () {//code to migrate up to version 1}
-        EmailTemplates.insert( {
-            "_id":"ConfirmFamily",
+        EmailTemplates.insert({
+            "_id": "ConfirmFamily",
             "type": "System",
             "campaign": false,
             "description": "Confirm group to a family",
@@ -169,10 +172,10 @@ Migrations.add({
 
             },
         })
-        EmailTemplates.insert( {
-            "_id":"UnconfirmationFamily",
+        EmailTemplates.insert({
+            "_id": "UnconfirmationFamily",
             "description": "Unconfirm group to a family",
-            "subject":"Unconfirmation for Homestay group ",
+            "subject": "Unconfirmation for Homestay group ",
             "body": "body",
             "buttons": {
                 "FirstName": {
@@ -229,24 +232,217 @@ Migrations.add({
 })
 
 
+Migrations.add({
+    version: 6,
+    name: 'add Cancel email template" ',
+    up: function () {
+        EmailTemplates.insert({
+            "_id": "CancelFamily",
+            "description": "Cancel group to a family",
+            "subject": "Cancel for Homestay group ",
+            "body": "body",
+            "buttons": {
+                "FirstName": {
+                    "contents": "First name",
+                    "tooltip": "First Name",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >First name</div>"
+                },
+                "surname": {
+                    "contents": "Surname",
+                    "tooltip": "Surname",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Surname</div>"
+                },
+                "GroupName": {
+                    "contents": "Group Name",
+                    "tooltip": "Group Name",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Group Name</div>"
+                },
+                "FromDate": {
+                    "contents": "From date",
+                    "tooltip": "From date",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >From date</div>"
+                },
+                "ToDate": {
+                    "contents": "To date",
+                    "tooltip": "To date",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >To date</div>"
+                },
+                "Location": {
+                    "contents": "Location",
+                    "tooltip": "Location",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Location</div>"
+                },
+
+                "ConfirmedSummary": {
+                    "contents": "Confirmed Summary",
+                    "tooltip": "Confirmed Summary",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Confirmed Summary</div>"
+                },
+
+                "AppliedSummary": {
+                    "contents": "Applied Summary",
+                    "tooltip": "Applied Summary",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Applied Summary</div>"
+                },
+                "AvailableSummary": {
+                    "contents": "AvailableSummary",
+                    "tooltip": "AvailableSummary",
+                    "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Available Summary</div>"
+                },
+
+            },
+        })
+        return true
+    },
+})
+
+
+Migrations.add({
+    version: 7,
+    name: 'remove null parents" ',
+    up: function () {
+        console.log('parents removed: ', Meteor.users.update({
+            roles: 'family',
+            parents: null
+        }, {$pull: {"parents": null}}, {multi: true}))
+
+        console.log('children removed: ', Meteor.users.update({
+            roles: 'family',
+            children: null
+        }, {$pull: {"children": null}}, {multi: true}))
+
+        console.log('guests removed: ', Meteor.users.update({
+            roles: 'family',
+            guests: null
+        }, {$pull: {"guests": null}}, {multi: true}))
+        return true
+    },
+})
+
+Migrations.add({
+    version: 8,
+    name: 'Migrating blue cards information " ',
+    up: function () {
+        let notes
+        notes = BlueCard.find({"notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue cards', notes.count())
+
+        notes = Meteor.users.find({"parents.blueCard": {$exists: 1}, "parents.blueCard.id": {$exists: 0}})
+        console.log('cuantas parents with out id', notes.count())
+        notes = Meteor.users.find({"children.blueCard": {$exists: 1}, "children.blueCard.id": {$exists: 0}})
+        console.log('cuantas children with out id', notes.count())
+        notes = Meteor.users.find({"guests.blueCard": {$exists: 1}, "guests.blueCard.id": {$exists: 0}})
+        console.log('cuantas guests with out id', notes.count())
+
+
+        notes = Meteor.users.find({"parents.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue parents', notes.count())
+        notes = Meteor.users.find({"children.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue children', notes.count())
+        notes = Meteor.users.find({"guests.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue guests', notes.count())
+
+
+        let n = 0
+        let f = 0
+        const cursor2 = BlueCard.find({"notes": {$exists: 1, $ne: ''}})
+        cursor2.forEach((blue) => {
+            const fa = Meteor.users.findOne({_id: blue.familyId, [blue.type + '.firstName']: blue.firstName})
+            if (fa) {
+                const person = fa[blue.type]
+                for (let i in person) {
+                    if (!person[i]) {
+                        console.error(fa)
+                    } else {
+                        if (person[i].firstName == blue.firstName) {
+                            n++
+                            const res = Meteor.users.update({_id: blue.familyId}, {
+                                $set: {
+                                    [blue.type + '.' + i + '.blueCard.id']: blue._id,
+                                    [blue.type + '.' + i + '.blueCard.notes']: blue.notes
+                                }
+                            })
+                            console.log('i got it ', n, blue.familyId, blue._id, blue.notes != '', blue.type)
+                        }
+
+                    }
+                }
+            } else {
+                console.log('not found', blue)
+            }
+        })
+
+        Families.find({}).forEach((fa) => {
+            Families.update(fa._id, {$set: {version: 18}})
+        })
+
+        notes = Meteor.users.find({"parents.blueCard": {$exists: 1}, "parents.blueCard.id": {$exists: 0}})
+        console.log('cuantas parents with out id', notes.count())
+        notes = Meteor.users.find({"children.blueCard": {$exists: 1}, "children.blueCard.id": {$exists: 0}})
+        console.log('cuantas children with out id', notes.count())
+        notes = Meteor.users.find({"guests.blueCard": {$exists: 1}, "guests.blueCard.id": {$exists: 0}})
+        console.log('cuantas guests with out id', notes.count())
+
+        notes = BlueCard.find({"notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue cards', notes.count())
+        notes = Meteor.users.find({"parents.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue parents', notes.count())
+        notes = Meteor.users.find({"children.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue children', notes.count())
+        notes = Meteor.users.find({"guests.blueCard.notes": {$exists: 1, $ne: ''}})
+        console.log('cuantas notas hay en blue guests', notes.count())
+    }
+})
+
+Migrations.add({
+    version: 9,
+    name: 'Updating Audi log" ',
+    up: function () {
+        Audit.find({}).forEach((a) => {
+            if (a.where != 'groups') {
+                Audit.update(a._id, {$set: {familyId: a.docId}})
+            } else {
+                const group = Groups.findOne(a.docId)
+                const familyId = (a && a.result && a.result["/familyId"] && a.result["/familyId"].value) || (a && a.result && a.result["/"] && a.result["/"].value && a.result["/"].value.familyId) ||
+                    (a.result && a.result["/familyId"] && a.result["/familyId"].before)
+                if (familyId) {
+                    if (group){
+                        Audit.update(a._id, {
+                            $set: {familyId: familyId, description: group.id + ' ' + group.name}
+                        })
+                    }else{
+                        console.error('no group *******************************************',a)
+                    }
+
+                } else {
+                    console.error('no family *******************************************',a)
+                }
+
+
+            }
+
+        })
+    }
+})
 
 /*
- Migrations.add({
- version: 2,
- name: 'Update blue card status" ',
- up: function () {//code to migrate up to version 1}
- let cursor
- cursor = Meteor.users.find({
- "roles": "family"
- })
- cursor.forEach((family) => {
- Families.update(family._id, {$set: {version: 11}})
- })
- return true
- },
+ cursor2.forEach((family) => {
+
+ for (let i in family.parents) {
+ const bc = BlueCard.findOne({familyId: family._id, firstName: family.parents[i].firstName, type: 'parents'})
+ if (bc) {
+
+ } else {
+ console.error('no bc, por que?????')
+ }
+ }
  })
 
 
+ */
+
+
+/*
  Migrations.add({
  version: 3,
  name: 'Update phone in emails reports" ',

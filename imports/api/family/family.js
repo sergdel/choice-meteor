@@ -38,7 +38,7 @@ export const emailSchema = new SimpleSchema({
 
 export const Families = {}
 Families.findContact = function (familyId, userId) {
-    Audit.insert({type: 'accessInfo', docId: familyId, userId})
+    Audit.insert({type: 'accessInfo', docId: familyId, familyId, userId})
     return Meteor.users.find(familyId, {
         fields: {
             "emails.address": 1,
@@ -83,8 +83,8 @@ Families.cancelGroup = function (familyId, groupId) {
     return result
 
 }
-Families.confirmGroup = function (familyId, groupId) {
-    Meteor.users.update({_id: familyId, "groups.groupId": groupId}, {$set: {"groups.$.status": "confirmed"}})
+Families.updateGroupStatusTo = function (status, familyId, groupId) {
+    Meteor.users.update({_id: familyId, "groups.groupId": groupId}, {$set: {"groups.$.status": status}})
     updateGroupCount(familyId)
 }
 Families.applyGroup = function (familyId, groupId, data) {
@@ -100,7 +100,7 @@ Families.applyGroup = function (familyId, groupId, data) {
 }
 Families.find = function (selector = {}, options) {
     if (typeof selector === 'string')
-        Audit.insert({type: 'access', docId: selector, userId: options.userId})
+        Audit.insert({type: 'access', docId: selector, familyId: selector, userId: options.userId})
     selector = _.extend(selector, {roles: 'family'})
     return Meteor.users.find(selector, options)
 }
@@ -110,7 +110,7 @@ Families.findOne = (_id, options) => {
 Families.insert = function (email, options) {
     const familyId = Accounts.createUser({email})
     Meteor.users.update(familyId, {$set: {roles: ['family'], "parents": [{"email": email}]}})
-    Audit.insert({type: 'create', docId: familyId, userId: options.userId})
+    Audit.insert({type: 'create', docId: familyId, userId: options.userId, familyId: familyId})
     return familyId
 }
 Families.update = function (_id, modifier, options = {}, callback) {
@@ -143,14 +143,14 @@ Families.update = function (_id, modifier, options = {}, callback) {
     Tags.insert(newDoc && newDoc.office && newDoc.office.tags)
 
     if (options.userId)
-        Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId})
+        Audit.insert({type: 'update', docId: _id, newDoc, oldDoc, userId: options.userId, familyId: _id})
     return true
 }
 Families.upsert = function (_id, modifier, options, callback) {
     return //
 }
 Families.remove = function (_id, options) {
-    Audit.insert({type: 'remove', docId: _id, userId: options.userId})
+    Audit.insert({type: 'remove', docId: _id, familyId: _id, userId: options.userId})
     return Meteor.users.remove(_id)
 }
 export const familySchema = new SimpleSchema({
@@ -402,6 +402,7 @@ export const insertBlueCards = function (family) {
     }
     BlueCard.remove({_id: {$nin: blueCardIds}, familyId: family._id})
 }
+
 
 export const setArrayCount = function (family) {
     family.parentsCount = family.parents ? family.parents.length : 0

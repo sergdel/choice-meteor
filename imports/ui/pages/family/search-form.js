@@ -7,12 +7,24 @@ import '/imports/ui/pages/family/export'
 AutoForm.hooks({
     searchFamilyListForm: {
         onSubmit: function (search, modifier) {
-            if (search.address && search.address.geometry) {
-                Session.set('searchFamilyListForm.address', search.address);
-                Session.set('searchFamilyListForm.distance', search.distance);
-            } else {
-                Session.set('searchFamilyListForm.address', null)
+            console.log('onSubmit')
+            //hack, beacouse when the input is clean the value of the address dosen0t change
+            //that why i check if the input itself is empty then i clean the address
+            if ($('[name="address"]').val()==''){
+                Session.set('searchFamilyListForm.address', undefined)
+            }else{
+                if (search.address && search.address.geometry) {
+                    console.log('si',search.address)
+
+                    Session.set('searchFamilyListForm.address', search.address);
+                    Session.set('searchFamilyListForm.distance', search.distance);
+                } else {
+                    console.log('no',search.address)
+
+                    Session.set('searchFamilyListForm.address', undefined)
+                }
             }
+
             Session.set('searchFamilyListForm.queryContact', search.queryContact)
             return false;
         }
