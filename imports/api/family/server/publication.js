@@ -34,8 +34,10 @@ Meteor.publish('families', function (limit, query = {}, sort = {}) {
     return Meteor.users.find(query, {limit, sort})
 });
 Meteor.publish('familyContactInfo', function (familyId) {
+    console.log('familyContactInfo',familyId)
     if (!Roles.userIsInRole(this.userId,['admin','staff']))
         return this.ready()
+    console.log('familyContactInfo',familyId,Families.findContact(familyId,this.userId).fetch())
     return Families.findContact(familyId,this.userId)
 })
 Meteor.publish('family', function (familyId) {

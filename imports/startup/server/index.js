@@ -3,6 +3,7 @@
  */
 
 import "./startup";
+
 import "../useraccounts-configuration"
 import '/imports/api/family/server/export'
 import "./token-login";
@@ -34,5 +35,8 @@ import "/imports/api/email/methods"
 import "/imports/api/tags/tags"
 import "/imports/api/tags/server/publication"
 import "/imports/api/account/account"
+import "./cron";
+
+
 
 

@@ -30,7 +30,7 @@ export const blueCardSchema = new SimpleSchema({
     status: {
         optional: true,
         type: String,
-        allowedValues: ['apply', 'reapply', 'reapply', 'sent', 'send', 'approved', 'excempt', 'declined', 'expired', 'n/a'],
+        allowedValues: ['apply', 'reapply', 'reapply', 'sent', 'send', 'approved', 'excempt', 'declined','expiring', 'expired', 'n/a'],
         autoform: {
             options: function (x) {
                 /* const parent = this.name.replace('blueCard.status', 'dateOfBirth');
@@ -68,6 +68,7 @@ export const blueCardSchema = new SimpleSchema({
                     {label: 'Excempt', value: 'excempt'},
                     {label: 'Declined', value: 'declined'},
                     {label: 'Expired', value: 'expired'},
+                    {label: 'Expiring', value: 'expiring'},
                     {label: 'n/a', value: 'n/a'}]
             },
             afFieldInput: {
@@ -114,7 +115,6 @@ export const blueCardSchema = new SimpleSchema({
 /*
  Template.registerHelper('afFieldValueIs', function autoFormFieldValueIs(options) {
  options = parseOptions(options, 'afFieldValueIs');
-
  var currentValue = AutoForm.getFieldValue(options.name, options.formId);
  return currentValue === options.value;
  });

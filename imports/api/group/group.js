@@ -584,6 +584,17 @@ const columns = [
         operator: '$regex',
     },
     {
+        key: 'city',
+        operator: '$regex',
+
+    },
+    {
+        key: 'location',
+        label: 'Study Location',
+        operator: '$regex',
+
+    },
+    {
         key: 'dates.0',
         label: 'From',
         operator: '$eq',
@@ -624,17 +635,7 @@ const columns = [
         operator: '$regex',
 
     },
-    {
-        key: 'city',
-        operator: '$regex',
 
-    },
-    {
-        key: 'location',
-        label: 'Study Location',
-        operator: '$regex',
-
-    },
     {
         key: 'students',
         operator: '$eq',

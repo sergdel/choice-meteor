@@ -1,0 +1,11 @@
+<template name="groupsConflict">
+    <table class="table table-condensed table-bordered table-striped" style="color: #999">
+        {{#each conflict}}
+            <tr>
+                <td><small>{{id}}</small></td>
+                <td><small>{{showDate dates.[0]}}</small></td>
+                <td><small>{{showDate dates.[1]}}</small></td>
+            </tr>
+        {{/each}}
+    </table>
+</template>

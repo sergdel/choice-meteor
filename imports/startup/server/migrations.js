@@ -425,22 +425,19 @@ Migrations.add({
     }
 })
 
-/*
- cursor2.forEach((family) => {
 
- for (let i in family.parents) {
- const bc = BlueCard.findOne({familyId: family._id, firstName: family.parents[i].firstName, type: 'parents'})
- if (bc) {
-
- } else {
- console.error('no bc, por que?????')
- }
- }
- })
-
-
- */
-
+Migrations.add({
+    version: 10,
+    name: 'Pass to approved blue card wihich have # and expridate " ',
+    up: function () {
+        BlueCard.find({expiryDate: {$gte: new Date()}, number: {$ne: '' , $exists: 1}, status: {$ne:'approved'}}).forEach((blu)=>{
+            BlueCard.update(blu._id,{$set: {status: 'approved'}})
+            Meteor.users.update({'parents.blueCard.id':blu._id},{$set:{'parents.$.blueCard.status': 'approved'}})
+            Meteor.users.update({'children.blueCard.id':blu._id},{$set:{'children.$.blueCard.status': 'approved'}})
+            Meteor.users.update({'guests.blueCard.id':blu._id},{$set:{'guests.$.blueCard.status': 'approved'}})
+        })
+    }
+})
 
 /*
  Migrations.add({

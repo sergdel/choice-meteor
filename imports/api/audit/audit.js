@@ -126,9 +126,22 @@ const AuditFilterSchema = new SimpleSchema({
         optional: true,
     },
     where: {
-        type: String,
+        type: [String],
         label: 'Where',
         optional: true,
+        autoform: {
+            type:  'select-multi-checkbox-combo',
+            options: [
+                {
+                    label: "Groups",
+                    value: "groups"
+                },
+                {
+                    label: "Families",
+                    value: "families"
+                },
+              ],
+        },
     }
 })
 const operators = [  // Optional Array works for option filter
@@ -164,7 +177,7 @@ export const AuditAutoTable = new AutoTable({
                 return m.format('Do MMM YYYY H:mm')
             },
         },
-        {key: 'where', operator: '$regex', label: 'Where'},
+        {key: 'where', operator: '$in', label: 'Where'},
         {key: 'description', operator: '$regex', label: 'Detail'},
     ],
     collection: Audit,

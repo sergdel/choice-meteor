@@ -80,6 +80,7 @@ BlueCard.filterSchema = new SimpleSchema({
                 {label: 'Approved', value: 'approved'},
                 {label: 'Excempt', value: 'excempt'},
                 {label: 'Declined', value: 'declined'},
+                {label: 'Expiring', value: 'expiring'},
                 {label: 'Expired', value: 'expired'},
                 {label: 'n/a', value: 'n/a'}]
         },
@@ -145,6 +146,7 @@ BlueCard.autoTable = new AutoTable({
                 if (!m.isValid()) return val
                 return m.format('Do MMM YY') + ' - ' + m.fromNow()
             },
+            operators
 
         },
         {

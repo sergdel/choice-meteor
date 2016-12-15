@@ -79,7 +79,8 @@ const reportFilterSchema = new SimpleSchema({
     loggedAt: {
         type: Date,
         optional: true
-    }
+    },
+
 })
 
 
@@ -152,16 +153,13 @@ export const reportsAutoTable = new AutoTable({
             operators
         },
         {
-            key: 'applied',
-            label: 'Applied',
-            operator: '$eq',
-            operators,
-        },
-        {
             key: 'notes', label: 'Notes', operator: '$regex',
             template: 'emailCampaignNotes'
         },
-
+        {
+            key: 'contactInfo', label: 'Contact',
+            template: 'familyContact',
+        },
         {
             key: 'action', label: 'Action',
             render: function () {
@@ -189,7 +187,7 @@ export const reportsAutoTable = new AutoTable({
 
     ],
     link: function (doc, key) {
-        if (key != 'notes')
+        if (key != 'notes' && key != 'contactInfo')
             return FlowRouter.path('familyEdit', {familyId: doc.userId})
     }
 

@@ -3,6 +3,7 @@
  */
 import './notes'
 import './reports.html'
+import '/imports/ui/pages/family/contact'
 import {reportsAutoTable} from '/imports/api/email/reports'
 
 Template.emailsReports.helpers({

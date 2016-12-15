@@ -6,6 +6,35 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 import {SimpleSchema} from 'meteor/aldeed:simple-schema'
 import {EmailTemplates} from '/imports/api/email/templates'
 import {familyStatus} from "/imports/api/family/family-status";
+
+const operators = [  // Optional Array works for option filter
+    {
+        label: 'Equal',
+        shortLabel: '=',
+        operator: '$eq',
+    },
+    {
+        label: 'More than',
+        shortLabel: '>',
+        operator: '$gt',
+    },
+    {
+        label: 'Less than',
+        shortLabel: '<',
+        operator: '$lt',
+    },
+    {
+        label: 'More or equal than',
+        shortLabel: '≥',
+        operator: '$gte',
+    },
+    {
+        label: 'Less or equal than',
+        shortLabel: '≤',
+        operator: '$lte',
+    },
+]
+
 const emailFamilyFilter = new SimpleSchema({
     'emails.$.address': {
         label: 'Email',
@@ -53,6 +82,10 @@ const emailFamilyFilter = new SimpleSchema({
     'groups.applied':{
         type: Number,
         optional: true,
+    },
+    'groups.confirmed':{
+        type: Number,
+        optional: true,
     }
 
 })
@@ -87,13 +120,8 @@ export const campaignAutoTable = new AutoTable({
             label: 'Suburb',
             operator: '$regex'
         },
-        {
-            key: 'groups.applied', label: 'Applied', operator: '$size',
-            render: function (val) {
-                val=val || []
-                return val.length
-            }
-        },
+        {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
+        {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
     ],
     collection: Meteor.users,
     query: {roles: 'family'},
@@ -101,6 +129,8 @@ export const campaignAutoTable = new AutoTable({
     schema: emailFamilyFilter,
     settings: {
         options: {
+            columnsSort: true,
+            columnsDisplay: true,
             filters: true,
             showing: true,
         }

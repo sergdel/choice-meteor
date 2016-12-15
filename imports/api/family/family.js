@@ -22,6 +22,8 @@ export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
         type: String,
+
+
         regEx: SimpleSchema.RegEx.Email,
         unique: true,
         custom: function () {
@@ -43,7 +45,8 @@ Families.findContact = function (familyId, userId) {
         fields: {
             "emails.address": 1,
             "contact.homePhone'": 1,
-            "parents.mobilePhone": 1
+            "parents.mobilePhone": 1,
+            "roles": 1
         }
     })
 }
@@ -331,7 +334,7 @@ familySchema.messages({
 
 
 export const setBlueCardStatus = function (family) {
-    const map = ["n/a", "approved", "excempt", "send", "sent", "apply", "reapply", "expired", "declined"];
+    const map = ["n/a", "approved", "excempt", "send", "sent", "apply", "reapply", "expiring", "expired", "declined"];
     let min = 0
     for (let type of ['parents', 'children', 'guests']) {
         if (Array.isArray(family[type])) {

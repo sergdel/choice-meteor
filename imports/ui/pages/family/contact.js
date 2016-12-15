@@ -23,17 +23,18 @@ Template.familyContact.events({
             html: true,
             trigger: 'hover',
             title: "Contact Information",
-            content: Blaze.toHTML(Template.loading)
         }
 
-        //$button.popover(options)
-        const familyId = this._id
+        //this.userId || this._id ==>if is called from emailes reports use userId if if called from other else use _id
+        const familyId = this.userId || this._id
+        console.log(this.userId, this._id,familyId)
         if (!$button.data('created'))
             $button.html('<i class="fa fa-spinner fa-spin fa-fw"></i>')
             instance.subscribe('familyContactInfo', familyId, {
                 onReady: function () {
                     $button.html('<i class="fa fa-phone"></i>')
                     const family = Families.findOne(familyId)
+                    console.log('familyu',family)
                     const emails = _.pluck(family.emails, 'address').join(';')
                     const info = {
                         emails,

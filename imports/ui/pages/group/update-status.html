@@ -1,11 +1,11 @@
 <template name="groupUpdateStatus">
     {{#if applied}}
-        <button class="btn btn-primary btn-sm updateStatus" data-status="confirmed">Confirm <i class="fa fa-check-square-o"></i></button>
+        <button class="btn btn-primary btn-sm updateStatus" data-status="confirmed" id="{{_id}}">Confirm <i class="fa fa-check-square-o"></i></button>
     {{/if}}
     {{#if confirm}}
         <div class="btn-group-vertical" role="group">
-            <button class="btn btn-primary btn-sm updateStatus" data-status="applied">Unconfirm <i class="fa fa-square-o"></i></button>
-            <button class="btn btn-primary btn-sm updateStatus" data-status="canceled">Cancel <i class="fa fa-ban"></i></button>
+            <button class="btn btn-primary btn-sm updateStatus" data-status="applied" id="{{_id}}">Unconfirm <i class="fa fa-square-o"></i></button>
+            <button class="btn btn-primary btn-sm updateStatus" data-status="canceled" id="{{_id}}">Cancel <i class="fa fa-ban"></i></button>
         </div>
     {{/if}}
 

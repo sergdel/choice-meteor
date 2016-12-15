@@ -69,6 +69,7 @@ const columns = [
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
     {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
+    {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
@@ -107,6 +108,7 @@ export const familyFilterSchema = new SimpleSchema({
                 {label: 'sent', value: 'sent',},
                 {label: 'apply', value: 'apply',},
                 {label: 'reapply', value: 'reapply',},
+                {label: 'expiring', value: 'expiring'},
                 {label: 'expired', value: 'expired',},
                 {label: 'declined', value: 'declined',},
             ]

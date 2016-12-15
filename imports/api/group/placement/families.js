@@ -68,7 +68,6 @@ const columns = [
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
-    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
 
     {
         key: 'contactInfo', label: 'Contact',
@@ -78,8 +77,38 @@ const columns = [
     {key: 'groups.0.gender', label: 'Gender', operator: '$in',},
     {key: 'groups.0.minimum', label: 'Min', operator: '$eq', operators},
     {key: 'groups.0.maximum', label: 'Max', operator: '$eq', operators},
+    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
     {
-        key: 'action', label: 'Status', template: 'groupUpdateStatus'
+        key: 'groupsCount.confirmed', label: 'Conflict', operator: '$eq', operators,
+        render: function (val) {
+            if (val>0){
+                Meteor.call('checkGroupConflict',FlowRouter.getParam('groupId'),this._id,(err,conflict)=> {
+                    if (!err){
+                        if (_.isEmpty(conflict)){
+                            const $b=$('#'+this._id).find('i').removeClass('fa-hand-o-paper').addClass('fa-thumbs-o-up ')
+                            $b.removeClass('label-warning"').addClass('label-success')
+                        }else{
+                            const $b=$('#'+this._id)
+                            const content=Blaze.toHTMLWithData(Template.groupsConflict,{conflict})
+                            console.log('content',content)
+                            $b.removeClass('label-warning').addClass('label-danger')
+                            $b.find('i').removeClass('fa-hand-o-paper').addClass('fa-thumbs-o-down')
+                            $b.popover({
+                                content,
+                                placement: 'left',
+                                html: true,
+                                trigger: "hover",
+                            })
+                        }
+                    }
+                })
+                return '<span class="label label-warning"  id="'+ this._id+'"><i class="fa fa-hand-paper-o "></i></span>'
+            }
+            return val
+        }
+    },
+    {
+        key: 'action', label: 'Action', template: 'groupUpdateStatus'
     }
 ]
 
@@ -231,7 +260,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     'groupsCount.applied': {
         type: Number,
         optional: true,
-    }
+    },
 });
 
 const columnsKeysOmit = function (keys) {
@@ -274,7 +303,6 @@ export const familiesPlacementAppliedAutoTable = new AutoTable(
                 }
                 , sort, limit
             })
-            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
             return cursor
         },
         schema: familyPlacementFilterSchema,
@@ -290,7 +318,7 @@ export const familiesPlacementAppliedAutoTable = new AutoTable(
             }
         },
         link: function (row, path) {
-            if (path != 'action')
+            if (path != 'action' && path!='groupsCount.confirmed'  && path != 'contactInfo')
                 return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
@@ -327,7 +355,6 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
                 }
                 , sort, limit
             })
-            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
             return cursor
         },
         schema: familyPlacementFilterSchema,
@@ -343,7 +370,7 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
             }
         },
         link: function (row, path) {
-            if (path != 'action')
+            if (path != 'action' && path != 'contactInfo')
                 return FlowRouter.path('atCounterfamiliesPlacementPotentialAutoTable', {familyId: row._id})
         }
     }
@@ -363,7 +390,7 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
                 limit,
                 sort
             }), {noReady: true});
-            const groupId = query['groups.groupId'].$ne
+            const groupId = query.$or[0]['groups.groupId'].$ne
             const cursor = Meteor.users.find(query, {
                 fields: {
                     parents: 1,
@@ -382,7 +409,6 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
                 }
                 , sort, limit
             })
-            console.log('atCounterfamiliesPlacementPotentialAutoTable', cursor.count())
             return cursor
         },
         settings: {
@@ -397,7 +423,7 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
             }
         },
         link: function (row, path) {
-            if (path != 'action')
+            if (path != 'action' && path != 'contactInfo')
                 return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }

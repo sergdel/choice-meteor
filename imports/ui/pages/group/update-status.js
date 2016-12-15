@@ -4,9 +4,10 @@ import {EmailTemplates} from '/imports/api/email/templates'
 import {Groups} from '/imports/api/group/group'
 
 Template.groupUpdateStatus.onCreated(function () {
-    if (!EmailTemplates.findOne('ConfirmFamily') || EmailTemplates.findOne('UnconfirmationFamily')) {
+    if (!EmailTemplates.findOne('ConfirmFamily') || EmailTemplates.findOne('UnconfirmationFamily') || EmailTemplates.findOne('CancelFamily')) {
         this.subscribe('EmailTemplate', 'ConfirmFamily')
         this.subscribe('EmailTemplate', 'UnconfirmationFamily')
+        this.subscribe('EmailTemplate', 'CancelFamily')
     }
 
 });
@@ -25,7 +26,7 @@ Template.groupUpdateStatus.helpers({
     },
     confirm: () => {
         const template = Template.instance()
-        return template.data && template.data.groups && template.data.groups[0].status == 'confirm'
+        return template.data && template.data.groups && template.data.groups[0].status == 'confirmed'
     },
 });
 
