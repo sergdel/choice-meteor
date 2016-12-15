@@ -21,6 +21,7 @@ Template.groupList.helpers({
     autoTableStaff: Groups.autoTableStaff,
     autoTableFamilyAvailable: Groups.autoTableFamilyAvailable,
     autoTableFamilyApplied: Groups.autoTableFamilyApplied,
+    autoTableFamilyConfirmed: Groups.autoTableFamilyConfirmed,
     customQueryAvailable: function () {
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
             return {"families.familyId": {$ne: FlowRouter.getParam('familyId')}}
@@ -32,6 +33,12 @@ Template.groupList.helpers({
             return {"families": {$elemMatch: {status:  "applied", familyId: FlowRouter.getParam('familyId')}}}
         else
             return {"families": {$elemMatch: {status:  "applied", familyId: Meteor.userId()}}}
+    },
+    customQueryConfirmed: function () {
+        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
+            return {"families": {$elemMatch: {status:  "confirmed", familyId: FlowRouter.getParam('familyId')}}}
+        else
+            return {"families": {$elemMatch: {status:  "confirmed", familyId: Meteor.userId()}}}
     },
 });
 Template.bsModalPrompt.events({

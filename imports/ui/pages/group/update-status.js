@@ -1,4 +1,5 @@
 import './update-status.html'
+import './apply'
 import {Template} from 'meteor/templating'
 import {EmailTemplates} from '/imports/api/email/templates'
 import {Groups} from '/imports/api/group/group'
@@ -27,6 +28,10 @@ Template.groupUpdateStatus.helpers({
     confirm: () => {
         const template = Template.instance()
         return template.data && template.data.groups && template.data.groups[0].status == 'confirmed'
+    },
+    potential: () => {
+        const template = Template.instance()
+        return !template.data || !template.data.groups || !template.data.groups[0] || !template.data.groups[0].status
     },
 });
 

@@ -439,6 +439,28 @@ Migrations.add({
     }
 })
 
+
+
+
+
+
+Migrations.add({
+    version: 11,
+    name: 'rename availablePlacements to applied and create confirmed and cancel counters " ',
+    up: function () {
+        Groups.updateBySelector({}, {$rename: {'availablePlacements': 'applied'}},{multi: true, filter: false})
+        console.info('remember to delete availablePlacements from the schema in groups')
+        Groups.find({}).forEach((group)=>{
+            const applied = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
+            const confirmed = (group && group.families && _.where(group.families, {status: 'confirmed'}).length) || 0
+            const canceled = (group && group.families && _.where(group.families, {status: 'canceled'}).length) || 0
+            Groups.update(group._id, {$set: {applied, confirmed, canceled}}, {filter: false})
+        })
+    }
+})
+
+
+
 /*
  Migrations.add({
  version: 3,

@@ -9,7 +9,6 @@ import {Audit} from '/imports/api/audit/audit'
 import {Email} from 'meteor/email'
 
 
-
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
         return 'required'
@@ -69,24 +68,27 @@ class GroupCollection extends Mongo.Collection {
         return super.update(_id, modifier, options);
     }
 
-    updateStatusTo(status,groupId, familyId, userId){
+    updateStatusTo(status, groupId, familyId, userId) {
 
-        Families.updateGroupStatusTo(status,familyId, groupId)
+        Families.updateGroupStatusTo(status, familyId, groupId)
         super.update({
             _id: groupId,
             status: {$ne: "removed"},
-            "families.familyId":familyId,
+            "families.familyId": familyId,
         }, {$set: {"families.$.status": status}})
         const group = super.findOne(groupId, {fields: {families: 1}})
-        const oldStatus=_.findWhere(group.families,{familyId}).status
-        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
-        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        const oldStatus = _.findWhere(group.families, {familyId}).status
+        const groupNew = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
+        const applied = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'applied'}).length) || 0
+        const confirmed = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'confirmed'}).length) || 0
+        const canceled = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'canceled'}).length) || 0
+        super.update(groupId, {$set: {applied, confirmed, canceled}}, {filter: false})
         Audit.insert({
             userId: userId,
-            type:  'update',
+            type: 'update',
             familyId: familyId,
             docId: groupId,
-            description:  group.id + ' ' + group.name,
+            description: groupNew.id + ' ' + groupNew.name,
             newDoc: {status: status},
             oldDoc: {status: oldStatus},
             where: 'groups'
@@ -95,6 +97,7 @@ class GroupCollection extends Mongo.Collection {
 
 
     }
+
     apply(groupId, familyId, data, userId) {
         //todo better performance, insted find ans update 3 times, use $inc
         data.status = 'applied'
@@ -113,14 +116,16 @@ class GroupCollection extends Mongo.Collection {
         }, {$pull: {"families": {familyId: {$eq: familyId}}}}, {filter: false})
         //add the new data (is like update but works for edition and cretion
         super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {families: data}}, {filter: false})
-        const group = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
-        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
-        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        const groupNew = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
+        const applied = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'applied'}).length) || 0
+        const confirmed = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'confirmed'}).length) || 0
+        const canceled = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'canceled'}).length) || 0
+        super.update(groupId, {$set: {applied, confirmed, canceled}}, {filter: false})
         Audit.insert({
             userId: userId,
             type: groupExists ? 'update' : 'create',
             docId: groupId,
-            description:  group.id + ' ' + group.name,
+            description: groupNew.id + ' ' + groupNew.name,
             familyId: familyId,
             newDoc: data,
             oldDoc: oldData,
@@ -138,13 +143,15 @@ class GroupCollection extends Mongo.Collection {
         const oldData = _.findWhere(group.families || [], {familyId}) || {}
         super.update(groupId, {$pull: {"families": {familyId: familyId, status: 'applied'}}}, {filter: false})
         const groupNew = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
-        const availablePlacements = (group && group.families && _.where(group.families, {status: 'applied'}).length) || 0
-        super.update(groupId, {$set: {availablePlacements}}, {filter: false})
+        const applied = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'applied'}).length) || 0
+        const confirmed = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'confirmed'}).length) || 0
+        const canceled = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'canceled'}).length) || 0
+        super.update(groupId, {$set: {applied, confirmed, canceled}}, {filter: false})
         Audit.insert({
             userId: userId,
             type: 'remove',
             docId: groupId,
-            description:  group.id + ' ' + group.name,
+            description: groupNew.id + ' ' + groupNew.name,
             familyId: familyId,
             newDoc: {},
             oldDoc: oldData,
@@ -385,7 +392,52 @@ const schemaObject = {
     },
     availablePlacements: {
         type: Number,
-        label: 'Available',
+        label: 'Applied',
+        optional: true,
+        autoform: {
+            type: 'readonly',
+            class: 'readonly-bordered',
+
+        },
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        },
+    },
+    applied: {
+        type: Number,
+        label: 'Applied',
+        optional: true,
+        autoform: {
+            type: 'readonly',
+            class: 'readonly-bordered',
+
+        },
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        },
+    },
+    confirmed: {
+        type: Number,
+        label: 'Confirmed',
+        optional: true,
+        autoform: {
+            type: 'readonly',
+            class: 'readonly-bordered',
+
+        },
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        },
+    },
+    canceled: {
+        type: Number,
+        label: 'Confirmed',
         autoform: {
             type: 'readonly',
             class: 'readonly-bordered',
@@ -620,8 +672,14 @@ const columns = [
 
     },
     {
-        key: 'availablePlacements',
-        label: 'Available',
+        key: 'applied',
+        label: 'Applied',
+        operator: '$eq',
+        operators,
+    },
+    {
+        key: 'confirmed',
+        label: 'Confirmed',
         operator: '$eq',
         operators,
     },
@@ -735,8 +793,13 @@ let groupFilterSchema = new SimpleSchema({
 
         optional: true,
     },
-    availablePlacements: {
-        label: 'Available',
+    applied: {
+        label: 'Applied',
+        type: Number,
+        optional: true,
+    },
+    confirmed: {
+        label: 'Cconfirmed',
         type: Number,
         optional: true,
     },
@@ -889,6 +952,31 @@ Groups.autoTableFamilyApplied = new AutoTable(
         }
     }
 )
+columnsFamilyApplied.pop()
+Groups.autoTableFamilyConfirmed = new AutoTable(
+    {
+        id: 'groupFamilyConfirmed',
+        collection: Groups,
+        columns: columnsFamilyApplied,
+        schema: groupFilterSchema,
+        publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
+        settings: {
+            options: {
+                columnsSort: true,
+                columnsDisplay: false,
+                showing: true,
+                filters: true,
+            },
+            msg: {
+                noRecordsCriteria: 'You haven\'t apply for any groups yet',
+            },
+            klass: {
+                //  tableWrapper: ''
+            }
+        }
+    }
+)
+
 
 
 /*

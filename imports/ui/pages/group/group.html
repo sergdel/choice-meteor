@@ -2,7 +2,7 @@
     {{#if Template.subscriptionsReady }}
         {{#if data.found}}
             <h1><a href="{{pathFor 'groupList'}}"> Groups</a> - {{data.group.parents.[0].firstName}}
-                {{data.group.id}} {{data.group.name}}
+                {{data.group.id}} {{data.group.name}} <small>{{showDate data.group.dates.[0]}} - {{showDate data.group.dates.[1]}} ({{data.group.nationality}}) ({{data.group.location}})</small>
             </h1>
 
             <ul class="nav nav-tabs" role="tablist">

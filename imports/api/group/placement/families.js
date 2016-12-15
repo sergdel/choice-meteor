@@ -81,19 +81,20 @@ const columns = [
     {
         key: 'groupsCount.confirmed', label: 'Conflict', operator: '$eq', operators,
         render: function (val) {
-            if (val>0){
-                Meteor.call('checkGroupConflict',FlowRouter.getParam('groupId'),this._id,(err,conflict)=> {
-                    if (!err){
-                        if (_.isEmpty(conflict)){
-                            const $b=$('#'+this._id).find('i').removeClass('fa-hand-o-paper').addClass('fa-thumbs-o-up ')
-                            $b.removeClass('label-warning"').addClass('label-success')
-                        }else{
-                            const $b=$('#'+this._id)
-                            const content=Blaze.toHTMLWithData(Template.groupsConflict,{conflict})
-
-                            $b.removeClass('label-warning').addClass('label-danger')
-                            $b.find('i').removeClass('fa-hand-o-paper').addClass('fa-thumbs-o-down')
-                            $b.popover({
+            if (val > 0) {
+                Meteor.call('checkGroupConflict', FlowRouter.getParam('groupId'), this._id, (err, conflict) => {
+                    if (!err) {
+                        const $b = $('#' + this._id)
+                        const $i = $('#' + this._id).find('i')
+                        $b.removeClass('label-warning')
+                        $i.removeClass('fa-hand-paper-o')
+                        if (_.isEmpty(conflict)) {
+                            $i.addClass('fa-thumbs-o-up')
+                            $b.addClass('label-success')
+                        } else {
+                            const content = Blaze.toHTMLWithData(Template.groupsConflict, {conflict})
+                            $i.addClass('fa-thumbs-o-down')
+                            $b.addClass('label-danger').popover({
                                 content,
                                 placement: 'left',
                                 html: true,
@@ -102,9 +103,9 @@ const columns = [
                         }
                     }
                 })
-                return '<span class="label label-warning"  id="'+ this._id+'"><i class="fa fa-hand-paper-o "></i></span>'
+                return '<span class="label label-warning"  id="' + this._id + '"><i class="fa fa-hand-paper-o "></i></span>'
             }
-            return val
+            return '<span class="label label-success"  id="' + this._id + '"><i class="fa  fa-thumbs-o-up"></i></span>'
         }
     },
     {
@@ -318,7 +319,7 @@ export const familiesPlacementAppliedAutoTable = new AutoTable(
             }
         },
         link: function (row, path) {
-            if (path != 'action' && path!='groupsCount.confirmed'  && path != 'contactInfo')
+            if (path != 'action' && path != 'groupsCount.confirmed' && path != 'contactInfo')
                 return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
