@@ -41,7 +41,7 @@ Migrations.add({
                     familyApplied.groupId = _id
                     familyGroups.push(familyApplied)
                 } else {
-                    console.log(family._id, _id)
+
                 }
 
 

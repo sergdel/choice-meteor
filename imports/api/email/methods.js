@@ -72,7 +72,7 @@ Meteor.methods({
             query: Object
         })
         this.unblock()
-        console.log('sendCampaign', doc.query)
+
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
 

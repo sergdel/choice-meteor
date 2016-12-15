@@ -3,12 +3,12 @@ import {Template} from "meteor/templating";
 import {Groups} from "/imports/api/group/group";
 import '/imports/ui/componets/autoform/readonly/readonly'
 Template.groupEdit.onCreated(function () {
-    console.log('Template.groupEdit.onCreated', this)
+
 
 });
 
 Template.groupEdit.onRendered(function () {
-    console.log('Template.groupEdit.onRendered', this)
+
 });
 
 Template.groupEdit.onDestroyed(function () {

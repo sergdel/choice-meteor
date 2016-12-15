@@ -32,7 +32,7 @@ Meteor.methods({
         const family = Families.findOne(familyId)
         const group = Groups.findOne(groupId)
         const confirmedGroup = _.pluck(_.where(family.groups || [], {status: 'confirmed'}), 'groupId')
-        console.log('confirmedGroup',confirmedGroup)
+
         const conflict=Groups.find({
             _id: {$in: confirmedGroup},
             $or: [
@@ -41,7 +41,7 @@ Meteor.methods({
                 {"dates.0": {$lte: group.dates[0]}, "dates.1": {$gte: group.dates[1]}},
             ]
         })
-        console.log('conflict.fetch()',conflict.fetch())
+
         return conflict.fetch()
     }
 })
@@ -71,7 +71,7 @@ Meteor.methods({
             subject = subject.replace(/<img id="Location" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, location)
 
             subject = htmlToText.fromString(subject)
-            console.log(subject)
+
             let body = emailTemplate.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
             body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
             body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
@@ -106,7 +106,7 @@ Meteor.methods({
             } else {
                 options.to = 'c@imagenproactiva.com'
                 Email.send(options);
-                console.log('email send to me')
+
             }
         }
         const createTable = function (familyId, status) {
@@ -120,11 +120,11 @@ Meteor.methods({
                 }
                 groups = Groups.find({families: {$elemMatch: {familyId, status}}}, {sort: {"dates.0": 1}})
 
-                console.log(status)
+
             } else {
                 table = '<p>Here is a summary of other available groups that you may want to apply for:</p><br>'
                 groups = Groups.find({"families.familyId": {$ne: familyId}}, {sort: {"dates.0": 1}})
-                console.log('avalibles', groups.count())
+
             }
             table += '<table style="width: 100%; border-collapse: collapse; border: 1px solid #e4e4e4; text-align: center">' +
                 '<thead>' +

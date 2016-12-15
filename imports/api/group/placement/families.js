@@ -90,7 +90,7 @@ const columns = [
                         }else{
                             const $b=$('#'+this._id)
                             const content=Blaze.toHTMLWithData(Template.groupsConflict,{conflict})
-                            console.log('content',content)
+
                             $b.removeClass('label-warning').addClass('label-danger')
                             $b.find('i').removeClass('fa-hand-o-paper').addClass('fa-thumbs-o-down')
                             $b.popover({
