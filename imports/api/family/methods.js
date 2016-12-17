@@ -19,7 +19,8 @@ import {check} from 'meteor/check'
 Meteor.methods({
 
     createToken: function (familyId) {
-        check(familyId,String)
+        this.unblock()
+        check(familyId, String)
         if (!Roles.userIsInRole(this.userId, ['admin'])) {
             throw new Meteor.Error(403, 'Access forbidden', 'Only admin can create tokens')
         }
@@ -27,7 +28,15 @@ Meteor.methods({
         return LoginToken.createTokenForUser(familyId);
 
     },
+    familyReviewed: function (familyId) {
+        this.unblock()
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            familyId = this.userId
+        }
+        return Families.update(familyId, {$set: {reviewed: new Date()}})
+    },
     familyRemove: function (familyId) {
+        this.unblock()
         check(familyId, String)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             throw new Meteor.Error(403, 'Access forbidden', 'Only admin can remove profiles')
@@ -35,8 +44,9 @@ Meteor.methods({
         Families.remove(familyId, {userId: this.userId})
     },
     familyEdit: function (modifier, familyId) {
-        check(familyId,String)
-        check(modifier,Object)
+        this.unblock()
+        check(familyId, String)
+        check(modifier, Object)
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         //check if is authorized
 
@@ -80,7 +90,8 @@ Meteor.methods({
 
     },
     emailExist: function (email, isNotThisFamilyId) {
-        check(email,String)
+        this.unblock()
+        check(email, String)
 
         //if (Meteor.isServer) Meteor._sleepForMs(300 * Meteor.isDevelopment);
         let query = {$or: [{emails: {$elemMatch: {address: email}}}, {parents: {$elemMatch: {email}}}]};
@@ -89,7 +100,8 @@ Meteor.methods({
         return Meteor.users.find(query).count() > 0
     },
     familyNew: function (doc) {
-        check(doc,Object)
+        this.unblock()
+        check(doc, Object)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
             throw new Meteor.Error(403, 'Access forbidden', 'Only staff and admin can create new families')
 

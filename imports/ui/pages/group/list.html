@@ -1,31 +1,36 @@
 <template name="groupList">
 
-
     {{#if isInRole 'admin,staff' }}
         {{#if isActiveRoute 'groupList'}}
-            <h1>Groups<button class="btn btn-primary btn-lg groupNew">
-                <div class="fa fa-plus"></div>
-            </button>
-            </h1>
+                <h1>Groups
+                    <button class="btn btn-primary btn-lg groupNew">
+                        <div class="fa fa-plus"></div>
+                    </button>
+                </h1>
 
             {{>atTable at=autoTableStaff }}
         {{/if}}
     {{/if}}
     {{#if isInRole 'family,admin,staff' }}
         {{#if isNotActiveRoute 'groupList'}}
-            <h3>Available</h3>
-            {{>atTable at=autoTableFamilyAvailable customQuery=customQueryAvailable }}
-            <h3>Applied</h3>
-            {{>atTable at=autoTableFamilyApplied customQuery=customQueryApplied }}
-            <h3>Confirmed</h3>
+                <h3>Confirmed</h3>
             {{>atTable at=autoTableFamilyConfirmed customQuery=customQueryConfirmed }}
+                <h3>Applied</h3>
+            {{>atTable at=autoTableFamilyApplied customQuery=customQueryApplied }}
+        {{!wait for confirmed subscription be ready, because i use its publish information (groups) for customQuery !}}
+            {{#if autoTableFamilyConfirmedReady }}
+                    <h3>Available</h3>
+                {{>atTable at=autoTableFamilyAvailable customQuery=customQueryAvailable }}
+            {{else}}
+                {{>loading}}
+            {{/if}}
         {{/if}}
     {{/if}}
 
-</template>
+    </template>
 
 
-<!--ul class="nav nav-tabs" >
-    <li class="active"><a href="" >Home</a></li>
-    <li ><a href="">Profile</a></li>
-</ul-->
+    <!--ul class="nav nav-tabs" >
+        <li class="active"><a href="" >Home</a></li>
+        <li ><a href="">Profile</a></li>
+    </ul-->

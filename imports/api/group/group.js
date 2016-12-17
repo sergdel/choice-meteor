@@ -3,6 +3,7 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
+import {Distances, Locations} from '/imports/api/location/location'
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {FlowRouter} from 'meteor/kadira:flow-router'
 import {Audit} from '/imports/api/audit/audit'
@@ -294,14 +295,36 @@ const schemaObject = {
             }
         }
     },
-    location: {
+    locationId: {
+        label: 'Location',
         type: String,
+        optional: true,
         autoform: {
-            afFormGroup: {
-                //"formgroup-class": 'col-sm-3',
+            options: function () {
+                return Locations.find({}).map((loc) => {
+                    return {value: loc._id, label: loc.name}
+                })
             }
         }
+
     },
+    location: {
+        type: String,
+        optional: true,
+        autoValue: function () {
+            if (Meteor.isServer) {
+                const location = Locations.find(this.field('locationId'))
+                return location && location.name
+            }
+
+        }
+    },
+    travelDuration: {
+        type: Number,
+        optional: true,
+        min: 0
+    },
+
     students: {
         min: 0,
         type: Number,
@@ -550,7 +573,7 @@ groupEditNewSchema.messages({
     guestToMismatch: "[label] has to be more or equal than guest from"
 })
 groupApplySchema.messages({
-    maximumMismatch: "[label] has to be more or equal than minimun"
+    maximumMismatch: "[label] has to be more or equal than minimum"
 })
 
 export const Groups = new GroupCollection('groups');
@@ -727,6 +750,13 @@ const columns = [
         label: 'Payment',
         operator: '$regex',
     },
+    {
+        key: 'travel.duration.value',
+        label: 'Travel duration',
+        render: function () {
+            return this && this.travel && this.travel.duration.text
+        }
+    }
 
 ]
 
@@ -761,9 +791,28 @@ let groupFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
+    locationId: {
+        type: String,
+        optional: true,
+        autoform: {
+            options: function () {
+                return Locations.find({}).map((loc) => {
+                    return {value: loc._id, label: loc.name}
+                })
+            }
+        }
+
+    },
     location: {
         type: String,
         optional: true,
+        autoValue: function () {
+            if (Meteor.isServer) {
+                const location = Locations.find(this.field('locationId'))
+                return location && location.name
+            }
+
+        }
     },
     students: {
         type: Number,
@@ -844,7 +893,7 @@ Groups.autoTableStaff = new AutoTable(
         }
     }
 )
-const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.0', 'dates.1', 'nights', 'ages', 'city', 'location'])
+const columnsFamilyAvailable = columnsKeys(['id', 'name', 'nationality', 'dates.0', 'dates.1', 'nights', 'ages', 'city', 'location', 'travel.duration.value'])
 columnsFamilyAvailable.push({
     key: 'guest.home',
     label: 'Guest/home',
@@ -872,12 +921,107 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                 filters: true,
             },
             msg: {
-                noRecordsCriteria: 'There are not any groups available at this time',
+                noRecords: 'There are not any groups available at this time',
             },
             klass: {
                 //   tableWrapper: ''
             }
         },
+        publish: function (id, limit, query, sort) {
+
+
+            if (!Roles.userIsInRole(this.userId, ['admin','staff','family'])) {
+                return this.ready()
+            }
+            const self = this;
+            //"families": {$elemMatch: {status:  "confirmed", familyId:
+            const familyId = query.$and[0]["families.familyId"].$ne
+            const publishGroups = []
+            self.added('counts', 'atCounter' + id, {count: 0})
+
+
+            /*
+             const conflict=Groups.find({
+             _id: {$in: confirmedGroup},
+             $or: [
+             {"dates.0": {$gte: group.dates[0], $lte: group.dates[1]}},
+             {"dates.1": {$gte: group.dates[0], $lte: group.dates[1]}},
+             {"dates.0": {$lte: group.dates[0]}, "dates.1": {$gte: group.dates[1]}},
+             ]
+             })
+             */
+            console.log('query',query)
+            var handle = Groups.find(query).observeChanges({
+                added: function (groupId, group) {
+                    const maxDuration = group.travelDuration || 35
+                    let distance = Distances.findOne(familyId + '|' + group.locationId)
+                    const duration = (distance && distance.travel && distance.travel.duration && distance.travel.duration.value) || 0
+                    if (maxDuration >= duration) {
+                        if (distance && distance.travel)
+                            group.travel = distance.travel
+                        publishGroups.push(groupId)
+
+                        self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
+                        self.added("groups", groupId, group);
+                    }
+                },
+                changed: function (groupId, group) {
+                    const groupNew = Groups.findOne(groupId)
+                    const maxDuration = group.travelDuration || 35
+                    let distance = Distances.findOne(familyId + '|' + groupNew.locationId)
+                    const duration = (distance && distance.travel && distance.travel.duration && distance.travel.duration.value) || 0
+
+                    if (maxDuration >= duration) {
+                        if (distance && distance.travel) {
+                            group.travel = distance.travel
+                            groupNew.travel = distance.travel
+                        }
+                        if (publishGroups.indexOf(groupId) >= 0) {
+                            self.changed("groups", groupId, group)
+                        } else {
+                            publishGroups.push(groupId)
+                            self.added("groups", groupId, groupNew);
+                            self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
+                        }
+                    } else {
+                        if (index>= 0) {
+                            publishGroups.splice(index, 1);
+                            self.removed("groups", groupId);
+                            self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
+                            console.log(self)
+                        }
+                    }
+
+                }
+                ,
+                removed: function (groupId) {
+                    const index=publishGroups.indexOf(groupId)
+                    console.log('000publishGroups',publishGroups,groupId,index)
+                    if (index>= 0) {
+                        publishGroups.splice(index, 1);
+                        console.log('11publishGroups',publishGroups)
+                        self.removed("groups", groupId);
+                        self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
+                    }
+
+                }
+            });
+
+            self.ready();
+
+            self.onStop(function () {
+                handle.stop();
+
+
+            });
+            return false
+        },
+        link: function (row, path) {
+            if (path != 'action' && Roles.userIsInRole(Meteor.userId(), ['staff', 'admins'])) {
+                return FlowRouter.path('groupEdit', {groupId: row._id})
+            }
+            return ''
+        }
 
     }
 )
@@ -944,11 +1088,18 @@ Groups.autoTableFamilyApplied = new AutoTable(
                 filters: true,
             },
             msg: {
-                noRecordsCriteria: 'You haven\'t apply for any groups yet',
+                noRecords: 'You haven\'t apply for any groups yet',
             },
             klass: {
                 //  tableWrapper: ''
             }
+        },
+
+        link: function (row, path) {
+            if (path != 'action' && Roles.userIsInRole(Meteor.userId(), ['staff', 'admins'])) {
+                return FlowRouter.path('groupEdit', {groupId: row._id})
+            }
+            return ''
         }
     }
 )
@@ -968,15 +1119,21 @@ Groups.autoTableFamilyConfirmed = new AutoTable(
                 filters: true,
             },
             msg: {
-                noRecordsCriteria: 'You haven\'t apply for any groups yet',
+                noRecords: 'There are not any groups confirmed at this time',
             },
             klass: {
                 //  tableWrapper: ''
             }
+        },
+
+        link: function (row, path) {
+            if (path != 'action' && Roles.userIsInRole(Meteor.userId(), ['staff', 'admins'])) {
+                return FlowRouter.path('groupEdit', {groupId: row._id})
+            }
+            return ''
         }
     }
 )
-
 
 
 /*

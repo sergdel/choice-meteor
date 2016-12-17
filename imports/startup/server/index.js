@@ -35,6 +35,9 @@ import "/imports/api/email/methods"
 import "/imports/api/tags/tags"
 import "/imports/api/tags/server/publication"
 import "/imports/api/account/account"
+import "/imports/api/location/location"
+import "/imports/api/location/methods"
+import "/imports/api/location/server/publication"
 import "./cron";
 
 

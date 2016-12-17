@@ -22,23 +22,53 @@ Template.groupList.helpers({
     autoTableFamilyAvailable: Groups.autoTableFamilyAvailable,
     autoTableFamilyApplied: Groups.autoTableFamilyApplied,
     autoTableFamilyConfirmed: Groups.autoTableFamilyConfirmed,
+    autoTableFamilyConfirmedReady:()=>{
+        return Groups.autoTableFamilyConfirmed.subscriptionReady()
+    },
     customQueryAvailable: function () {
-        if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-            return {"families.familyId": {$ne: FlowRouter.getParam('familyId')}}
-        else
-            return {"families.familyId": {$ne: Meteor.userId()}}
+        return ()=> {
+            const family = Families.findOne(this.familyId, {groups: 1})
+            console.log('.......family',family,this)
+            const confirmedGroupIds = (family && family.groups && _.pluck(_.where(family.groups, {status: 'confirmed'}), 'groupId')) || []
+            console.log('confirmedGroupIds', confirmedGroupIds)
+            const and = []
+            if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
+                and.push({"families.familyId": {$ne: FlowRouter.getParam('familyId')}})
+            else
+                and.push({"families.familyId": {$ne: Meteor.userId()}})
+
+            const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1}})
+            console.log('confirmedGroups', confirmedGroups.fetch())
+            confirmedGroups.forEach((confirmed) => {
+                console.log('confirmed', confirmed)
+                and.push({
+                    //dates0 and dates1 can not be between a confirmed group
+                    "dates.0": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
+                    "dates.1": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
+                    //dates and wrapped a dates of confirmed group
+                    $or: [
+                        {"dates.0": {$gte: confirmed.dates[1]}},
+                        {"dates.1": {$lte: confirmed.dates[0]}}
+                    ]
+                })
+            })
+            console.log('before--------->', {$and: and})
+
+
+            return {$and: and}
+        }
     },
     customQueryApplied: function () {
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-            return {"families": {$elemMatch: {status:  "applied", familyId: FlowRouter.getParam('familyId')}}}
+            return {"families": {$elemMatch: {status: "applied", familyId: FlowRouter.getParam('familyId')}}}
         else
-            return {"families": {$elemMatch: {status:  "applied", familyId: Meteor.userId()}}}
+            return {"families": {$elemMatch: {status: "applied", familyId: Meteor.userId()}}}
     },
     customQueryConfirmed: function () {
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-            return {"families": {$elemMatch: {status:  "confirmed", familyId: FlowRouter.getParam('familyId')}}}
+            return {"families": {$elemMatch: {status: "confirmed", familyId: FlowRouter.getParam('familyId')}}}
         else
-            return {"families": {$elemMatch: {status:  "confirmed", familyId: Meteor.userId()}}}
+            return {"families": {$elemMatch: {status: "confirmed", familyId: Meteor.userId()}}}
     },
 });
 Template.bsModalPrompt.events({
@@ -61,8 +91,8 @@ Template.groupList.events({
 
         if (!groupApply) {
             //if there is'nt a group apply is because in creating a new one in this case in take te values from the last application
-            const family=Families.findOne(familyId)
-            groupApply=family && family.groups &&  _.where(family.groups,{status: 'applied'} ).pop()
+            const family = Families.findOne(familyId)
+            groupApply = family && family.groups && _.where(family.groups, {status: 'applied'}).pop()
         }
         const moment1 = this.dates && this.dates[0] && moment(this.dates[0])
         const moment2 = this.dates && this.dates[1] && moment(this.dates[1])
@@ -81,7 +111,7 @@ Template.groupList.events({
                 doc: groupApply,
                 id: 'applyGroup',
                 buttonContent: false,
-                omitFields: ['familyId','status']
+                omitFields: ['familyId', 'status']
             },
             btnDismissText: 'Cancel',
             btnOkText: 'Save'

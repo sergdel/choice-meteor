@@ -96,7 +96,7 @@ Meteor.methods({
                 'suburb': family.contact && family.contact.address && family.contact.address.suburb,
                 'campaign': "Group confirmation",
                 "loggedAt": family.loggedAt,
-                "userId": emailTemplate._id,
+                "userId": family._id,
                 html: body,
                 text,
                 status: 'sent',

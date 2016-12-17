@@ -1,6 +1,7 @@
 import './placements.html'
 import './update-status'
 import './conflict.html'
+import '../family/contact'
 import {familiesPlacementAppliedAutoTable,familiesPlacementConfirmedAutoTable,familiesPlacementPotentialAutoTable} from '/imports/api/group/placement/families'
 Template.groupPlacements.onCreated(function () {
     //add your statement here

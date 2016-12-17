@@ -33,6 +33,13 @@ Template.familyEdit.onDestroyed(function () {
 });
 
 Template.familyEdit.helpers({
+    showFromMax:(val)=>{
+        const limit = moment(val).max(new Date());
+        if (limit.isValid())
+            return limit.fromNow();
+        else
+            return ''
+    },
     omitFields: () => {
         if (Roles.userIsInRole(Meteor.userId(), ['family'])) {
             return ['adult.score', 'adult.status']
@@ -68,6 +75,9 @@ Template.familyEdit.helpers({
 ;
 
 Template.familyEdit.events({
+    'click .reviewed'(e,instance){
+        Meteor.call('familyReviewed', this.familyId)
+    },
     'click .removeFamily'(e, instance) {
         BootstrapModalPrompt.prompt({
             title: 'Please confirm',

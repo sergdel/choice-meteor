@@ -29,6 +29,8 @@ import "/imports/ui/pages/group/placements.js";
 
 import "/imports/ui/pages/email/emails";
 
+import "/imports/ui/pages/location/list";
+import "/imports/ui/pages/location/edit";
 
 
 /*
@@ -232,6 +234,25 @@ familyRoutes.route('/bluecard/:limit?', {
         BlazeLayout.render('layout', {yield: 'blueCardList'})
     }
 });
+
+
+/**Locations**/
+const locationsRoutes = adminRoleRoutes.group({
+    prefix: '/location'
+});
+
+locationsRoutes.route('/list', {
+    name: 'locationList',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'locationList'})
+    }
+});
+locationsRoutes.route('/edit/:locationId', {
+    name: 'locationEdit',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'locationEdit'})
+    }
+})
 
 
 /**Groups**/

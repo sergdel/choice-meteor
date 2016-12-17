@@ -18,6 +18,8 @@ import {moment} from "meteor/momentjs:moment";
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Audit} from '/imports/api/audit/audit'
 import {Tags} from '/imports/api/tags/tags'
+import {updateDistance} from "/imports/api/location/methods";
+import {availabilitySchema} from "./availability";
 export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
@@ -134,6 +136,17 @@ Families.update = function (_id, modifier, options = {}, callback) {
     //todo hacer esto con joins probablemente con un helper https://guide.meteor.com/collections.html#collection-helpers
     //una  moificacion al autotable donde permita custom publish
     // y
+
+
+    //if the geoposition chage updates de distances
+    if ((newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lat) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lat) ||
+        (newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lng) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lng)
+    ){
+        Locations.find().forEach((loc)=>{
+            updateDistance(newDoc,loc)
+        })
+
+    }
     Email.update({userId: _id}, {
         $set: {
             mobilePhone: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].mobilePhone,
@@ -158,6 +171,10 @@ Families.remove = function (_id, options) {
 }
 export const familySchema = new SimpleSchema({
     createdAt: {
+        optional: true,
+        type: Date
+    },
+    reviewed: {
         optional: true,
         type: Date
     },
@@ -323,6 +340,17 @@ export const familySchema = new SimpleSchema({
         }
 
     },
+    "availability":{
+        label: 'Unavailable dates',
+        optional: true,
+        type: Array,
+
+    },
+    "availability.$":{
+        label: '222202222',
+        optional: true,
+        type: availabilitySchema
+    }
 
 });
 

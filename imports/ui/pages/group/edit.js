@@ -3,7 +3,7 @@ import {Template} from "meteor/templating";
 import {Groups} from "/imports/api/group/group";
 import '/imports/ui/componets/autoform/readonly/readonly'
 Template.groupEdit.onCreated(function () {
-
+    this.subscribe('locations')
 
 });
 

@@ -3,10 +3,14 @@
  */
 import {Meteor} from 'meteor/meteor'
 import {Accounts} from 'meteor/accounts-base'
+import {modifyEmailTemplates} from "/imports/api/email/server/initial-setup";
 
 
 
 Meteor.startup(()=> {
+    for (const emailTemplate of ["enrollAccount", "resetPassword", "verifyEmail"]){
+        modifyEmailTemplates(emailTemplate)
+    }
     const email = 'jonathan@freewill.vision';
     if (!Accounts.findUserByEmail(email)) {
         const userId = Accounts.createUser({

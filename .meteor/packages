@@ -37,7 +37,7 @@ cesarve:bs-modal-prompt
 ostrio:files
 ostrio:autoform-files
 dispatch:login-token
-http@1.2.10
+http
 meteorhacks:kadira
 kadira:debug
 aldeed:template-extension@4.0.0

@@ -127,11 +127,9 @@ export const reportsAutoTable = new AutoTable({
     columns: [
         {key: 'parent1', label: 'Parent 1', operator: '$regex'},
         {key: 'parent2', label: 'Parent 2', operator: '$regex'},
-        {key: 'mobilePhone', label: 'Phone', operator: '$regex'},
         {key: 'surname', label: 'Surname', operator: '$regex'},
         {key: 'city', label: 'City', operator: '$regex'},
         {key: 'suburb', label: 'Suburb', operator: '$regex'},
-        {key: 'to', label: 'To', operator: '$regex'},
         {key: 'subject', label: 'Subject ', operator: '$regex'},
         {key: 'campaign', label: 'Campaign ', operator: '$regex'},
         {

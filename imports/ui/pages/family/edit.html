@@ -19,8 +19,8 @@
                                                               data-toggle="tab">Profile</a></li>
                     <li role="presentation" class=""><a href="#groups" aria-controls="profile" role="tab"
                                                         data-toggle="tab">Groups</a></li>
-
-
+                    <li role="presentation" class=""><a href="#availability" aria-controls="profile" role="tab"
+                                                        data-toggle="tab">Availability</a></li>
                     {{#if isInRole 'family'}}
                         <li role="presentation" class=""><a href="#accounts" aria-controls="profile" role="tab"
                                                             data-toggle="tab">Accounts</a></li>
@@ -51,6 +51,17 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="profile">
                         <h3>Profile</h3>
+
+                        Your profile was most recently reviewed and confirmed by you:
+                        {{#if family.reviewed}}
+                            {{showFromMax family.reviewed}}
+                        {{else}}
+                            <span class="text-danger">never</span>
+                        {{/if}}
+                        <button class="btn btn-block btn-default reviewed">
+                            Click here if you've reviewed and confirmed your profile information today
+                        </button>
+                        <br>
                         {{>familyForm formType="method-update" formMethod="familyEdit" doc=family resetOnSuccess=false
                                 familyStatusOptions=familyStatusOptions }}
                         {{#if isInRole 'admin'}}
@@ -61,6 +72,19 @@
                     <div role="tabpanel" class="tab-pane " id="groups">
                         <h3>Groups</h3>
                         {{>groupList}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane " id="availability">
+                        <h3>Availability</h3>
+                        Please identify any dates when you're not available to welcome guests. This data will be used to avoid presenting you with groups that you're not available to welcome.
+                        <div class="no-panel-heading">
+                        {{#autoForm schema=familySchema doc=family id="familyAvailability"  doc=family
+                                    type="method-update"
+                                    meteormethod="familyEdit"
+                                    resetOnSuccess=false}}
+                            {{>afQuickField name="availability"}}
+                            {{>buttonSubmit new=false edit=true}}
+                        {{/autoForm}}
+                        </div>
                     </div>
 
                     {{#if isInRole 'family'}}

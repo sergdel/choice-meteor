@@ -3,12 +3,20 @@ import "/imports/ui/componets/accordion";
 import "/imports/ui/componets/button-submit"
 
 import "./form.html";
-
 import {Template} from "meteor/templating";
 import {familySchema} from "/imports/api/family/family";
 import "/imports/api/files/files";
+import {moment} from 'meteor/momentjs:moment'
+
 
 Template.familyForm.helpers({
+    isOver175: (name, formId) => {
+        const bod = AutoForm.getFieldValue(name, formId)
+        if (bod instanceof Date) {
+            return bod <= moment().subtract(17.5, 'years')
+        }
+        return false
+    },
     schema: familySchema,
     new: () => Template.instance().data.formType == "method",
     edit: () => Template.instance().data.formType == "method-update",
@@ -50,15 +58,15 @@ Template.familyForm.onDestroyed(function () {
 
 AutoForm.addHooks('familyForm', {
     onError: function (formType, error) {
-        const errors=familySchema.namedContext("familyForm").invalidKeys()
+        const errors = familySchema.namedContext("familyForm").invalidKeys()
 
-        for (let i in errors){
-            const $field=$('[name="'+errors[i].name+'"]')
-            const $panel=$field.parents('.panel-collapse')
-            if (i==0){
-                $panel.one('shown.bs.collapse',function(){
+        for (let i in errors) {
+            const $field = $('[name="' + errors[i].name + '"]')
+            const $panel = $field.parents('.panel-collapse')
+            if (i == 0) {
+                $panel.one('shown.bs.collapse', function () {
                     var body = $("html, body");
-                    body.stop().animate({scrollTop: $field.offset().top-30}, 600,'swing');
+                    body.stop().animate({scrollTop: $field.offset().top - 30}, 600, 'swing');
 
                 })
             }

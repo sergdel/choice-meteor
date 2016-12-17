@@ -7,7 +7,7 @@ import {Email} from 'meteor/email'
 
 
 export const modifyEmailTemplates = function (emailTemplate) {
-    if (_.contains(["enrollAccount", "resetPassword", "verifyEmail", "resetPassword"], emailTemplate._id)) {
+    if (_.contains(["enrollAccount", "resetPassword", "verifyEmail"], emailTemplate._id)) {
         Accounts.emailTemplates[emailTemplate._id].subject = function (user) {
             return emailTemplate.subject
         };
