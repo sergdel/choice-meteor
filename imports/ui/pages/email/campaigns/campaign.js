@@ -17,15 +17,23 @@ Template.emailsCampaign.helpers({
 AutoForm.addHooks('campaignForm', {
     before: {
         method: function (doc) {
+            const customQuery = Session.get('campaignList_customQuery')
+            doc.query=doc.query || {}
+            if (!_.isEmpty(customQuery)){
+                doc.query=_.extend(doc.query,customQuery)
+            }
+            Meteor.call('sendCampaignCount',doc,function(err,count){
+                $('.calculating').replaceWith(count)
+            })
             BootstrapModalPrompt.prompt({
                 title: "Confirm",
-                content: 'Are you sure to send this campaign?',
+                content: 'Are you sure to send this campaign to <i class="calculating fa-spinner fa-spinner fa-fw"></i>?',
                 btnDismissText: 'Cancel',
                 btnOkText: 'Send it'
             }, (data) => {
                 if (data) {
                     doc.query=doc.query || {}
-                    const customQuery = Session.get('campaignList_customQuery')
+
                     if (!_.isEmpty(customQuery)){
                         doc.query=_.extend(doc.query,customQuery)
                     }

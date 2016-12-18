@@ -15,6 +15,7 @@ import {EmailTemplates} from '/imports/api/email/templates'
 import {Audit} from '/imports/api/audit/audit'
 import {Locations} from '/imports/api/location/location'
 import {updateDistance} from "/imports/api/location/methods";
+import {Distances} from "/imports/api/location/location";
 Migrations.config({
     log: true
 });
@@ -167,8 +168,8 @@ Migrations.add({
                     "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Applied Summary</div>"
                 },
                 "AvailableSummary": {
-                    "contents": "AvailableSummary",
-                    "tooltip": "AvailableSummary",
+                    "contents": "Available Summary",
+                    "tooltip": "Available Summary",
                     "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Available Summary</div>"
                 },
 
@@ -481,28 +482,100 @@ Migrations.add({
 })
 
 
-
-
-
-
-
-
 Migrations.add({
     version: 13,
     name: 'Create Locations && update Groups" ',
     up: function () {
-        Groups.updateBySelector({location:'Griffith'},{$set: {location:'Griffith University'}},{multi: true})
-        const locations=[{"_id":"fBM8gzXnwtyfNjAkc","name":"Griffith University","address":{"street":"Parklands Dr","suburb":"Southport","city":"Gold Coast","state":"QLD","country":"AU","zip":"4215","lat":-27.9627982,"lng":153.38077840000005,"geometry":{"type":"Point","coordinates":[153.38077840000005,-27.9627982]},"fullAddress":"Parklands Dr, Southport QLD 4215, Australia","placeId":"ChIJRUuWwwQQkWsRiYhwq2ldAKM"}},{"_id":"cqhzhp6FZBeCGfCa2","name":"Livingstone Christian College","address":{"street":"62 Reedmans Rd","suburb":"Ormeau","city":"Gold Coast","state":"QLD","country":"AU","zip":"4208","lat":-27.7927741,"lng":153.2678158,"geometry":{"type":"Point","coordinates":[153.2678158,-27.7927741]},"fullAddress":"62 Reedmans Rd, Ormeau QLD 4208, Australia","placeId":"ChIJb0Nm2MMUkWsRtvlm5TqMRA0"}},{"_id":"mDkfRTBD3uY4ympkL","name":"TBC"},{"_id":"iZ3k8e4ex94Wdip6X","name":"Southport Community Center","address":{"street":"6 Lawson St","suburb":"Southport","city":"Gold Coast","state":"QLD","country":"AU","zip":"4215","lat":-27.970901,"lng":153.41413799999998,"geometry":{"type":"Point","coordinates":[153.41413799999998,-27.970901]},"fullAddress":"6 Lawson St, Southport QLD 4215, Australia","placeId":"ChIJ3X9XCPMPkWsReyROqmFHiNU"}},{"_id":"ua5o6gbEatsyPxEKd","name":"Imagine Education, Benowa","address":{"street":"13 Benowa Rd","suburb":"Southport","city":"Gold Coast","state":"QLD","country":"AU","zip":"4215","lat":-27.9846444,"lng":153.40845650000006,"geometry":{"type":"Point","coordinates":[153.40845650000006,-27.9846444]},"fullAddress":"13 Benowa Rd, Southport QLD 4215, Australia","placeId":"ChIJmQe9k-8PkWsR8if1So6sEDE"}},{"_id":"6qTAy8ZpYHuaWPY6W","name":"Groves Christian College","address":{"street":"70 Laughlin St","suburb":"Kingston","city":"Logan","state":"QLD","country":"AU","zip":"4114","lat":-27.6617425,"lng":153.1101251,"geometry":{"type":"Point","coordinates":[153.1101251,-27.6617425]},"fullAddress":"70 Laughlin St, Kingston QLD 4114, Australia","placeId":"ChIJ6UqiKVNBkWsR0iHA7Tw-N2Q"}}]
+        Groups.updateBySelector({location: 'Griffith'}, {$set: {location: 'Griffith University'}}, {multi: true})
+        const locations = [{
+            "_id": "fBM8gzXnwtyfNjAkc",
+            "name": "Griffith University",
+            "address": {
+                "street": "Parklands Dr",
+                "suburb": "Southport",
+                "city": "Gold Coast",
+                "state": "QLD",
+                "country": "AU",
+                "zip": "4215",
+                "lat": -27.9627982,
+                "lng": 153.38077840000005,
+                "geometry": {"type": "Point", "coordinates": [153.38077840000005, -27.9627982]},
+                "fullAddress": "Parklands Dr, Southport QLD 4215, Australia",
+                "placeId": "ChIJRUuWwwQQkWsRiYhwq2ldAKM"
+            }
+        }, {
+            "_id": "cqhzhp6FZBeCGfCa2",
+            "name": "Livingstone Christian College",
+            "address": {
+                "street": "62 Reedmans Rd",
+                "suburb": "Ormeau",
+                "city": "Gold Coast",
+                "state": "QLD",
+                "country": "AU",
+                "zip": "4208",
+                "lat": -27.7927741,
+                "lng": 153.2678158,
+                "geometry": {"type": "Point", "coordinates": [153.2678158, -27.7927741]},
+                "fullAddress": "62 Reedmans Rd, Ormeau QLD 4208, Australia",
+                "placeId": "ChIJb0Nm2MMUkWsRtvlm5TqMRA0"
+            }
+        }, {"_id": "mDkfRTBD3uY4ympkL", "name": "TBC"}, {
+            "_id": "iZ3k8e4ex94Wdip6X",
+            "name": "Southport Community Center",
+            "address": {
+                "street": "6 Lawson St",
+                "   suburb": "Southport",
+                "city": "Gold Coast",
+                "state": "QLD",
+                "country": "AU",
+                "zip": "4215",
+                "lat": -27.970901,
+                "lng": 153.41413799999998,
+                "geometry": {"type": "Point", "coordinates": [153.41413799999998, -27.970901]},
+                "fullAddress": "6 Lawson St, Southport QLD 4215, Australia",
+                "placeId": "ChIJ3X9XCPMPkWsReyROqmFHiNU"
+            }
+        }, {
+            "_id": "ua5o6gbEatsyPxEKd",
+            "name": "Imagine Education, Benowa",
+            "address": {
+                "street": "13 Benowa Rd",
+                "suburb": "Southport",
+                "city": "Gold Coast",
+                "state": "QLD",
+                "country": "AU",
+                "zip": "4215",
+                "lat": -27.9846444,
+                "lng": 153.40845650000006,
+                "geometry": {"type": "Point", "coordinates": [153.40845650000006, -27.9846444]},
+                "fullAddress": "13 Benowa Rd, Southport QLD 4215, Australia",
+                "placeId": "ChIJmQe9k-8PkWsR8if1So6sEDE"
+            }
+        }, {
+            "_id": "6qTAy8ZpYHuaWPY6W",
+            "name": "Groves Christian College",
+            "address": {
+                "street": "70 Laughlin St",
+                "suburb": "Kingston",
+                "city": "Logan",
+                "state": "QLD",
+                "country": "AU",
+                "zip": "4114",
+                "lat": -27.6617425,
+                "lng": 153.1101251,
+                "geometry": {"type": "Point", "coordinates": [153.1101251, -27.6617425]},
+                "fullAddress": "70 Laughlin St, Kingston QLD 4114, Australia",
+                "placeId": "ChIJ6UqiKVNBkWsR0iHA7Tw-N2Q"
+            }
+        }]
 
-        locations.forEach((location)=>{
-            const locationId= Locations.insert(location)
-            Groups.updateBySelector({location: location.name },{$set: {locationId}},{multi: true})
+        locations.forEach((location) => {
+            const locationId = Locations.insert(location)
+            Groups.updateBySelector({location: location.name}, {$set: {locationId}}, {multi: true})
         })
 
     }
 })
-
-
 
 
 Migrations.add({
@@ -510,26 +583,29 @@ Migrations.add({
     name: 'create locations',
     up: function () {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
-        Groups.updateBySelector({},{$set: {travelDuration: 35}},{multi: true, filter: false})
+        Groups.updateBySelector({}, {$set: {travelDuration: 35}}, {multi: true, filter: false})
     },
 })
 
 Migrations.add({
     version: 15,
     name: 'generate distances',
-    up: function(){
-        let limit=9999999999
-        if (Meteor.isDevelopment){
-            limit= limit
+    up: function () {
+        let limit = 9999999
+        if (Meteor.isDevelopment) {
+            limit = 10
         }
-        Families.find({},{limit}).forEach((fam)=>{
-            Locations.find({},{limit}).forEach((loc)=>{
-                updateDistance(fam,loc)
+        Families.find({}, {limit}).forEach((fam) => {
+            Locations.find({}, {limit}).forEach((loc) => {
+                if (Distances.find(fam._id + '|' + loc._id).count()==0){
+                    updateDistance(fam, loc)
+                }
             })
         })
-
     }
 })
+
+
 /*
  Migrations.add({
  version: 3,

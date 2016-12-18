@@ -9,6 +9,9 @@ import {Groups} from "/imports/api/group/group";
 import {check} from "meteor/check";
 import {moment} from 'meteor/momentjs:moment'
 import htmlToText from 'html-to-text'
+import {createTable} from '/imports/api/group/placement/methods'
+
+
 Meteor.methods({
     templateNew: function (doc) {
         check(doc, EmailTemplates.schema.new)
@@ -65,6 +68,15 @@ Meteor.methods({
 
 
     },
+    sendCampaignCount: function (doc) {
+        check(doc, {
+            name: String,
+            template: String,
+            query: Object
+        })
+        if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
+        return Families.find(doc.query).count()
+    },
     sendCampaign: function (doc) {
         check(doc, {
             name: String,
@@ -76,15 +88,15 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, 'admin')) throw new Meteor.Error('Access denied', 'Only admin can send emails')
         const families = Families.find(doc.query, {fields: {"emails.address": 1, "parents": 1, contact: 1}})
 
-        const template = EmailTemplates.findOne(doc.template)
-        if (template.campaign == true) {
-            if (families.count() > 3 && Meteor.isDevelopment)
-                throw new Error('mas de 3 solo probando')
+        const emailTemplate = EmailTemplates.findOne(doc.template)
+        if (emailTemplate.campaign == true) {
+           let count=0
             families.forEach((user) => {
                 const userId = user._id
+                const familyId = user._id
                 const email = user.emails[0].address
                 let enrollAccountUrl = ''
-                if (template._id == "enrollAccount") {
+                if (emailTemplate._id == "enrollAccount") {
                     const token = Random.secret();
                     const when = new Date();
                     const tokenRecord = {
@@ -101,23 +113,33 @@ Meteor.methods({
                     Meteor._ensure(user, 'services', 'password').reset = tokenRecord;
                     enrollAccountUrl = Accounts.urls.enrollAccount(token);
                 }
+                let confirmedSummary = '', appliedSummary = '', availableSummary = ''
+
 
                 const firstName = user.firstName ? user.firstName : user.parents && user.parents[0] && user.parents[0].firstName || ''
                 const surname = user.surname ? user.surname : user.parents && user.parents[0] && user.parents[0].surname || ''
 
-                let subject = template.subject.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+                let subject = emailTemplate.subject.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
                 subject = subject.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
-                subject = subject.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</td>`)
                 subject = htmlToText.fromString(subject)
 
-                let body = template.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+                let body = emailTemplate.body.replace(/<img id="firstName" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, firstName)
+                if (body.match(/<img id="ConfirmedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi) || body.match(/<img id="AppliedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi) || body.match(/<img id="AvailableSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi)) {
+                    confirmedSummary = createTable(familyId, 'confirmed')
+                    appliedSummary = createTable(familyId, 'applied')
+                    availableSummary = createTable(familyId, false)
+                }
                 body = body.replace(/<img id="surname" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, surname)
+                body = body.replace(/<img id="ConfirmedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, confirmedSummary)
+                body = body.replace(/<img id="AppliedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, appliedSummary)
+                body = body.replace(/<img id="AvailableSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, availableSummary)
                 body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</td>`)
+
 
                 const text = htmlToText.fromString(body)
                 const options = {
                     to: email,
-                    from: `${template.fromName} <${template.from}>`,
+                    from: `${emailTemplate.fromName} <${emailTemplate.from}>`,
                     subject: subject,
                     "parent1": user.parents && user.parents[0] && user.parents[0].firstName,
                     "parent2": user.parents && user.parents[1] && user.parents[1].firstName,
@@ -132,15 +154,22 @@ Meteor.methods({
                     text,
                     status: 'sent',
                 };
+                count++
                 if (Meteor.isProduction) {
                     Email.send(options);
                 } else {
-                    options.to='c@imagenproactiva.com'
-                    Email.send(options);
-                    console.log('email send', options.to)
+                    if (count<=3){
+                        options.to = 'c@imagenproactiva.com'
+                        Email.send(options);
+                        console.log('email sent', options.to)
+                    }else{
+                        console.log('email NO sent (MORE THAN 3)', options.to)
+                    }
+
                 }
             })
         }
     },
 })
+
 

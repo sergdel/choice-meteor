@@ -372,7 +372,7 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
         },
         link: function (row, path) {
             if (path != 'action' && path != 'contactInfo')
-                return FlowRouter.path('atCounterfamiliesPlacementPotentialAutoTable', {familyId: row._id})
+                return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }
 )

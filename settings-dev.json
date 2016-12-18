@@ -1,13 +1,9 @@
 {
   "galaxy.meteor.com": {
     "env": {
-      "MONGO_URL": "mongodb://choice:2020Vision@ds139817.mlab.com:39817/choice",
+      "MONGO_URL": "mongodb://choice.dev:Dev00000000@ds139817.mlab.com:39817/choice",
       "ROOT_URL": "http://dev.choicehomestay.com.au"
     }
-  },
-  "mailgun":{
-    "api_key":"key-99107b6bbac759ca5e1ee811e959323f",
-    "domain":"choicehomestay.com"
   },
   "kadira": {
     "appId": "gD4YdjZBaoptgpfiH",

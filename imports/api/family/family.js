@@ -20,6 +20,7 @@ import {Audit} from '/imports/api/audit/audit'
 import {Tags} from '/imports/api/tags/tags'
 import {updateDistance} from "/imports/api/location/methods";
 import {availabilitySchema} from "./availability";
+import {Locations} from "/imports/api/location/location";
 export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
@@ -133,17 +134,15 @@ Families.update = function (_id, modifier, options = {}, callback) {
     setBlueCardStatus(newDoc)
     insertBlueCards(newDoc)
     Meteor.users.update(_id, newDoc, options)
-    //todo hacer esto con joins probablemente con un helper https://guide.meteor.com/collections.html#collection-helpers
-    //una  moificacion al autotable donde permita custom publish
-    // y
 
 
-    //if the geoposition chage updates de distances
-    if ((newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lat) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lat) ||
-        (newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lng) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lng)
-    ){
-        Locations.find().forEach((loc)=>{
-            updateDistance(newDoc,loc)
+    //if the geoposition change updates the distances
+    if ((newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lat) && (newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lng) &&
+        ((newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lat) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lat) ||
+        (newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lng) != (oldDoc && oldDoc.contact && oldDoc.contact.address && oldDoc.contact.address.lng))
+    ) {
+        Locations.find().forEach((loc) => {
+            updateDistance(newDoc, loc)
         })
 
     }
@@ -151,7 +150,7 @@ Families.update = function (_id, modifier, options = {}, callback) {
         $set: {
             mobilePhone: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].mobilePhone,
             parent1: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].firstName,
-            paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[0].firstName,
+            paren2: newDoc && newDoc.parents && newDoc.parents[1] && newDoc.parents[1].firstName,
             surname: newDoc && newDoc.parents && newDoc.parents[0] && newDoc.parents[0].surname
         }
     }, {multi: true})
@@ -340,13 +339,13 @@ export const familySchema = new SimpleSchema({
         }
 
     },
-    "availability":{
+    "availability": {
         label: 'Unavailable dates',
         optional: true,
         type: Array,
 
     },
-    "availability.$":{
+    "availability.$": {
         label: '222202222',
         optional: true,
         type: availabilitySchema

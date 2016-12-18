@@ -24,7 +24,23 @@ class ClassEmailTemplates extends Mongo.Collection{
                 "contents": "Surname",
                 "tooltip": "Surname",
                 "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Surname</div>"
-            }
+            },
+            "ConfirmedSummary": {
+                "contents": "Confirmed Summary",
+                "tooltip": "Confirmed Summary",
+                "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Confirmed Summary</div>"
+            },
+
+            "AppliedSummary": {
+                "contents": "Applied Summary",
+                "tooltip": "Applied Summary",
+                "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Applied Summary</div>"
+            },
+            "AvailableSummary": {
+                "contents": "Available Summary",
+                "tooltip": "Available Summary",
+                "insertText": "<div class='label label-default'  style='display: inline-block; font: inherit !important'  >Available Summary</div>"
+            },
         }
 
         return super.insert(doc)

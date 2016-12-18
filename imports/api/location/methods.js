@@ -57,18 +57,16 @@ export const updateDistance=function(family,location){
     if (family.contact && family.contact.address && family.contact.address.lng && location && location.address && location.address.lat) {
         const locationId=location._id
         const familyId = family._id
-        if (Meteor.isProduction) Meteor._sleepForMs(250);
         const response = HTTP.get(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${location.address.lat},${location.address.lng}&origins=${family.contact.address.lat},${family.contact.address.lng}&key=AIzaSyDREfT4Rypm8BD2TqwK-8tAHvAQ46Nswbg`)
+        console.log('updateDistance',family._id)
         if (response.statusCode == 200) {
-
             const travel = response.data && response.data.rows && response.data.rows[0]  && response.data.rows[0].elements  && response.data.rows[0].elements[0]
-
             if (travel && travel.status == 'OK') {
                 delete travel.status
                 travel.duration.value=travel.duration.value/60
                 travel.distance.value=travel.duration.value/1000
                 Distances.upsert(family._id + '|' + locationId, {familyId, locationId, travel})
-                if (Meteor.isDevelopment) console.log(family._id + '|' + locationId)
+                console.log(family._id + '|' + locationId)
             }
         }
     }

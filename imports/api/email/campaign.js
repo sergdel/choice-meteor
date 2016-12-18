@@ -89,6 +89,9 @@ const emailFamilyFilter = new SimpleSchema({
     }
 
 })
+
+
+
 export const campaignAutoTable = new AutoTable({
     id: 'campaignList',
     columns: [

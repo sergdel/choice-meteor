@@ -3,10 +3,10 @@
  */
 
 import "./startup";
+import "./redirect";
 
 import "../useraccounts-configuration"
 import '/imports/api/family/server/export'
-import "./token-login";
 import "/imports/startup/server/mailgun"
 import "/imports/api/files/server/publication";
 import "/imports/api/files/files";
@@ -39,6 +39,7 @@ import "/imports/api/location/location"
 import "/imports/api/location/methods"
 import "/imports/api/location/server/publication"
 import "./cron";
+import "./fakefy";
 
 
 

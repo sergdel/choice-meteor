@@ -20,7 +20,7 @@
                     <li role="presentation" class=""><a href="#groups" aria-controls="profile" role="tab"
                                                         data-toggle="tab">Groups</a></li>
                     <li role="presentation" class=""><a href="#availability" aria-controls="profile" role="tab"
-                                                        data-toggle="tab">Availability</a></li>
+                                                        data-toggle="tab">Unavailablity</a></li>
                     {{#if isInRole 'family'}}
                         <li role="presentation" class=""><a href="#accounts" aria-controls="profile" role="tab"
                                                             data-toggle="tab">Accounts</a></li>
@@ -74,7 +74,7 @@
                         {{>groupList}}
                     </div>
                     <div role="tabpanel" class="tab-pane " id="availability">
-                        <h3>Availability</h3>
+                        <h3>Unavailablity</h3>
                         Please identify any dates when you're not available to welcome guests. This data will be used to avoid presenting you with groups that you're not available to welcome.
                         <div class="no-panel-heading">
                         {{#autoForm schema=familySchema doc=family id="familyAvailability"  doc=family

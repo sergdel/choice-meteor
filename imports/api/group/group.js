@@ -935,22 +935,17 @@ Groups.autoTableFamilyAvailable = new AutoTable(
             }
             const self = this;
             //"families": {$elemMatch: {status:  "confirmed", familyId:
-            const familyId = query.$and[0]["families.familyId"].$ne
+            console.log('publish query',query)
+            let familyId = query && query.$and && query.$and[0]  && query.$and[0]["families.familyId"]  && query.$and[0]["families.familyId"].$ne
+            if (!familyId){
+                familyId= query && query["families.familyId"] &&  query["families.familyId"]["$ne"]
+                console.error('check this please publish !!', id, limit, query, sort)
+            }
             const publishGroups = []
             self.added('counts', 'atCounter' + id, {count: 0})
 
 
-            /*
-             const conflict=Groups.find({
-             _id: {$in: confirmedGroup},
-             $or: [
-             {"dates.0": {$gte: group.dates[0], $lte: group.dates[1]}},
-             {"dates.1": {$gte: group.dates[0], $lte: group.dates[1]}},
-             {"dates.0": {$lte: group.dates[0]}, "dates.1": {$gte: group.dates[1]}},
-             ]
-             })
-             */
-            console.log('query',query)
+
             var handle = Groups.find(query).observeChanges({
                 added: function (groupId, group) {
                     const maxDuration = group.travelDuration || 35
@@ -970,13 +965,13 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                     const maxDuration = group.travelDuration || 35
                     let distance = Distances.findOne(familyId + '|' + groupNew.locationId)
                     const duration = (distance && distance.travel && distance.travel.duration && distance.travel.duration.value) || 0
-
+                    const index=publishGroups.indexOf(groupId)
                     if (maxDuration >= duration) {
                         if (distance && distance.travel) {
                             group.travel = distance.travel
                             groupNew.travel = distance.travel
                         }
-                        if (publishGroups.indexOf(groupId) >= 0) {
+                        if (index >= 0) {
                             self.changed("groups", groupId, group)
                         } else {
                             publishGroups.push(groupId)
@@ -988,7 +983,6 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                             publishGroups.splice(index, 1);
                             self.removed("groups", groupId);
                             self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
-                            console.log(self)
                         }
                     }
 
@@ -996,23 +990,17 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                 ,
                 removed: function (groupId) {
                     const index=publishGroups.indexOf(groupId)
-                    console.log('000publishGroups',publishGroups,groupId,index)
                     if (index>= 0) {
                         publishGroups.splice(index, 1);
-                        console.log('11publishGroups',publishGroups)
                         self.removed("groups", groupId);
                         self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
                     }
 
                 }
             });
-
             self.ready();
-
             self.onStop(function () {
                 handle.stop();
-
-
             });
             return false
         },
