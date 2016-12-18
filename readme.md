@@ -6,7 +6,7 @@
     cd choice-meteor
     meteor npm install
     git submodule update --init --recursive
-    meteor run
+    meteor --settings settings.json
     
 in other terminal
     
