@@ -155,7 +155,12 @@ publicRoutes.route('/', {
         BlazeLayout.render('public', {yield: 'home'})
     }
 });
-
+publicRoutes.route('/signin', {
+    name: 'signin',
+    action(params, queryParams) {
+       FlowRouter.go('/sign-in')
+    }
+});
 publicRoutes.route('/information', {
     name: 'information',
     parent: 'home',
