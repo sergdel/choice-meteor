@@ -1,7 +1,7 @@
 {
   "galaxy.meteor.com": {
     "env": {
-      "MONGO_URL": "mongodb://choice.dev:Dev00000000@ds139817.mlab.com:39817/choice",
+      "MONGO_URL": "mongodb://choice-dev:Dev00000000@ds139817.mlab.com:39817/choice",
       "ROOT_URL": "http://dev.choicehomestay.com.au"
     }
   },
