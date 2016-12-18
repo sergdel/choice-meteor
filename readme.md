@@ -7,3 +7,8 @@
     meteor npm install
     git submodule update --init --recursive
     meteor run
+    
+in other terminal
+    
+    cd private
+    mongorestore db --db meteor --drop  --port 3001
