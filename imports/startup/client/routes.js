@@ -108,7 +108,7 @@ export const familyRoleRoutes = loggedRoutes.group({
         Tracker.autorun(function () {
             if (!Meteor.userId() && Session.get('familyRoute')) {
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
-                return FlowRouter.go('forbidden');
+                return FlowRouter.go('signin');
             }
         });
     }],
@@ -123,7 +123,7 @@ export const adminRoleRoutes = loggedRoutes.group({
         Tracker.autorun(function () {
             if (!Roles.userIsInRole(Meteor.userId(), 'admin') && Session.get('adminRoute')) {
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
-                return FlowRouter.go('forbidden');
+                return FlowRouter.go('signin');
             }
         });
     }],
@@ -137,7 +137,7 @@ export const staffRoleRoutes = loggedRoutes.group({
         Tracker.autorun(function () {
             if (!Roles.userIsInRole(Meteor.userId(), ['staff', 'admin']) && Session.get('staffRoute')) {
                 Session.set('redirectAfterLogin', FlowRouter._current.path);
-                return FlowRouter.go('forbidden');
+                return FlowRouter.go('signin');
             }
         });
     }],
