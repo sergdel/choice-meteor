@@ -25,8 +25,6 @@ export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
         type: String,
-
-
         regEx: SimpleSchema.RegEx.Email,
         unique: true,
         custom: function () {
@@ -122,6 +120,11 @@ Families.insert = function (email, options) {
 Families.update = function (_id, modifier, options = {}, callback) {
     const oldDoc = Meteor.users.findOne(_id)
 
+    // in family profile there are no information about status, notes or geristered bluecards, then if a family role save the infomation
+    //will be lostr theses fields, Thats why we merge the old info in the modifier
+    mergeOldBlueCardInfo(oldDoc, modifier);
+
+
 
     const updated = Meteor.users.update(_id, modifier, options, callback)
     if (!updated) throw new Meteor.Error(404, 'Family not found', '_id: ' + _id)
@@ -129,7 +132,7 @@ Families.update = function (_id, modifier, options = {}, callback) {
     //todo change that to next line (now is having problem with a infitite cycle
     //todo do the log here
     //LocalCollection._modify(newDoc, modifier)
-    let time = new Date().getTime()
+
 
     setBlueCardStatus(newDoc)
     insertBlueCards(newDoc)
@@ -414,13 +417,14 @@ export const insertBlueCards = function (family) {
                     expiryDate: member.blueCard && member.blueCard.expiryDate ? member.blueCard.expiryDate : undefined,
                     status: member.blueCard && member.blueCard.status ? member.blueCard.status : undefined,
                     registered: member.blueCard && member.blueCard.registered ? member.blueCard.registered : undefined,
-                    notes: member.blueCard && member.blueCard.notes ? member.blueCard.notes : '',
+                    notes: member.blueCard && member.blueCard.notes ? member.blueCard.notes : undefined,
                     type,
-                    applied: (family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
+                    applied: (family.groups && _.where(family.groups, {status: 'applied'}).length) || undefined
 
                 }
+                console.log(blueCard)
                 if (member.blueCard && member.blueCard.id) {
-                    BlueCard.update(member.blueCard.id, blueCard)
+                    BlueCard.update(member.blueCard.id, {$set: blueCard})
                 } else {
                     const blueCardId = BlueCard.insert(blueCard)
                     family[type][i].blueCard = family[type][i].blueCard || {}
@@ -453,5 +457,18 @@ export const setFamilyScore = function (family) {
     family.familyScore = ((family.office && family.office.familyScore ? family.office.familyScore : 0) + (family.office && family.office.homeScore ? family.office.homeScore : 0)) / 2
     return family.familyScore
 
+}
+const mergeOldBlueCardInfo = function (oldDoc, modifier) {
+    for (let type of ['parents', 'children', 'guests']) {
+        if (modifier.$set[type]) {
+            for (let i in modifier.$set[type]) {
+                if (modifier.$set[type][i].blueCard) {
+                    modifier.$set[type][i].blueCard.notes = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.notes
+                    modifier.$set[type][i].blueCard.status = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.status
+                    modifier.$set[type][i].blueCard.registered = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.registered
+                }
+            }
+        }
+    }
 }
 

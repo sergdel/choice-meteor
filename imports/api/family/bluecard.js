@@ -6,6 +6,7 @@ export const blueCardSchema = new SimpleSchema({
     number: {
         optional: true,
         type: String,
+
         autoform: {
             afFormGroup: {
                 "formgroup-class": 'col-sm-6',

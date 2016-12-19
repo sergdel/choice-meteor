@@ -38,13 +38,14 @@ Meteor.methods({
         const lat = modifier.$set['address.lat'] || oldLat
         const lng = modifier.$set['address.lng'] || oldLng
 
-        console.log('lat lng', lat, lng)
+        console.log('lat lng', lat, lng,lat != oldLat || lng != oldLng)
         Locations.update(locationId, modifier)
+        const newLocation=Locations.findOne(locationId)
         this.unblock()
         if (lat != oldLat || lng != oldLng) {
             Meteor.setTimeout(() => {
                 Families.find({}, {}).forEach((family) => {
-                    updateDistance(family,locationId)
+                    updateDistance(family,newLocation)
                 })
 
             }, 1000)
@@ -54,6 +55,7 @@ Meteor.methods({
 })
 
 export const updateDistance=function(family,location){
+    console.log(family.contact && family.contact.address && family.contact.address.lng && location && location.address && location.address.lat)
     if (family.contact && family.contact.address && family.contact.address.lng && location && location.address && location.address.lat) {
         const locationId=location._id
         const familyId = family._id
@@ -67,7 +69,11 @@ export const updateDistance=function(family,location){
                 travel.distance.value=travel.duration.value/1000
                 Distances.upsert(family._id + '|' + locationId, {familyId, locationId, travel})
                 console.log(family._id + '|' + locationId)
+            }else{
+                console.error('1updateDistance',familyId + '|' + locationId,response)
             }
+        }else{
+            console.error('2updateDistance',familyId + '|' + locationId,response)
         }
     }
 }

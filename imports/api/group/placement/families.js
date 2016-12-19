@@ -391,7 +391,7 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
                 limit,
                 sort
             }), {noReady: true});
-            const groupId = query.$or[0]['groups.groupId'].$ne
+            const groupId = query.$and[0].$or[0]['groups.groupId'].$ne
             const cursor = Meteor.users.find(query, {
                 fields: {
                     parents: 1,

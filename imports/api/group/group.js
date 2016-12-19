@@ -313,8 +313,12 @@ const schemaObject = {
         optional: true,
         autoValue: function () {
             if (Meteor.isServer) {
-                const location = Locations.find(this.field('locationId'))
-                return location && location.name
+                const locationId = this.field('locationId') && this.field('locationId').value
+                if (locationId){
+                    const location = Locations.findOne(locationId)
+                    console.log(this.field('locationId'),location)
+                    return location && location.name
+                }
             }
 
         }

@@ -12,6 +12,12 @@ export const availabilitySchema = new SimpleSchema({
             type: 'daterangepicker',
             afFormGroup: {
                 "formgroup-class": 'col-sm-6',
+
+            },
+            dateRangePickerOptions: {
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
             }
         }
     },

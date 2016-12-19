@@ -26,10 +26,31 @@ Template.groupPlacements.helpers({
         return {"groups" : {$elemMatch: {groupId: FlowRouter.getParam('groupId'), status: 'confirmed' }}}
 
     },
-    potential:()=>{
+    potential:function(){
+        console.log('potential',this,Template.instance())
         const groupId=FlowRouter.getParam('groupId')
+        const dates= this.group &&  this.group.dates
+        const and=[]
+        and.push ({$or:[{"groups.groupId": {$ne: groupId}},{"groups" : {$elemMatch: {groupId: groupId, status: 'canceled' }}}]})
+        if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date) ) {
+            and.push({
+                $or: [
+                    {availability: {$exists: 0}},
+                    {
+                        //dates0 and dates1 can not be between a confirmed group
+                        "availability.dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
+                        "availability.dates.1": {$not: {$gte: dates[0], $lte: dates[1]}},
+                        //dates and wrapped a dates of confirmed group
+                        $or: [
+                            {"availability.dates.0": {$gte: dates[1]}},
+                            {"availability.dates.1": {$lte: dates[0]}}
+                        ]
+                    }
+                ]
 
-        return {$or:[{"groups.groupId": {$ne: groupId}},{"groups" : {$elemMatch: {groupId: groupId, status: 'canceled' }}}]}
+            })
+        }
+        return {$and: and}
     },
 });
 
