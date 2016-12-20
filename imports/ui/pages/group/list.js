@@ -6,7 +6,7 @@ import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
 
 Template.groupList.onCreated(function () {
-
+    this.customQuery = new ReactiveVar( {} );
 });
 Template.groupList.onRendered(function () {
 
@@ -70,6 +70,10 @@ Template.groupList.helpers({
         else
             return {"families": {$elemMatch: {status: "confirmed", familyId: Meteor.userId()}}}
     },
+    customQuery: function() {
+        var query = Template.instance().customQuery.get();
+        return query;
+    }
 });
 Template.bsModalPrompt.events({
     'click .groupCancelApply'(e, instance){
@@ -154,5 +158,28 @@ Template.groupList.events({
         });
     },
 
+    'change input[name="dates.0"]': function (evt, tpl){
+        evt.preventDefault();
+        var from_date = $('input[name="dates.0"]').val();
+        var customQuery = Template.instance().customQuery.get();
+        console.log ("clicked date - "+from_date);
+        //console.log (new Date(from_date));
+        customQuery["dates.0"] = {"$gte": new Date(from_date)};
+        Template.instance().customQuery.set(customQuery);
+        console.log (customQuery);
+        console.log (Template.instance());
+        Template.instance().view._render();
+    },
+
+    'change input[name="dates.1"]': function (evt, tpl){
+        evt.preventDefault();
+        var from_date = $('input[name="dates.1"]').val();
+        var customQuery = Template.instance().customQuery.get();
+        console.log ("clicked date - "+from_date);
+        //console.log (new Date(from_date));
+        customQuery["dates.1"] = {"$lte": new Date(from_date)};
+        Template.instance().customQuery.set(customQuery);
+        console.log (customQuery);
+    },
 });
 

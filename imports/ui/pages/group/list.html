@@ -8,7 +8,7 @@
                     </button>
                 </h1>
 
-            {{>atTable at=autoTableStaff }}
+                {{>atTable at=autoTableStaff customQuery=customQuery }}
         {{/if}}
     {{/if}}
     {{#if isInRole 'family,admin,staff' }}
