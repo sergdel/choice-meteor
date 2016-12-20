@@ -162,24 +162,31 @@ Template.groupList.events({
         evt.preventDefault();
         var from_date = $('input[name="dates.0"]').val();
         var customQuery = Template.instance().customQuery.get();
-        console.log ("clicked date - "+from_date);
-        //console.log (new Date(from_date));
         customQuery["dates.0"] = {"$gte": new Date(from_date)};
         Template.instance().customQuery.set(customQuery);
-        console.log (customQuery);
-        console.log (Template.instance());
-        Template.instance().view._render();
     },
 
     'change input[name="dates.1"]': function (evt, tpl){
         evt.preventDefault();
         var from_date = $('input[name="dates.1"]').val();
         var customQuery = Template.instance().customQuery.get();
-        console.log ("clicked date - "+from_date);
-        //console.log (new Date(from_date));
         customQuery["dates.1"] = {"$lte": new Date(from_date)};
         Template.instance().customQuery.set(customQuery);
-        console.log (customQuery);
     },
+
+    'click input[name="status"]' : function (evt, tpl) {
+        //evt.preventDefault();
+        var customQuery = Template.instance().customQuery.get();
+        var status_arr = [];
+        var inputs = $('input[name="status"]:checked');
+        for (i = 0; i < inputs.length; i++)
+        {
+            status_arr.push(inputs[i].value);
+        }
+        $('input[name="status_operator"]').val(JSON.stringify({"$in" : status_arr}));
+        customQuery["status"] = {"$in" : status_arr};
+        Template.instance().customQuery.set(customQuery);
+        console.log (customQuery);
+    }
 });
 

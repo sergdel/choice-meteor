@@ -27,7 +27,7 @@ const renderGuest = function () {
 
 class GroupCollection extends Mongo.Collection {
     find(selector, options) {
-        if (_.isObject(selector)) {
+        if (_.isObject(selector) && !selector.status) {
             selector = _.extend(selector, {status: {$ne: "removed"}})
         }
         return super.find(selector, options);
