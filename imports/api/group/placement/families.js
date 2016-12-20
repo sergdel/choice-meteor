@@ -281,6 +281,7 @@ export const familiesPlacementAppliedAutoTable = new AutoTable(
         publishExtraFields: ['roles', 'groups'],
         columns,
         publish: function (id, limit, query, sort) {
+           if (!Roles.userIsInRole(this.userId, ['admin','staff'])) return this.ready()
             Counts.publish(this, 'atCounterfamiliesPlacementAppliedAutoTable', Meteor.users.find(query, {
                 limit,
                 sort
@@ -333,6 +334,7 @@ export const familiesPlacementConfirmedAutoTable = new AutoTable(
         publishExtraFields: ['roles', 'groups'],
         columns,
         publish: function (id, limit, query, sort) {
+            if (!Roles.userIsInRole(this.userId, ['admin','staff'])) return this.ready()
             Counts.publish(this, 'atCounterfamiliesPlacementConfirmedAutoTable', Meteor.users.find(query, {
                 limit,
                 sort
@@ -387,11 +389,12 @@ export const familiesPlacementPotentialAutoTable = new AutoTable(
         columns: columnsKeysOmit(['groups.0.guests', 'groups.0.gender', 'groups.0.minimum', 'groups.0.maximum']),
         schema: familyPlacementFilterSchema,
         publish: function (id, limit, query, sort) {
+            if (!Roles.userIsInRole(this.userId, ['admin','staff'])) return this.ready()
             Counts.publish(this, 'atCounterfamiliesPlacementPotentialAutoTable', Meteor.users.find(query, {
                 limit,
                 sort
             }), {noReady: true});
-            const groupId = query.$or[0]['groups.groupId'].$ne
+            const groupId = query.$and[0].$or[0]['groups.groupId'].$ne
             const cursor = Meteor.users.find(query, {
                 fields: {
                     parents: 1,

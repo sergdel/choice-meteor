@@ -116,6 +116,9 @@ export const reportsAutoTable = new AutoTable({
     collection: Email,
     schema: reportFilterSchema,
     publishExtraFields: ['userId', 'html'],
+    publish: function () {
+        return Roles.userIsInRole(this.userId, ['admin','staff'])
+    },
     settings: {
         options: {
             columnsSort: true,

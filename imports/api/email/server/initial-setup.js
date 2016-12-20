@@ -4,6 +4,7 @@
 
 import htmlToText from 'html-to-text'
 import {Email} from 'meteor/email'
+import {Families} from '/imports/api/family/family'
 
 
 export const modifyEmailTemplates = function (emailTemplate) {
@@ -37,6 +38,7 @@ export const modifyEmailTemplates = function (emailTemplate) {
 
 Accounts.onLogin(function (log) {
     const userId = log.user._id
+    Families.update(userId,{$set: {loggedAt: new Date()}})
     Email.update({userId}, {$set: {loggedAt: new Date()}}, {multi: true})
 
 })

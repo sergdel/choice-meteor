@@ -178,7 +178,9 @@ BlueCard.autoTable = new AutoTable({
     schema: BlueCard.filterSchema,
     query: {$or: [{dateOfBirth: {$lte: moment().subtract(17.5, 'years').toDate()}}, {dateOfBirth: {$not: {$type: 9}}}]},
     collection: BlueCard,
-
+    publish: function () {
+        return Roles.userIsInRole(this.userId, ['admin','staff'])
+    },
     settings: {
         options: {
             columnsSort: true,

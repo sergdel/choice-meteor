@@ -597,7 +597,7 @@ Migrations.add({
         }
         Families.find({}, {limit}).forEach((fam) => {
             Locations.find({}, {limit}).forEach((loc) => {
-                if (Distances.find(fam._id + '|' + loc._id).count()==0){
+                if (Distances.find(fam._id + '|' + loc._id).count() == 0) {
                     updateDistance(fam, loc)
                 }
             })
@@ -605,6 +605,18 @@ Migrations.add({
     }
 })
 
+Migrations.add({
+    version: 16,
+    name: 'update logged At',
+    up: function () {
+        Families.find({}).forEach((fam) => {
+            const email = Email.findOne({userId: fam._id, loggedAt: {$exists: 1}})
+            if (email) {
+                Families.update(fam._id, {$set: {loggedAt: email.loggedAt}})
+            }
+        })
+    }
+})
 
 /*
  Migrations.add({

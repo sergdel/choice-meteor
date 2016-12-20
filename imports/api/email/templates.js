@@ -202,5 +202,8 @@ EmailTemplates.autoTable = new AutoTable({
     id: 'emailTemplatesList',
     collection: EmailTemplates,
     columns: [{key: 'description', label: 'Description'}, {key: 'subject', label: 'Subject'}],
+    publish: function () {
+        return Roles.userIsInRole(this.userId, ['admin','staff'])
+    },
 
 })

@@ -261,6 +261,9 @@ export const guestAutoTable = new AutoTable({
     columns,
     publishExtraFields: [],
     schema: guestsFilterSchema,
+    publish: function () {
+        return Roles.userIsInRole(this.userId, ['admin','staff'])
+    },
     settings: {
         options: {
             columnsSort: true,

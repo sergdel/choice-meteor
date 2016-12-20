@@ -24,9 +24,7 @@ Meteor.methods({
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff']))
             throw new Meteor.Error(403, 'Access denied!', 'Only staff can update new groups')
         this.unblock()
-        Groups.attachSchema(Groups.schemas.new, {replace: true})
-        Groups.attachSchema(Groups.schemas.edit)
-        return Groups.update(groupId, modifier)
+            return Groups.update(groupId, modifier)
 
     },
     groupCancelApply: function (groupId, familyId) {

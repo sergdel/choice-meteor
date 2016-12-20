@@ -73,12 +73,101 @@ const columns = [
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
-    }
+    },
+    {
+        key: 'loggedAt',
+        label: 'Last Login',
+        operator: '$gte',
+        operators,
+        render: function (val) {
+            if (!val) return ''
+            const m = moment(val)
+            if (!m.isValid()) return val
+            return m.format('Do MMM YYYY')
+        },
+    },
+    {
+        key: 'reviewed',
+        label: 'Last Update',
+        operator: '$gte',
+        operators,
+        render: function (val) {
+            if (!val) return ''
+            const m = moment(val)
+            if (!m.isValid()) return val
+            return m.format('Do MMM YYYY')
+        },
+    },
+    {
+        key: 'availability',
+        label: 'Unavailability',
+        render: function(val){
+            if (Array.isArray(val))
+                return val.length
+        }
+    },
+    {
+        key: 'other.contactDate',
+        label: 'Enquiry date',
+        operator: '$gte',
+        operators,
+        render: function (val) {
+            if (!val) return ''
+            const m = moment(val)
+            if (!m.isValid()) return val
+            return m.format('Do MMM YYYY')
+        },
+    },
+    {
+        key: 'other.drive',
+        label: 'Drive?',
+        operator: '$in',
+    },
 
 ]
 
 export const familyFilterSchema = new SimpleSchema({
+    'groupsCount.applied':{
+        type: Number,
+        optional: true,
+    },
+    'groupsCount.confirmed':{
+        type: Number,
+        optional: true,
+    },
+    'groups.applied':{
+        type: Number,
+        optional: true,
+    },
+    'groups.confirmed':{
+        type: Number,
+        optional: true,
+    },
+    'loggedAt':{
+        type: Date,
+        optional: true,
 
+    },
+    reviewed: {
+        optional: true,
+        type: Date
+    },
+    'other.contactDate': {
+        optional: true,
+        type: Date
+    },
+    'other.drive':{
+        type:[String],
+        optional: true,
+        autoform:{
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'Yes', value: 'Yes',},
+                {label: 'No', value: 'No',},
+                {label: 'Maybe', value: 'Maybe'},
+            ]
+        }
+    },
     "parents.$.firstName": {
         type: String,
         optional: true,
@@ -211,6 +300,9 @@ export const familiesAutoTable = new AutoTable(
         publishExtraFields: ['roles','emails'],
         columns,
         schema: familyFilterSchema,
+        publish: function () {
+            return Roles.userIsInRole(this.userId, ['admin','staff'])
+        },
         settings: {
             options: {
                 columnsSort: true,

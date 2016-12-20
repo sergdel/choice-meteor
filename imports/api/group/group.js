@@ -52,7 +52,8 @@ class GroupCollection extends Mongo.Collection {
         if (typeof _id != 'string') {
             throw new Meteor.Error('Use only _id as selector for Groups collection, otherwise use updateBySelector')
         }
-        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        Groups.attachSchema(Groups.schemas.edit)
+        Groups.attachSchema(Groups.schemas.new)
         const group = super.findOne(_id)
         if (!group) {
             throw new Meteor.Error(404, 'Group not found!')
@@ -313,8 +314,12 @@ const schemaObject = {
         optional: true,
         autoValue: function () {
             if (Meteor.isServer) {
-                const location = Locations.find(this.field('locationId'))
-                return location && location.name
+                const locationId = this.field('locationId') && this.field('locationId').value
+                if (locationId) {
+                    const location = Locations.findOne(locationId)
+                    console.log(this.field('locationId'), location)
+                    return location && location.name
+                }
             }
 
         }
@@ -756,7 +761,13 @@ const columns = [
         render: function () {
             return this && this.travel && this.travel.duration.text
         }
-    }
+    },
+    {
+        key: 'availableFamilies',
+        label: 'Available families',
+        operator: '$eq',
+        operators
+    },
 
 ]
 
@@ -856,6 +867,10 @@ let groupFilterSchema = new SimpleSchema({
         label: 'Payment',
         type: String,
         optional: true,
+    },
+    availableFamilies:{
+        type: String,
+        optional: true,
     }
 
 })
@@ -877,6 +892,85 @@ Groups.autoTableStaff = new AutoTable(
         columns,
         publishExtraFields: ['guestsTo', 'guestsFrom'],
         schema: groupFilterSchema,
+        publish: function (id, limit, query, sort) {
+
+            if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+                return this.ready()
+            }
+
+            const self = this;
+            const publishGroups = []
+            let count=0
+
+            self.added('counts', 'atCounter' + id, {count})
+            var handle = Groups.find(query).observeChanges({
+                added: function (groupId, group) {
+                    let availableFamiliesQuery = {}
+                    const dates = group.dates
+                    if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date)) {
+                        availableFamiliesQuery = ({
+                            $or: [
+                                {availability: {$exists: 0}},
+                                {
+                                    //dates0 and dates1 can not be between a confirmed group
+                                    "availability.dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
+                                    "availability.dates.1": {$not: {$gte: dates[0], $lte: dates[1]}},
+                                    //dates and wrapped a dates of confirmed group
+                                    $or: [
+                                        {"availability.dates.0": {$gte: dates[1]}},
+                                        {"availability.dates.1": {$lte: dates[0]}}
+                                    ]
+                                }
+                            ]
+
+                        })
+                    }
+                    group.availableFamilies = Families.find(availableFamiliesQuery).count()
+                    count++
+                    self.changed('counts', 'atCounter' + id, {count})
+                    self.added("groups", groupId, group);
+                },
+                changed: function (groupId, group) {
+                    let availableFamiliesQuery = {}
+                    const dates = group.dates
+                    if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date)) {
+                        availableFamiliesQuery = ({
+                            $or: [
+                                {availability: {$exists: 0}},
+                                {
+                                    //dates0 and dates1 can not be between a confirmed group
+                                    "availability.dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
+                                    "availability.dates.1": {$not: {$gte: dates[0], $lte: dates[1]}},
+                                    //dates and wrapped a dates of confirmed group
+                                    $or: [
+                                        {"availability.dates.0": {$gte: dates[1]}},
+                                        {"availability.dates.1": {$lte: dates[0]}}
+                                    ]
+                                }
+                            ]
+
+                        })
+                    }
+                    group.availableFamilies = Families.find(availableFamiliesQuery).count()
+                    count++
+                    self.changed('counts', 'atCounter' + id, {count})
+                    self.added("groups", groupId, group);
+
+                }
+                ,
+                removed: function (groupId) {
+                        count --
+                        self.removed("groups", groupId);
+                        self.changed('counts', 'atCounter' + id, {count})
+
+                }
+            });
+            self.ready();
+            self.onStop(function () {
+                handle.stop();
+            });
+            return false
+        },
         settings: {
             options: {
                 columnsSort: true,
@@ -930,20 +1024,19 @@ Groups.autoTableFamilyAvailable = new AutoTable(
         publish: function (id, limit, query, sort) {
 
 
-            if (!Roles.userIsInRole(this.userId, ['admin','staff','family'])) {
+            if (!Roles.userIsInRole(this.userId, ['admin', 'staff', 'family'])) {
                 return this.ready()
             }
             const self = this;
             //"families": {$elemMatch: {status:  "confirmed", familyId:
-            console.log('publish query',query)
-            let familyId = query && query.$and && query.$and[0]  && query.$and[0]["families.familyId"]  && query.$and[0]["families.familyId"].$ne
-            if (!familyId){
-                familyId= query && query["families.familyId"] &&  query["families.familyId"]["$ne"]
+            console.log('publish query', query)
+            let familyId = query && query.$and && query.$and[0] && query.$and[0]["families.familyId"] && query.$and[0]["families.familyId"].$ne
+            if (!familyId) {
+                familyId = query && query["families.familyId"] && query["families.familyId"]["$ne"]
                 console.error('check this please publish !!', id, limit, query, sort)
             }
             const publishGroups = []
             self.added('counts', 'atCounter' + id, {count: 0})
-
 
 
             var handle = Groups.find(query).observeChanges({
@@ -965,7 +1058,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                     const maxDuration = group.travelDuration || 35
                     let distance = Distances.findOne(familyId + '|' + groupNew.locationId)
                     const duration = (distance && distance.travel && distance.travel.duration && distance.travel.duration.value) || 0
-                    const index=publishGroups.indexOf(groupId)
+                    const index = publishGroups.indexOf(groupId)
                     if (maxDuration >= duration) {
                         if (distance && distance.travel) {
                             group.travel = distance.travel
@@ -979,7 +1072,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                             self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
                         }
                     } else {
-                        if (index>= 0) {
+                        if (index >= 0) {
                             publishGroups.splice(index, 1);
                             self.removed("groups", groupId);
                             self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
@@ -989,8 +1082,8 @@ Groups.autoTableFamilyAvailable = new AutoTable(
                 }
                 ,
                 removed: function (groupId) {
-                    const index=publishGroups.indexOf(groupId)
-                    if (index>= 0) {
+                    const index = publishGroups.indexOf(groupId)
+                    if (index >= 0) {
                         publishGroups.splice(index, 1);
                         self.removed("groups", groupId);
                         self.changed('counts', 'atCounter' + id, {count: publishGroups.length})
@@ -1067,6 +1160,9 @@ Groups.autoTableFamilyApplied = new AutoTable(
         collection: Groups,
         columns: columnsFamilyApplied,
         schema: groupFilterSchema,
+        publish: function () {
+            return Roles.userIsInRole(this.userId, ['family','admin','staff'])
+        },
         publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
         settings: {
             options: {
@@ -1099,6 +1195,9 @@ Groups.autoTableFamilyConfirmed = new AutoTable(
         columns: columnsFamilyApplied,
         schema: groupFilterSchema,
         publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
+        publish: function () {
+            return Roles.userIsInRole(this.userId, ['family','admin','staff'])
+        },
         settings: {
             options: {
                 columnsSort: true,

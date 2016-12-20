@@ -17,7 +17,7 @@ Template.groupEdit.onDestroyed(function () {
 
 Template.groupEdit.helpers({
     collection: ()=> {
-        Groups.attachSchema(Groups.schemas.new, {replace: true})
+        Groups.attachSchema(Groups.schemas.new)
         Groups.attachSchema(Groups.schemas.edit)
         return Groups
     },

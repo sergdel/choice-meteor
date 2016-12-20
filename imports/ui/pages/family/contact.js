@@ -29,7 +29,7 @@ Template.familyContact.events({
         const options = {
             placement: "left",
             html: true,
-            trigger: 'hover',
+            trigger: 'click',
             title: "Contact Information",
         }
         //this.userId || this._id ==>if is called from emailes reports use userId if if called from other else use _id

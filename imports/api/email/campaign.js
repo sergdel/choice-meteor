@@ -86,7 +86,67 @@ const emailFamilyFilter = new SimpleSchema({
     'groups.confirmed':{
         type: Number,
         optional: true,
-    }
+    },
+    'loggedAt':{
+        type: Date,
+        optional: true,
+
+    },
+    reviewed: {
+        optional: true,
+        type: Date
+    },
+    'other.contactDate': {
+        optional: true,
+        type: Date
+    },
+    'other.drive':{
+        type:[String],
+        optional: true,
+        autoform:{
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'Yes', value: 'Yes',},
+                {label: 'No', value: 'No',},
+                {label: 'Maybe', value: 'Maybe',},
+            ]
+        }
+    },
+    'blueCardStatus': {
+        type: [String],
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: [
+                {label: 'n/a', value: 'n/a',},
+                {label: 'approved', value: 'approved',},
+                {label: 'excempt', value: 'excempt',},
+                {label: 'send', value: 'send',},
+                {label: 'sent', value: 'sent',},
+                {label: 'apply', value: 'apply',},
+                {label: 'reapply', value: 'reapply',},
+                {label: 'expiring', value: 'expiring'},
+                {label: 'expired', value: 'expired',},
+                {label: 'declined', value: 'declined',},
+            ]
+        },
+    },
+    'parentsCount': {
+        type: Number,
+        optional: true,
+    },
+    'childrenCount': {
+        type: Number,
+        optional: true,
+    },
+    'groupsCount.applied':{
+        type: Number,
+        optional: true,
+    },
+    'groupsCount.confirmed':{
+        type: Number,
+        optional: true,
+    },
 
 })
 
@@ -109,6 +169,66 @@ export const campaignAutoTable = new AutoTable({
             key: 'parents.0.surname',
             label: 'Surname',
             operator: '$regex'
+        },
+        {
+            key: 'loggedAt',
+            label: 'Last Login',
+            operator: '$gte',
+            operators,
+            render: function (val) {
+                if (!val) return ''
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY')
+            },
+        },
+        {
+            key: 'reviewed',
+            label: 'Last Update',
+            operator: '$gte',
+            operators,
+            render: function (val) {
+                if (!val) return ''
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY')
+            },
+        },
+        {
+            key: 'availability',
+            label: 'Unavailability',
+            render: function(val){
+                if (Array.isArray(val))
+                    return val.length
+            }
+        },
+        {
+            key: 'other.contactDate',
+            label: 'Enquiry date',
+            operator: '$gte',
+            operators,
+            render: function (val) {
+                if (!val) return ''
+                const m = moment(val)
+                if (!m.isValid()) return val
+                return m.format('Do MMM YYYY')
+            },
+        },
+        {
+            key: 'other.drive',
+            label: 'Drive?',
+            operator: '$in',
+        },
+        {
+            key:'blueCardStatus',
+            label: 'Blue Card',
+            operator: '$in',
+        },
+        {
+            key: 'parentsCount', label: '# parents', operator: '$eq', operators
+        },
+        {
+            key: 'childrenCount', label: '# children', operator: '$eq', operators
         },
         {
             key: 'office.familyStatus', operator: '$in',
