@@ -28,7 +28,7 @@ export const otherSchema = new SimpleSchema({
             }
         }
     },
-    schoolTransport: {
+    /*schoolTransport: {
         optional: true,
         type: Boolean,
         autoform: {
@@ -37,7 +37,20 @@ export const otherSchema = new SimpleSchema({
             }
         }
 
+    },*/
+    drive: {
+        optional: true,
+        type: String,
+        allowedValues: ['Yes', 'No', 'Maybe'],
+        autoform: {
+            options: 'allowed',
+            afFormGroup: {
+                "formgroup-class": 'col-md-3',
+            }
+        }
+
     },
+
     indoorSmoking: {
         optional: true,
         type: Boolean,
@@ -72,5 +85,10 @@ export const otherSchema = new SimpleSchema({
                 "formgroup-class": 'col-sm-12',
             }
         }
-    }
+    },
+    contactDate: {
+        type: Date,
+        optional: true,
+
+    },
 });

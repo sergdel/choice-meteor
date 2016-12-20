@@ -55,6 +55,7 @@ AccountsTemplates.configure({
         socialIcons: {
             "meteor-developer": "fa fa-rocket"
         },
+        pwdLink_link: "Recover Your Password",
         title: {
             forgotPwd: "Recover Your Password"
         },

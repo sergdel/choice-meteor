@@ -192,10 +192,7 @@ export const AuditAutoTable = new AutoTable({
     },
     publishExtraFields: ['result', 'docId', 'name','familyId'],
     publish: function () {
-        return true
-        if (!Roles.userIsInRole(this.userId, 'admin')) {
-            return false
-        }
+        return Roles.userIsInRole(this.userId, ['admin','staff'])
     },
     link: function (doc, key) {
         return ""

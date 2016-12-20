@@ -115,6 +115,7 @@ Accounts.autoTable = new AutoTable(
         collection: Accounts,
         columns,
         schema: accountFilterSchema,
+
         settings: {
             options: {
                 columnsSort: true,

@@ -122,8 +122,10 @@ Families.update = function (_id, modifier, options = {}, callback) {
 
     // in family profile there are no information about status, notes or geristered bluecards, then if a family role save the infomation
     //will be lostr theses fields, Thats why we merge the old info in the modifier
-    mergeOldBlueCardInfo(oldDoc, modifier);
 
+    //console.log(1, modifier.$set.parents[0].blueCard)
+    mergeOldBlueCardInfo(oldDoc, modifier);
+    //console.log(2, modifier.$set.parents[0].blueCard)
 
 
     const updated = Meteor.users.update(_id, modifier, options, callback)
@@ -173,6 +175,10 @@ Families.remove = function (_id, options) {
 }
 export const familySchema = new SimpleSchema({
     createdAt: {
+        optional: true,
+        type: Date
+    },
+    loggedAt:{
         optional: true,
         type: Date
     },
@@ -346,14 +352,11 @@ export const familySchema = new SimpleSchema({
         label: 'Unavailable dates',
         optional: true,
         type: Array,
-
     },
     "availability.$": {
-        label: '222202222',
         optional: true,
         type: availabilitySchema
     }
-
 });
 
 
@@ -422,7 +425,7 @@ export const insertBlueCards = function (family) {
                     applied: (family.groups && _.where(family.groups, {status: 'applied'}).length) || undefined
 
                 }
-                console.log(blueCard)
+                //console.log(blueCard)
                 if (member.blueCard && member.blueCard.id) {
                     BlueCard.update(member.blueCard.id, {$set: blueCard})
                 } else {
@@ -462,10 +465,18 @@ const mergeOldBlueCardInfo = function (oldDoc, modifier) {
     for (let type of ['parents', 'children', 'guests']) {
         if (modifier.$set[type]) {
             for (let i in modifier.$set[type]) {
-                if (modifier.$set[type][i].blueCard) {
-                    modifier.$set[type][i].blueCard.notes = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.notes
-                    modifier.$set[type][i].blueCard.status = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.status
-                    modifier.$set[type][i].blueCard.registered = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.registered
+                if (modifier.$set[type][i] && modifier.$set[type][i].blueCard) {
+                    const notesOld = (oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.notes)
+                    const notesNew=modifier.$set[type][i].blueCard.notes
+                    modifier.$set[type][i].blueCard.notes= notesNew ? notesNew : notesOld
+
+                    const statusOld = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.status
+                    const statusNew=modifier.$set[type][i].blueCard.status
+                    modifier.$set[type][i].blueCard.status= statusNew ? statusNew : statusOld
+
+                    const registeredOld = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.registered
+                    const registeredNew=modifier.$set[type][i].blueCard.registered
+                    modifier.$set[type][i].blueCard.registered= registeredNew ? registeredNew : registeredOld
                 }
             }
         }
