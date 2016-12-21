@@ -4,6 +4,7 @@ import {FlowRouter} from "meteor/kadira:flow-router"
 import {Groups} from "/imports/api/group/group"
 import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
+import { ReactiveVar } from 'meteor/reactive-var'
 
 Template.groupList.onCreated(function () {
     this.customQuery = new ReactiveVar( {} );
