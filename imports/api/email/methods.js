@@ -133,7 +133,7 @@ Meteor.methods({
                 body = body.replace(/<img id="ConfirmedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, confirmedSummary)
                 body = body.replace(/<img id="AppliedSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, appliedSummary)
                 body = body.replace(/<img id="AvailableSummary" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, availableSummary)
-                body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</td>`)
+                body = body.replace(/<img id="url" src="data:image\/png;base64,([A-Za-z0-9\/\+\=]*)">/gi, `<a href="${enrollAccountUrl}">${enrollAccountUrl}</a>`)
 
 
                 const text = htmlToText.fromString(body)

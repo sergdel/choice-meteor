@@ -96,10 +96,7 @@ class GroupCollection extends Mongo.Collection {
             where: 'groups'
         })
         //send the email
-
-
     }
-
     apply(groupId, familyId, data, userId) {
         //todo better performance, insted find ans update 3 times, use $inc
         data.status = 'applied'
@@ -677,7 +674,7 @@ const columns = [
     {
         key: 'dates.0',
         label: 'From',
-        operator: '$eq',
+        operator: '$gte',
         operators,
         render: function (val) {
             const m = moment(val)
@@ -689,7 +686,7 @@ const columns = [
     {
         key: 'dates.1',
         label: 'To',
-        operator: '$eq',
+        operator: '$gte',
         operators,
         render: function (val) {
             const m = moment(val)
@@ -785,11 +782,14 @@ let groupFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
+    dates:{
+      type: [Date],
+        optional: true,
+    },
     "dates.$": {
         type: Date,
         optional: true,
     },
-
     nights: {
         type: Number,
         optional: true,

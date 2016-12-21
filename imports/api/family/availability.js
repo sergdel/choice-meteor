@@ -7,7 +7,6 @@ import {SimpleSchema} from "meteor/aldeed:simple-schema";
 export const availabilitySchema = new SimpleSchema({
     dates: {
         type: [Date],
-        optional: true,
         autoform:{
             type: 'daterangepicker',
             afFormGroup: {
