@@ -113,7 +113,13 @@ Template.groupList.events({
         const dates = moment1 && moment2 && moment1.isValid() && moment2.isValid() ? `(${moment1.format('Do MMM YY')} to ${moment2.format('Do MMM YY')})` : ""
         const location = this.location ? `(Location: ${this.location})` : ""
         const title = `Welcome guests from ${this.name} group ${dates} ${location}`
-        const content = (this.requirements || ' ') + (this.requirements && this.other ? ' <br>' : '') + (this.other || ' ')
+        const buildReq=function(req){
+            if (Array.isArray(req) && req.length>0){
+                return "<b>Requirements</b>:<br>&nbsp;&nbsp;&nbsp;" + req.join('<br>&nbsp;&nbsp;&nbsp;') + '<br>'
+            }
+            return ''
+        }
+        const content = buildReq(this.requirements) + (this.other || '')
         BootstrapModalPrompt.prompt({
             attachTo: instance.firstNode,
             title,
