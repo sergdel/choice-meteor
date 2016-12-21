@@ -123,6 +123,12 @@ const columns = [
         label: 'Drive?',
         operator: '$in',
     },
+    {
+        key: 'quickNotes',
+        label: 'Notes',
+        operator: '$regex',
+        template: 'familySearchNotes'
+    }
 
 ]
 
@@ -288,7 +294,11 @@ export const familyFilterSchema = new SimpleSchema({
     'groups': {
         type: Number,
         optional: true,
-    }
+    },
+    quickNotes: {
+        type: String,
+        optional: true,
+    },
 });
 
 
@@ -315,7 +325,7 @@ export const familiesAutoTable = new AutoTable(
             }
         },
         link: function (row, path) {
-            if (path != 'contactInfo')
+            if (path != 'contactInfo' && path != 'quickNotes')
                 return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }

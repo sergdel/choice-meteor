@@ -1,3 +1,4 @@
+import "./notes"
 import "./list.html"
 import "./contact"
 import "./search-form.js"

@@ -21,7 +21,6 @@ const expireBlueCard = function () {
             [blu.type + '.blueCard.id']: blu._id
         }, {$set: {[blu.type + '.$.blueCard.status']: 'expiring'}})
     })
-    console.log('expiredfe',fe)
     expiring+=BlueCard.update({expiryDate: {$lte: in3month}, status: {$ne: 'expiring'}}, {$set: {status: 'expiring'}},{multi: true})
     cursor = BlueCard.find({expiryDate: {$lte: now}, status: {$ne: 'expired'}})
     cursor.forEach((blu) => {
@@ -30,15 +29,14 @@ const expireBlueCard = function () {
             [blu.type + '.blueCard.id']: blu._id
         }, {$set: {[blu.type + '.$.blueCard.status']: 'expired'}})
     })
-    console.log('expiredfed',fed)
     expired+=BlueCard.update({expiryDate: {$lte: now}, status: {$ne: 'expired'}}, {$set: {status: 'expired'}},{multi: true})
-    console.log('expiring',expiring,'expired',expired)
 
 }
 Meteor.startup(() => {
     const h1 = Meteor.setInterval(() => {
         const now = new Date()
-        if (now.getHours() == 24) {
+        if (now.getHours() == 0) {
+            console.info('************************************************* 24h expiring bluecards')
             Meteor.clearInterval(h1)
             Meteor.setInterval(expireBlueCard, 12 * 60 * 60 * 1000)
         }

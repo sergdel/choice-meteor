@@ -1,7 +1,6 @@
 /**
  * Created by cesar on 6/11/16.
  */
-import {blueCards} from './aproved-blue-card'
 import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {Families} from '/imports/api/family/family'
 import {Groups} from '/imports/api/group/group'

@@ -17,7 +17,12 @@ import {check} from 'meteor/check'
 
 
 Meteor.methods({
-
+    updateFamilySearchNotes:function(familyId,notes){
+        check (familyId,String)
+        check (notes,String)
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update notes')
+        return Families.update(familyId, {$set: {quickNotes: notes}})
+    },
     createToken: function (familyId) {
         this.unblock()
         check(familyId, String)

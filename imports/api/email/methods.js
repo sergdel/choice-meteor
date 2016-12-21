@@ -20,6 +20,8 @@ Meteor.methods({
         return _id
     },
     updateEmailsCampaignReportNote: function (emailId, notes) {
+        check (emailId,String)
+        check (notes,String)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update notes')
         return Email.update(emailId, {$set: {notes: notes}})
     },

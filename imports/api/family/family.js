@@ -313,6 +313,15 @@ export const familySchema = new SimpleSchema({
             }
         }
     },
+    quickNote: {
+        type: String,
+        optional: true,
+        autoform: {
+            afFieldInput: {
+                rows: 3
+            },
+        }
+    },
     notes: {
         type: [Object],
         optional: true,
