@@ -617,6 +617,41 @@ Migrations.add({
     }
 })
 
+
+Migrations.add({
+    /*
+     If:
+     1) Blue card # exists
+     2) Blue card expiry date = in future
+     3) Blue card status = "Apply" or "NA"
+
+     Then, update the status to "Approved*/
+    version: 17,
+    name: 'update blue card status',
+    up: function () {
+        Families.find({}).forEach((family) => {
+            let changed=false
+            for (let type of ['parents', 'children', 'guests']) {
+                if (Array.isArray(family[type])) {
+                    for (let i in family[type]) {
+                        const blueCard=family[type][i].blueCard
+                        if (blueCard){
+                            if (blueCard.number && blueCard.expiryDate &&  blueCard.expiryDate instanceof Date &&  blueCard.expiryDate >=new Date() && (blueCard.status == 'apply' && blueCard.status != 'n/a'  || !blueCard.status)){
+                                family[type][i].blueCard.status='approved'
+                                changed=true
+                            }
+                        }
+                    }
+                }
+            }
+            if (changed){
+                Families.update(family._id,{$set: family})
+            }
+
+        })
+    }
+})
+
 /*
  Migrations.add({
  version: 3,
