@@ -17,6 +17,19 @@ import {check} from 'meteor/check'
 
 
 Meteor.methods({
+    updateFamilyFirstVisitStaff:function(familyId,staffId){
+        check (familyId,String)
+        check (staffId,String)
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update visits')
+        Families.update(familyId,{$set:{'office.firstVisit.staffId':staffId}})
+    },
+    updateFamilyFirstVisitTime:function(familyId,time){
+        console.log(time)
+        check (familyId,String)
+        check (time,Date)
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update visits')
+        Families.update(familyId,{$set:{'office.firstVisit.time':time}})
+    },
     updateFamilySearchNotes:function(familyId,notes){
         check (familyId,String)
         check (notes,String)

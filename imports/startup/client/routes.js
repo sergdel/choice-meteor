@@ -12,6 +12,7 @@ import "/imports/ui/pages/public/gallery.html";
 import "/imports/ui/pages/public/information";
 import "/imports/ui/pages/family/adult/edit";
 import "/imports/ui/pages/family/list";
+import "/imports/ui/pages/family/new-applications/list";
 import "/imports/ui/pages/family/edit";
 import "/imports/ui/pages/family/new";
 import "/imports/ui/pages/blue-card/list";
@@ -205,17 +206,20 @@ const familyRoutes = staffRoleRoutes.group({
     prefix: '/family'
 });
 
+familyRoutes.route('/new-applications', {
+    name: 'familyNewApplicationsList',
+    action(params, queryParams) {
+        BlazeLayout.render('layout', {yield: 'familyNewApplicationsList'})
+    }
+});
 familyRoutes.route('/list/:limit?', {
     name: 'familyList',
-    title: 'Families',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'familyList'})
     }
 });
 familyRoutes.route('/edit/:familyId/:limit?', {
     name: 'familyEdit',
-    parent: 'familyList',
-    title: 'Edit',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'familyEdit'})
     }
@@ -223,8 +227,6 @@ familyRoutes.route('/edit/:familyId/:limit?', {
 
 familyRoutes.route('/new', {
     name: 'familyNew',
-    parent: 'familyList',
-    title: 'Create',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'familyNew'})
     }
@@ -234,7 +236,6 @@ familyRoutes.route('/new', {
 
 familyRoutes.route('/bluecard/:limit?', {
     name: 'blueCardList',
-    title: 'Blue Card',
     action(params, queryParams) {
         BlazeLayout.render('layout', {yield: 'blueCardList'})
     }

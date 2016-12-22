@@ -652,6 +652,15 @@ Migrations.add({
     }
 })
 
+Migrations.add({
+    version: 18 ,
+    name: 'update substatus enabled to all groups',
+    up: function () {
+        Groups.updateBySelector({},{$set:{enabled: true}},{multi:true})
+    }
+})
+
+
 /*
  Migrations.add({
  version: 3,

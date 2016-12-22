@@ -5,13 +5,16 @@ import {Mongo} from 'meteor/mongo'
 import {Meteor} from 'meteor/meteor'
 import {_} from 'lodash'
 import diff from 'recursive-diff'
-import {familySchema} from '/imports/api/family/family'
 import {AutoTable} from 'meteor/cesarve:auto-table'
+import {familyStatus} from "/imports/api/family/family-status";
 
 
 class AuditCollection extends Mongo.Collection {
     insert({userId, type, docId, newDoc, oldDoc, familyId, description, where = 'families'}) {
         const user = Meteor.users.findOne(userId)
+        const family = Meteor.users.findOne(familyId, {fields: {'office.familyStatus': 1}})
+        console.log(family)
+        const familyStatus = family && family.office && family.office.familyStatus
         const name = (user.firstName && user.surname) ? user.firstName + ' ' + user.surname : false || ((user.parents && user.parents[0] && user.parents[0].surname) + ' ' + (user.parents && user.parents[0] && user.parents[0].firstName))
         const role = user.roles.pop()
         if (type == 'update' || type == 'create' || type == 'remove') {
@@ -35,6 +38,7 @@ class AuditCollection extends Mongo.Collection {
                     where,
                     docId,
                     familyId,
+                    familyStatus,
                     description,
                     result,
                     role,
@@ -50,6 +54,7 @@ class AuditCollection extends Mongo.Collection {
                 where,
                 docId,
                 familyId,
+                familyStatus,
                 description,
                 role,
                 name,
@@ -59,8 +64,8 @@ class AuditCollection extends Mongo.Collection {
         }
     }
 
-    update(selector,modifier,options) {
-        return super.update(selector,modifier, options)
+    update(selector, modifier, options) {
+        return super.update(selector, modifier, options)
     }
 
     remove() {
@@ -130,7 +135,7 @@ const AuditFilterSchema = new SimpleSchema({
         label: 'Where',
         optional: true,
         autoform: {
-            type:  'select-multi-checkbox-combo',
+            type: 'select-multi-checkbox-combo',
             options: [
                 {
                     label: "Groups",
@@ -140,9 +145,21 @@ const AuditFilterSchema = new SimpleSchema({
                     label: "Families",
                     value: "families"
                 },
-              ],
+            ],
         },
-    }
+    },
+    'familyStatus': {
+        type: [Number],
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: function () {
+                return _.map(familyStatus, function (status) {
+                    return {label: status.label, value: status.id}
+                })
+            },
+        },
+    },
 })
 const operators = [  // Optional Array works for option filter
     {
@@ -179,6 +196,14 @@ export const AuditAutoTable = new AutoTable({
         },
         {key: 'where', operator: '$in', label: 'Where'},
         {key: 'description', operator: '$regex', label: 'Detail'},
+        {
+            key: 'familyStatus', label: 'Status', operator: '$in',
+            render: function (val) {
+                const status = _.find(familyStatus, {id: val})
+                return status && status.label || ''
+            }
+        }
+
     ],
     collection: Audit,
     schema: AuditFilterSchema,
@@ -190,11 +215,15 @@ export const AuditAutoTable = new AutoTable({
             showing: true,
         },
     },
-    publishExtraFields: ['result', 'docId', 'name','familyId'],
+    publishExtraFields: ['result', 'docId', 'name', 'familyId'],
     publish: function () {
-        return Roles.userIsInRole(this.userId, ['admin','staff'])
+        return Roles.userIsInRole(this.userId, ['admin', 'staff'])
     },
     link: function (doc, key) {
+        if (doc.familyId) {
+            return FlowRouter.path('familyEdit', {familyId: doc.familyId})
+        }
         return ""
+
     }
 })

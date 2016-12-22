@@ -8,7 +8,7 @@ import {BlueCard} from '/imports/api/blue-card/blue-card'
 import {FlowRouter} from 'meteor/kadira:flow-router'
 import {Audit} from '/imports/api/audit/audit'
 import {Email} from 'meteor/email'
-
+import {_} from 'meteor/underscore'
 
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
@@ -97,6 +97,7 @@ class GroupCollection extends Mongo.Collection {
         })
         //send the email
     }
+
     apply(groupId, familyId, data, userId) {
         //todo better performance, insted find ans update 3 times, use $inc
         data.status = 'applied'
@@ -560,7 +561,14 @@ const schemaObject = {
         type: groupApplySchema,
         optional: true,
     },
-
+    enabled: {
+        label: 'Enabled',
+        type: Boolean,
+        autoform: {
+            type: 'boolean-radios',
+            firstOption: false
+        },
+    },
 }
 
 const newObj = (_.pick(schemaObject, 'id', 'name'))
@@ -740,8 +748,27 @@ const columns = [
 
     {
         key: 'placed',
-        operator: '$eq',
-        operators
+        label: 'Placed',
+        render: function (val, key) {
+            let placed = 0
+            const families = _.where(this.families, {status: 'confirmed'})
+            for (const family of families) {
+                placed += Math.min(family.maximum, this.guestsTo)
+            }
+            return placed
+        }
+    },
+    {
+        key: 'remaining',
+        label: 'Remaining',
+        render: function (val, key) {
+            let placed = 0
+            const families = _.where(this.families, {status: 'confirmed'})
+            for (const family of families) {
+                placed += Math.min(family.maximum, this.guestsTo)
+            }
+            return this.students + this.adults - placed
+        }
     },
     {
         key: 'status',
@@ -782,8 +809,8 @@ let groupFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
-    dates:{
-      type: [Date],
+    dates: {
+        type: [Date],
         optional: true,
     },
     "dates.$": {
@@ -848,11 +875,11 @@ let groupFilterSchema = new SimpleSchema({
             ]
         },
     },
-    placed: {
-        type: Number,
+    /*placed: {
+     type: Number,
+     optional: true,
 
-        optional: true,
-    },
+     },*/
     applied: {
         label: 'Applied',
         type: Number,
@@ -868,7 +895,7 @@ let groupFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
-    availableFamilies:{
+    availableFamilies: {
         type: String,
         optional: true,
     }
@@ -900,7 +927,7 @@ Groups.autoTableStaff = new AutoTable(
 
             const self = this;
             const publishGroups = []
-            let count=0
+            let count = 0
 
             self.added('counts', 'atCounter' + id, {count})
             var handle = Groups.find(query).observeChanges({
@@ -959,9 +986,9 @@ Groups.autoTableStaff = new AutoTable(
                 }
                 ,
                 removed: function (groupId) {
-                        count --
-                        self.removed("groups", groupId);
-                        self.changed('counts', 'atCounter' + id, {count})
+                    count--
+                    self.removed("groups", groupId);
+                    self.changed('counts', 'atCounter' + id, {count})
 
                 }
             });
@@ -1005,8 +1032,9 @@ Groups.autoTableFamilyAvailable = new AutoTable(
         id: 'groupFamilyAvailable',
         collection: Groups,
         columns: columnsFamilyAvailable,
+        query: {enabled: true},
         schema: groupFilterSchema,
-        publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
+        publishExtraFields: ['families', 'guestsTo', 'guestsFrom','enabled'],
         settings: {
             options: {
                 columnsSort: true,
@@ -1161,7 +1189,7 @@ Groups.autoTableFamilyApplied = new AutoTable(
         columns: columnsFamilyApplied,
         schema: groupFilterSchema,
         publish: function () {
-            return Roles.userIsInRole(this.userId, ['family','admin','staff'])
+            return Roles.userIsInRole(this.userId, ['family', 'admin', 'staff'])
         },
         publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
         settings: {
@@ -1196,7 +1224,7 @@ Groups.autoTableFamilyConfirmed = new AutoTable(
         schema: groupFilterSchema,
         publishExtraFields: ['families', 'guestsTo', 'guestsFrom'],
         publish: function () {
-            return Roles.userIsInRole(this.userId, ['family','admin','staff'])
+            return Roles.userIsInRole(this.userId, ['family', 'admin', 'staff'])
         },
         settings: {
             options: {

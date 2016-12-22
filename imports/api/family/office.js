@@ -120,6 +120,28 @@ export const officeSchema = new SimpleSchema({
             }
         }
     },
+    firstVisit:{
+        type: Object,
+        optional: true,
+    },
+    "firstVisit.staffId":{
+        type: String,
+        optional: true,
+        autoform: {
+            afFormGroup: {
+                "formgroup-class": 'col-sm-6',
+            }
+        }
+    },
+    "firstVisit.time":{
+        type: Date,
+        optional: true,
+        autoform: {
+            afFormGroup: {
+                "formgroup-class": 'col-sm-6',
+            }
+        }
+    },
     files: {
         label: "Files",
         type: [String],
@@ -136,4 +158,5 @@ export const officeSchema = new SimpleSchema({
             }
         }
     },
+
 });

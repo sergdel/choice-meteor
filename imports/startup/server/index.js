@@ -16,6 +16,7 @@ import "/imports/api/family/server/publication";
 import "/imports/api/family/family";
 import "/imports/api/family/methods";
 import "/imports/api/family/auto-table";
+import "/imports/api/family/new-applications-auto-table";
 import "/imports/api/audit/server/publication";
 import "/imports/api/family/adult/methods";
 import "/imports/api/staff/server/publication";

@@ -28,11 +28,13 @@
                         {{else}}
                             {{#if isInRole 'admin,staff' }}
                                 <li><a href="{{pathFor 'familyList'}}">Families</a></li>
+                                <li><a href="{{pathFor 'familyNewApplicationsList'}}">New Apps</a></li>
                                 <li><a href="{{pathFor 'blueCardList'}}">Blue Cards</a></li>
                                 <li><a href="{{pathFor 'groupList'}}">Groups</a></li>
                             {{/if}}
                             {{#if isInRole 'admin' }}
                                 <li><a href="{{pathFor 'staffList'}}">Staff</a></li>
+                                <li><a href="{{pathFor 'locationList'}}">Locations</a></li>
                                 <li><a href="{{pathFor 'auditList'}}">Log</a></li>
 
                             {{/if}}

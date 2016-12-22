@@ -4,32 +4,7 @@
 import './search-form.html'
 import {optsGoogleplace} from "/imports/api/family/contact";
 import '/imports/ui/pages/family/export'
-AutoForm.hooks({
-    searchFamilyListForm: {
-        onSubmit: function (search, modifier) {
 
-            //hack, beacouse when the input is clean the value of the address dosen0t change
-            //that why i check if the input itself is empty then i clean the address
-            if ($('[name="address"]').val()==''){
-                Session.set('searchFamilyListForm.address', undefined)
-            }else{
-                if (search.address && search.address.geometry) {
-
-
-                    Session.set('searchFamilyListForm.address', search.address);
-                    Session.set('searchFamilyListForm.distance', search.distance);
-                } else {
-
-
-                    Session.set('searchFamilyListForm.address', undefined)
-                }
-            }
-
-            Session.set('searchFamilyListForm.queryContact', search.queryContact)
-            return false;
-        }
-    }
-});
 
 const AddressSchema = new SimpleSchema({
     fullAddress: {
@@ -104,19 +79,40 @@ export const searchSchema = new SimpleSchema({
 });
 
 Template.searchFamilyListForm.onCreated(function () {
+    const listName=this.data.listName
+    AutoForm.hooks({
+        [listName]: {
+            onSubmit: function (search, modifier) {
 
+                //hack, beacouse when the input is clean the value of the address dosen0t change
+                //that why i check if the input itself is empty then i clean the address
+                if ($('[name="address"]').val()==''){
+                    Session.set(listName+'.address', undefined)
+                }else{
+                    if (search.address && search.address.geometry) {
+                        Session.set(listName+'address', search.address);
+                        Session.set(listName+'.distance', search.distance);
+                    } else {
+                        Session.set(listName+'.address', undefined)
+                    }
+                }
+                Session.set(listName+'.queryContact', search.queryContact)
+                return false;
+            }
+        }
+    });
 });
 Template.searchFamilyListForm.helpers({
     searchSchema: searchSchema,
     optsGoogleplace: optsGoogleplace,
     distance: ()=> {
-        return Session.get('searchFamilyListForm.distance')
+        return Session.get(Template.instance().data.listName+'.distance')
     },
     address: ()=> {
-        return Session.get('searchFamilyListForm.address')
+        return Session.get(Template.instance().data.listName+'.address')
     },
     queryContact: ()=> {
-        return Session.get('searchFamilyListForm.queryContact')
+        return Session.get(Template.instance().data.listName+'.queryContact')
     },
 });
 

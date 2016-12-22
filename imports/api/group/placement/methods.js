@@ -127,7 +127,7 @@ export const createTable = function (familyId, status) {
 
     } else {
         table = '<p>Here is a summary of other available groups that you may want to apply for:</p><br>'
-        groups = Groups.find({"families.familyId": {$ne: familyId}}, {sort: {"dates.0": 1}})
+        groups = Groups.find({enabled: true,"families.familyId": {$ne: familyId}}, {sort: {"dates.0": 1}})
 
     }
     table += '<table style="width: 100%; border-collapse: collapse; border: 1px solid #e4e4e4; text-align: center">' +
@@ -147,3 +147,5 @@ export const createTable = function (familyId, status) {
         return ''
     return table
 }
+
+

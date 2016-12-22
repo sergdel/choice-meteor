@@ -4,6 +4,7 @@
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {familyStatus} from "./family-status";
 import {Tags} from "/imports/api/tags/tags";
+import {Groups} from "/imports/api/group/group"
 
 const operators = [  // Optional Array works for option filter
     {
@@ -35,122 +36,75 @@ const operators = [  // Optional Array works for option filter
 
 const columns = [
 
-    {key: 'parents.0.firstName', operator: '$regex',},
+    {key: 'parents.0.firstName',label:'Parent 1', operator: '$regex',},
+    {key: 'parents.1.firstName',label:'Parent 2', operator: '$regex',},
     {key: 'parents.0.surname', operator: '$regex',},
     {key: 'contact.address.city', operator: '$regex',},
     {key: 'contact.address.suburb', operator: '$regex',},
-    {key: 'blueCardStatus', label: 'Blue cards', operator: '$in',},
-    {
-        key: 'office.score', operator: '$eq', operators
-    },
-    {
-        key: 'parentsCount', label: '# parents', operator: '$eq', operators
-    },
-    {
-        key: 'childrenCount', label: '# children', operator: '$eq', operators
-    },
-    {
-        key: 'guestsCount', label: '# guests', operator: '$eq', operators
-    },
-    {
-        key: 'bedroomsCount', label: '# bedrooms', operator: '$eq', operators
-    },
-    {
-        key: 'bedsCount', label: '# beds', operator: '$eq', operators
-
-    },
-    {key: 'office.tags', operator: '$in',},
+    {key: 'contact.address.fullAddress', operator: '$regex',},
+    {key: 'contact.homePhone', operator: '$regex',},
+    {key: 'emails.0.address', label:'Email', operator: '$regex',},
     {
         key: 'office.familyStatus', label: 'Status', operator: '$in',
         render: function (val) {
-        const status = _.findWhere(familyStatus, {id: val})
-        return status && status.label || ''
-    }
-    },
-    {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
-    {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
-    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
-    {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
-    {
-        key: 'contactInfo', label: 'Contact',
-        template: 'familyContact',
-    },
-    {
-        key: 'loggedAt',
-        label: 'Last Login',
-        operator: '$gte',
-        operators,
-        render: function (val) {
-            if (!val) return ''
-            const m = moment(val)
-            if (!m.isValid()) return val
-            return m.format('Do MMM YYYY')
-        },
-    },
-    {
-        key: 'reviewed',
-        label: 'Last Update',
-        operator: '$gte',
-        operators,
-        render: function (val) {
-            if (!val) return ''
-            const m = moment(val)
-            if (!m.isValid()) return val
-            return m.format('Do MMM YYYY')
-        },
-    },
-    {
-        key: 'availability',
-        label: 'Unavailability',
-        render: function(val){
-            if (Array.isArray(val))
-                return val.length
+            const status = _.findWhere(familyStatus, {id: val})
+            return status && status.label || ''
         }
     },
     {
-        key: 'other.contactDate',
-        label: 'Enquiry date',
-        operator: '$gte',
-        operators,
-        render: function (val) {
-            if (!val) return ''
-            const m = moment(val)
-            if (!m.isValid()) return val
-            return m.format('Do MMM YYYY')
-        },
-    },
-    {
-        key: 'other.drive',
-        label: 'Drive?',
-        operator: '$in',
+        key: 'applied', label: 'Applied',
+        render: function () {
+            const groupIds = _.pluck(this.groups, 'groupId')
+            const groups = Groups.find({_id: {$in: groupIds}}, {fields: {name: 1, dates: 1}})
+            let body = ''
+            groups.forEach((group) => {
+                const date0 = group.dates && group.dates[0] && group.dates[0] instanceof Date ? moment(group.dates[0]).format('DD MMM YY') : ''
+                const date1 = group.dates && group.dates[1] && group.dates[1] instanceof Date ? moment(group.dates[1]).format('DD MMM YY') : ''
+                body += `<nobr>${group.name}</nobr><br><nobr>(${date0} - ${date1})</nobr><hr style="margin: 0">`
+            })
+            return body.substr(0, body.length - 4)
+        }
     },
     {
         key: 'quickNotes',
         label: 'Notes',
         operator: '$regex',
         template: 'familySearchNotes'
+    },
+    {
+        key: 'office.firstVisit.time',
+        label: 'Visit time',
+        operator: '$gte',
+        operators,
+        template: 'familyNeApplicationVisitTime'
+    },
+    {
+        key: 'office.firstVisit.staffId',
+        label: 'Visit staff',
+        operator: '$in',
+        template: 'familyNeApplicationVisitStaff'
     }
 
 ]
 
-export const familyFilterSchema = new SimpleSchema({
-    'groupsCount.applied':{
+export const newFamilyFilterSchema = new SimpleSchema({
+    'groupsCount.applied': {
         type: Number,
         optional: true,
     },
-    'groupsCount.confirmed':{
+    'groupsCount.confirmed': {
         type: Number,
         optional: true,
     },
-    'groups.applied':{
+    'groups.applied': {
         type: Number,
         optional: true,
     },
-    'groups.confirmed':{
+    'groups.confirmed': {
         type: Number,
         optional: true,
     },
-    'loggedAt':{
+    'loggedAt': {
         type: Date,
         optional: true,
 
@@ -163,10 +117,10 @@ export const familyFilterSchema = new SimpleSchema({
         optional: true,
         type: Date
     },
-    'other.drive':{
-        type:[String],
+    'other.drive': {
+        type: [String],
         optional: true,
-        autoform:{
+        autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
                 {label: 'Yes', value: 'Yes',},
@@ -187,7 +141,12 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
+
     'contact.address.suburb': {
+        type: String,
+        optional: true,
+    },
+    'contact.address.fullAddress':{
         type: String,
         optional: true,
     },
@@ -250,7 +209,8 @@ export const familyFilterSchema = new SimpleSchema({
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: function () {
-                return _.map(familyStatus, function (status) {
+                const filteredStatus = _.filter(familyStatus, (status) => status.id < 3)
+                return _.map(filteredStatus, function (status) {
                     return {label: status.label, value: status.id}
                 })
             },
@@ -280,7 +240,7 @@ export const familyFilterSchema = new SimpleSchema({
             ]
         },
     },
-    'emails.address': {
+    'emails.$.address': {
         type: String,
         optional: true
     },
@@ -300,19 +260,38 @@ export const familyFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
+    'office.firstVisit.time': {
+        type: Date,
+        optional: true,
+
+    },
+    'office.firstVisit.staffId': {
+        label: 'Staff',
+        type: [String],
+        optional: true,
+        autoform: {
+            type: 'select-multi-checkbox-combo',
+            options: function () {
+                const staffs = Meteor.users.find({$or: [{roles: 'staff'}, {roles: 'admin'}]});
+                return staffs.map((user) => {
+                    return {label: user.firstName, value: user._id}
+                })
+            }
+        }
+    }
 });
 
 
-export const familiesAutoTable = new AutoTable(
+export const newFamiliesAutoTable = new AutoTable(
     {
-        id: 'familyList',
+        id: 'newFamiliesAutoTable',
         collection: Meteor.users,
-        query: {roles: 'family'},
-        publishExtraFields: ['roles','emails'],
+        query: {roles: 'family', 'office.familyStatus': {$lt: 3}, 'groups.0': {$exists: 1}},
+        publishExtraFields: ['roles', 'office', 'groups'],
         columns,
-        schema: familyFilterSchema,
+        schema: newFamilyFilterSchema,
         publish: function () {
-            return Roles.userIsInRole(this.userId, ['admin','staff'])
+            return Roles.userIsInRole(this.userId, ['admin', 'staff'])
         },
         settings: {
             options: {
@@ -320,13 +299,15 @@ export const familiesAutoTable = new AutoTable(
                 columnsDisplay: true,
                 showing: true,
                 filters: true,
-            },
+            }
+            ,
             klass: {
                 tableWrapper: ''
             }
-        },
+        }
+        ,
         link: function (row, path) {
-            if (path != 'contactInfo' && path != 'quickNotes')
+            if (path != 'office.firstVisit.staffId' && path != 'office.firstVisit.time' && path != 'quickNotes')
                 return FlowRouter.path('familyEdit', {familyId: row._id})
         }
     }

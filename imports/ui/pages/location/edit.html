@@ -1,5 +1,5 @@
 <template name="locationEdit">
-    <h1>Location Detail</h1>
+    <h1>Location Detail <a href="{{pathFor 'locationList'}}" class="btn btn-primary btn-lg locationList"><i class="fa fa-list"></i></a></h1>
     {{#if Template.subscriptionsReady }}
         {{>quickForm id="locationEdit" doc=doc schema=locationSchema type="method-update" meteormethod="locationEdit"}}
     {{else}}

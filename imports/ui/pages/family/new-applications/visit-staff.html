@@ -1,0 +1,8 @@
+<template name="familyNeApplicationVisitStaff">
+    <select name="visit.staffId" class="form-control" style="min-width: 110px">
+        <option value="">Select one</option>
+        {{#each staff}}
+          <option value="{{_id}}" {{selected}}>{{firstName}}</option>
+        {{/each}}
+    </select>
+</template>
