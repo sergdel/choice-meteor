@@ -83,14 +83,14 @@ Template.searchFamilyListForm.onCreated(function () {
     AutoForm.hooks({
         [listName]: {
             onSubmit: function (search, modifier) {
-
+                console.log('AutoForm.hooks ' + listName, search, modifier)
                 //hack, beacouse when the input is clean the value of the address dosen0t change
                 //that why i check if the input itself is empty then i clean the address
                 if ($('[name="address"]').val()==''){
                     Session.set(listName+'.address', undefined)
                 }else{
                     if (search.address && search.address.geometry) {
-                        Session.set(listName+'address', search.address);
+                        Session.set(listName+'.address', search.address);
                         Session.set(listName+'.distance', search.distance);
                     } else {
                         Session.set(listName+'.address', undefined)

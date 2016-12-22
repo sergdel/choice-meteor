@@ -651,15 +651,14 @@ Migrations.add({
         })
     }
 })
-
 Migrations.add({
     version: 18 ,
     name: 'update substatus enabled to all groups',
     up: function () {
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
         Groups.updateBySelector({},{$set:{enabled: true}},{multi:true})
     }
 })
-
 
 /*
  Migrations.add({
