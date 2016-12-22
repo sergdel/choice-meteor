@@ -562,11 +562,13 @@ const schemaObject = {
         optional: true,
     },
     enabled: {
-        label: 'Enabled',
+        label: 'Show as available',
         type: Boolean,
         autoform: {
             type: 'boolean-radios',
-            firstOption: false
+            firstOption: false,
+            trueLabel: 'Yes',
+            falseLabel:'No'
         },
     },
 }
