@@ -7,11 +7,11 @@ import {optsGoogleplace} from "/imports/api/family/contact";
 AutoForm.hooks({
     searchCampaignListForm: {
         onSubmit: function (search, modifier) {
-            let customQuery = [];
+            let customQuery = {};
             if (search  && search.address && search.address.geometry) {
 
                 if (search.address) {
-                    customQuery.push({
+                    customQuery = _.extend(customQuery,{
                         "contact.address.geometry": {
                             $near: {
                                 $geometry: search.address.geometry,
@@ -24,7 +24,7 @@ AutoForm.hooks({
             }
 
             if (search.groupDuration) {
-                customQuery.push(
+                customQuery = _.extend(customQuery,
                     {"availability" :
                     {
                         $not : {
@@ -49,8 +49,8 @@ AutoForm.hooks({
                     }
                 );
             }
-            if (customQuery.length)
-                Session.set('campaignList_customQuery',{$and:customQuery})
+            if (Object.keys(customQuery).length)
+                Session.set('campaignList_customQuery',customQuery)
             else
                 Session.set('campaignList_customQuery',undefined)
             return false;

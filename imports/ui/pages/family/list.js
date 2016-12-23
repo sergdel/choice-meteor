@@ -23,10 +23,10 @@ Template.familyList.helpers({
     autoTable: () => familiesAutoTable,
     customQuery: function () {
         return () => {
-            let customQuery = [];
+            let customQuery = {};
             const address = Session.get('searchFamilyListForm.address')
             if (address) {
-                customQuery.push( {
+                customQuery = _.extend(customQuery, {
                     "contact.address.geometry": {
                         $near: {
                             $geometry: address.geometry,
@@ -37,7 +37,7 @@ Template.familyList.helpers({
             }
             const queryContact = Session.get('searchFamilyListForm.queryContact')
             if (queryContact) {
-                customQuery.push({$or : [
+                customQuery = _.extend(customQuery,{$or : [
                     {"emails.address": {$regex: queryContact, $options: 'gi'}},
                     {"parents.email": {$regex: queryContact, $options: 'gi'}},
                     {"parents.mobilePhone": {$regex: queryContact, $options: 'gi'}},
@@ -46,7 +46,7 @@ Template.familyList.helpers({
             }
             const availability = Session.get('searchFamilyListForm.availableDuration');
             if (availability) {
-                customQuery.push(
+                customQuery = _.extend(customQuery,
                     {"availability" :
                         {
                             $not : {
@@ -71,10 +71,7 @@ Template.familyList.helpers({
                     }
                 );
             }
-            if (customQuery.length)
-                return {$and:customQuery};
-            else
-                return {};
+            return customQuery;
         }
     }
 });
