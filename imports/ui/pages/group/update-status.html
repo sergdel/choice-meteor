@@ -8,6 +8,7 @@
     {{/if}}
     {{#if confirm}}
         <div class="btn-group-vertical" role="group">
+            {{>groupApply }}
             <button class="btn btn-primary btn-xs updateStatus" data-status="applied" id="{{_id}}">Unconfirm <i
                     class="fa fa-square-o"></i></button>
             <button class="btn btn-primary btn-xs updateStatus" data-status="canceled" id="{{_id}}">Cancel <i

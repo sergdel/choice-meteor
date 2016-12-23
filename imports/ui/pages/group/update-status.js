@@ -10,6 +10,7 @@ Template.groupUpdateStatus.onCreated(function () {
         this.subscribe('EmailTemplate', 'UnconfirmationFamily')
         this.subscribe('EmailTemplate', 'CancelFamily')
     }
+    this.subscribe('EmailTemplates');
 
 });
 
@@ -53,7 +54,7 @@ Template.groupUpdateStatus.events({
             default:
                 return
         }
-        const doc = EmailTemplates.findOne(templateId)
+        const doc = EmailTemplates.findOne({"_id":templateId})
         BootstrapModalPrompt.prompt({
             title: doc.description,
             autoform: {
