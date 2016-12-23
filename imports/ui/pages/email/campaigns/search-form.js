@@ -7,9 +7,9 @@ import {optsGoogleplace} from "/imports/api/family/contact";
 AutoForm.hooks({
     searchCampaignListForm: {
         onSubmit: function (search, modifier) {
-            let customQuery = {}
+            let customQuery = {};
             if (search  && search.address && search.address.geometry) {
-                
+
                 if (search.address) {
                     customQuery = {
                         "contact.address.geometry": {
@@ -18,15 +18,12 @@ AutoForm.hooks({
                                 $maxDistance: search.distance
                             }
                         }
-                    }
+                    };
 
                 }
-                
-                Session.set('campaignList_customQuery',customQuery)
-            } else {
+                Session.set('campaignList_customQuery', customQuery)
+            }else
                 Session.set('campaignList_customQuery',undefined)
-
-            }
             return false;
         }
     }

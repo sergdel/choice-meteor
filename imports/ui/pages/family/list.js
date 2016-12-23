@@ -24,7 +24,7 @@ Template.familyList.helpers({
     autoTable: () => familiesAutoTable,
     customQuery: function () {
         return () => {
-            let customQuery = {}
+            let customQuery = {};
             const address = Session.get('searchFamilyListForm.address')
             if (address) {
                 customQuery = {
@@ -34,7 +34,7 @@ Template.familyList.helpers({
                             $maxDistance: Session.get('searchFamilyListForm.distance')
                         }
                     }
-                }
+                };
             }
             const queryContact = Session.get('searchFamilyListForm.queryContact')
             if (queryContact) {
@@ -43,9 +43,9 @@ Template.familyList.helpers({
                     {"parents.email": {$regex: queryContact, $options: 'gi'}},
                     {"parents.mobilePhone": {$regex: queryContact, $options: 'gi'}},
                     {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
-                ]
+                ];
             }
-            return customQuery
+            return customQuery;
         }
     }
 });
