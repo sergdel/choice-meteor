@@ -25,6 +25,7 @@ AutoForm.hooks({
                 }
             }
 
+            Session.set('searchFamilyListForm.availableDuration', search.availableDuration);
             Session.set('searchFamilyListForm.queryContact', search.queryContact)
             return false;
         }
@@ -96,6 +97,22 @@ export const searchSchema = new SimpleSchema({
     address: {
         type: AddressSchema,
         optional: true,
+    },
+    availableDuration: {
+        type: [Date],
+        optional: true,
+        autoform:{
+            type: 'daterangepicker',
+            afFormGroup: {
+                "formgroup-class": 'col-sm-6',
+
+            },
+            dateRangePickerOptions: {
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            }
+        }
     },
     queryContact:{
         type: String,

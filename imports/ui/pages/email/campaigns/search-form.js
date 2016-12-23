@@ -7,22 +7,51 @@ import {optsGoogleplace} from "/imports/api/family/contact";
 AutoForm.hooks({
     searchCampaignListForm: {
         onSubmit: function (search, modifier) {
-            let customQuery = {};
+            let customQuery = [];
             if (search  && search.address && search.address.geometry) {
 
                 if (search.address) {
-                    customQuery = {
+                    customQuery.push({
                         "contact.address.geometry": {
                             $near: {
                                 $geometry: search.address.geometry,
                                 $maxDistance: search.distance
                             }
                         }
-                    };
+                    });
 
                 }
-                Session.set('campaignList_customQuery', customQuery)
-            }else
+            }
+
+            if (search.groupDuration) {
+                customQuery.push(
+                    {"availability" :
+                    {
+                        $not : {
+                            $elemMatch: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {"dates.0": {$gte: search.groupDuration[0]}},
+                                            {"dates.0": {$lte: search.groupDuration[1]}}
+                                        ]
+                                    },
+                                    {
+                                        $and: [
+                                            {"dates.1": {$gte: search.groupDuration[0]}},
+                                            {"dates.1": {$lte: search.groupDuration[1]}}
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                    }
+                );
+            }
+            if (customQuery.length)
+                Session.set('campaignList_customQuery',{$and:customQuery})
+            else
                 Session.set('campaignList_customQuery',undefined)
             return false;
         }
@@ -94,6 +123,22 @@ export const searchSchema = new SimpleSchema({
     address: {
         type: AddressSchema,
         optional: true,
+    },
+    groupDuration: {
+        type: [Date],
+        optional: true,
+        autoform:{
+            type: 'daterangepicker',
+            afFormGroup: {
+                "formgroup-class": 'col-lg-3',
+
+            },
+            dateRangePickerOptions: {
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            }
+        }
     },
 });
 
