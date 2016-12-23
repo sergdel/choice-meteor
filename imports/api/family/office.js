@@ -137,6 +137,16 @@ export const officeSchema = new SimpleSchema({
         type: Date,
         optional: true,
         autoform: {
+
+                type: "daterangepicker",
+                dateRangePickerOptions: {
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    locale: {
+                        format:  'DD/MM/YYYY',
+                    },
+                },
+
             afFormGroup: {
                 "formgroup-class": 'col-sm-6',
             }

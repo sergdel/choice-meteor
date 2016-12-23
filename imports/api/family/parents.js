@@ -53,8 +53,19 @@ export const parentSchema = new SimpleSchema({
         autoform: {
             afFormGroup: {
                 "formgroup-class": 'col-sm-3',
-            }
-        }
+            },
+                type: "daterangepicker",
+                dateRangePickerOptions: {
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    maxDate: new Date(),
+                    locale: {
+                        format:  'DD/MM/YYYY',
+                    },
+                },
+
+        },
+
     },
     birthCountry: {
         optional: true,

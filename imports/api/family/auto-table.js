@@ -35,7 +35,16 @@ const operators = [  // Optional Array works for option filter
 
 const columns = [
 
-    {key: 'parents.0.firstName', operator: '$regex',},
+    {
+        key: 'parents.0.firstName',
+        label: 'Parent 1',
+        operator: '$regex'
+    },
+    {
+        key: 'parents.1.firstName',
+        label: 'Parent 2',
+        operator: '$regex'
+    },
     {key: 'parents.0.surname', operator: '$regex',},
     {key: 'contact.address.city', operator: '$regex',},
     {key: 'contact.address.suburb', operator: '$regex',},
@@ -153,15 +162,45 @@ export const familyFilterSchema = new SimpleSchema({
     'loggedAt':{
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
 
     },
     reviewed: {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.contactDate': {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.drive':{
         type:[String],

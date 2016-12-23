@@ -107,15 +107,45 @@ export const newFamilyFilterSchema = new SimpleSchema({
     'loggedAt': {
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
 
     },
     reviewed: {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.contactDate': {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.drive': {
         type: [String],

@@ -7,9 +7,9 @@
 import {SimpleSchema} from "meteor/aldeed:simple-schema";
 import {genderType} from "./gender";
 import {blueCardSchema} from "./bluecard";
-const clonedGenderType=_.clone(genderType);
-clonedGenderType.autoform.afFormGroup["formgroup-class"]= 'col-sm-3';
-export const  guestSchema = new SimpleSchema({
+const clonedGenderType = _.clone(genderType);
+clonedGenderType.autoform.afFormGroup["formgroup-class"] = 'col-sm-3';
+export const guestSchema = new SimpleSchema({
     firstName: {
         optional: true,
         type: String,
@@ -30,16 +30,25 @@ export const  guestSchema = new SimpleSchema({
     },
     gender: genderType,
     dateOfBirth: {
+        optional: true,
+        type: Date,
         autoform: {
             afFormGroup: {
                 "formgroup-class": 'col-sm-3',
-            }
+            },
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                maxDate: new Date(),
+                locale: {
+                    format: 'DD/MM/YYYY',
+                },
+            },
         },
-        optional: true,
-        type: Date,
     },
-    blueCard:{
-        optional:true,
+    blueCard: {
+        optional: true,
         type: blueCardSchema,
         autoform: {
             template: 'clean'

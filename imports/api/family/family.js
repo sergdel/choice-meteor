@@ -39,6 +39,40 @@ export const emailSchema = new SimpleSchema({
     }
 })
 
+export const createAvailableQuery=function(confirmedGroups,unavailability){
+    confirmedGroups.forEach((confirmed) => {
+        if (confirmed.dates && confirmed.dates[0] && confirmed.dates[1] && confirmed.dates[0] instanceof Date && confirmed.dates[1] instanceof Date ) {
+            and.push({
+                //dates0 and dates1 can not be between a confirmed group
+                "dates.0": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
+                "dates.1": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
+                //dates and wrapped a dates of confirmed group
+                $or: [
+                    {"dates.0": {$gte: confirmed.dates[1]}},
+                    {"dates.1": {$lte: confirmed.dates[0]}}
+                ]
+            })
+        }
+    })
+    unavailability.forEach((dates)=>{
+        dates= dates && dates.dates
+        if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date) ){
+            and.push({
+                //dates0 and dates1 can not be between a confirmed group
+                "dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
+                "dates.1": {$not: {$gte: dates[0], $lte: dates[1]}},
+                //dates and wrapped a dates of confirmed group
+                $or: [
+                    {"dates.0": {$gte: dates[1]}},
+                    {"dates.1": {$lte: dates[0]}}
+                ]
+            })
+        }
+    })
+    return {$and: and}
+}
+
+
 export const Families = {}
 Families.findContact = function (familyId, userId) {
     Audit.insert({type: 'accessInfo', docId: familyId, familyId, userId})
@@ -58,13 +92,18 @@ Families.updateNotes = function (blueCardId, notes) {
     BlueCard.update(blueCardId, {$set: {notes: notes}})
 }
 export const updateGroupCount = function (familyId) {
-    const family = Families.findOne(familyId, {fields: {groups: 1}})
+    const family = Families.findOne(familyId, {fields: {availability: 1, groups: 1}})
     const appliedCount = (family && family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
     const confirmedCount = (family && family.groups && _.where(family.groups, {status: 'confirmed'}).length) || 0
+    const confirmedIds=_.pluck(family.groups,'groupId')
+    const confirmedGroups=Groups.find({_id: {$in: confirmedIds}},{dates:1}).fetch()
+    const availableQuery=createAvailableQuery(confirmedGroups,family.availability)
+    const available= Groups.find(availableQuery).count()
     Meteor.users.update(familyId, {
         $set: {
             "groupsCount.applied": appliedCount,
-            "groupsCount.confirmed": confirmedCount
+            "groupsCount.confirmed": confirmedCount,
+            "groupsCount.available": available
         }
     })
     BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
@@ -113,7 +152,7 @@ Families.findOne = (_id, options) => {
 }
 Families.insert = function (email, options) {
     const familyId = Accounts.createUser({email})
-    Meteor.users.update(familyId, {$set: {roles: ['family'], "parents": [{"email": email}]}})
+    Meteor.users.update(familyId, {$set: {roles: ['family'],"office.familyStatus":0, "parents": [{"email": email}]}})
     Audit.insert({type: 'create', docId: familyId, userId: options.userId, familyId: familyId})
     return familyId
 }
@@ -123,9 +162,7 @@ Families.update = function (_id, modifier, options = {}, callback) {
     // in family profile there are no information about status, notes or geristered bluecards, then if a family role save the infomation
     //will be lostr theses fields, Thats why we merge the old info in the modifier
 
-    //console.log(1, modifier.$set.parents[0].blueCard)
     mergeOldBlueCardInfo(oldDoc, modifier);
-    //console.log(2, modifier.$set.parents[0].blueCard)
 
 
     const updated = Meteor.users.update(_id, modifier, options, callback)
@@ -140,6 +177,10 @@ Families.update = function (_id, modifier, options = {}, callback) {
     insertBlueCards(newDoc)
     Meteor.users.update(_id, newDoc, options)
 
+    //if avaliability change
+    if ( newDoc.availability && oldDoc.availability && !_.isEqual(newDoc.availability,oldDoc.availability)){
+        updateGroupCount(_id)
+    }
 
     //if the geoposition change updates the distances
     if ((newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lat) && (newDoc && newDoc.contact && newDoc.contact.address && newDoc.contact.address.lng) &&

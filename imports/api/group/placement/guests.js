@@ -76,9 +76,29 @@ export const guestsSchema = new SimpleSchema({
     },
     from: {
         type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     to: {
         type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     status: {
         type: String,
@@ -147,10 +167,30 @@ export const guestsFilterSchema = new SimpleSchema({
     from: {
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     to: {
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     status: {
         type: String,

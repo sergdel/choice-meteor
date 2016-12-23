@@ -4,6 +4,7 @@ import {FlowRouter} from "meteor/kadira:flow-router"
 import {Groups} from "/imports/api/group/group"
 import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
+import {createAvailableQuery} from '/imports/api/family/family'
 Template.groupList.onRendered(function () {
 
 });
@@ -34,41 +35,7 @@ Template.groupList.helpers({
 
             const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1}})
             console.log('confirmedGroups', confirmedGroups.fetch())
-            confirmedGroups.forEach((confirmed) => {
-                console.log('confirmed', confirmed)
-                if (confirmed.dates && confirmed.dates[0] && confirmed.dates[1] && confirmed.dates[0] instanceof Date && confirmed.dates[1] instanceof Date ) {
-                    and.push({
-                        //dates0 and dates1 can not be between a confirmed group
-                        "dates.0": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
-                        "dates.1": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
-                        //dates and wrapped a dates of confirmed group
-                        $or: [
-                            {"dates.0": {$gte: confirmed.dates[1]}},
-                            {"dates.1": {$lte: confirmed.dates[0]}}
-                        ]
-                    })
-                }
-            })
-            unavailability.forEach((dates)=>{
-                dates= dates && dates.dates
-                console.log('unavailability', dates , dates[0] , dates[1] , (dates[0] instanceof Date) , (dates[1] instanceof Date) )
-                if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date) ){
-                    and.push({
-                        //dates0 and dates1 can not be between a confirmed group
-                        "dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
-                        "dates.1": {$not: {$gte: dates[0], $lte: dates[1]}},
-                        //dates and wrapped a dates of confirmed group
-                        $or: [
-                            {"dates.0": {$gte: dates[1]}},
-                            {"dates.1": {$lte: dates[0]}}
-                        ]
-                    })
-                }
-            })
-            console.log('before--------->', {$and: and})
-
-
-            return {$and: and}
+            return createAvailableQuery(confirmedGroups,unavailability)
         }
     },
     customQueryApplied: function () {

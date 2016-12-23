@@ -89,6 +89,15 @@ export const otherSchema = new SimpleSchema({
     contactDate: {
         type: Date,
         optional: true,
-
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
 });

@@ -11,7 +11,7 @@ class TagsClass extends Mongo.Collection {
                     super.insert({_id: tag, count: 0})
                 }
                 const count=Families.find({"office.tags":tag}).count()
-                super.update(tag, {$inc: {count}})
+                super.update(tag, {$set: {count}})
             }
         }
     }

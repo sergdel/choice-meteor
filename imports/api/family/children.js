@@ -34,7 +34,18 @@ export const childSchema = new SimpleSchema({
         autoform: {
             afFormGroup: {
                 "formgroup-class": 'col-sm-3',
-            }
+            },
+
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                maxDate: new Date(),
+                locale: {
+                    format: 'DD/MM/YYYY',
+                },
+            },
+
         }
     },
     nameOfSchool: {
@@ -46,8 +57,8 @@ export const childSchema = new SimpleSchema({
             }
         }
     },
-    blueCard:{
-        optional:true,
+    blueCard: {
+        optional: true,
         type: blueCardSchema,
         autoform: {
             template: 'clean'

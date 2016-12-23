@@ -129,6 +129,16 @@ const AuditFilterSchema = new SimpleSchema({
         type: Date,
         label: 'Time',
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     where: {
         type: [String],

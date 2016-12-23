@@ -78,6 +78,7 @@ const columns = [
     {key: 'groups.0.minimum', label: 'Min', operator: '$eq', operators},
     {key: 'groups.0.maximum', label: 'Max', operator: '$eq', operators},
     {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
+    {key: 'groups.0.comments', label: 'Comments', operator: '$regex'},
     {
         key: 'groupsCount.confirmed', label: 'Conflict', operator: '$eq', operators,
         render: function (val) {
@@ -108,9 +109,8 @@ const columns = [
             return '<span class="label label-success"  id="' + this._id + '"><i class="fa  fa-thumbs-o-up"></i></span>'
         }
     },
-    {
-        key: 'action', label: 'Action', template: 'groupUpdateStatus'
-    }
+    { key: 'action', label: 'Action', template: 'groupUpdateStatus'}
+
 ]
 
 
@@ -142,6 +142,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     },
     'groups.$.minimum': {label: 'Min', type: Number, optional: true,},
     'groups.$.maximum': {label: 'Max', type: Number, optional: true,},
+    'groups.$.comments': {label: 'Comments', type: String, optional: true,},
     "parents.$.firstName": {
         type: String,
         optional: true,

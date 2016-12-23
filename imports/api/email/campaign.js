@@ -42,7 +42,6 @@ const emailFamilyFilter = new SimpleSchema({
         optional: true,
     },
     'parents.$.firstName': {
-        label: 'First name',
         type: String,
         optional: true,
     },
@@ -90,15 +89,45 @@ const emailFamilyFilter = new SimpleSchema({
     'loggedAt':{
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
 
     },
     reviewed: {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.contactDate': {
         optional: true,
-        type: Date
+        type: Date,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     'other.drive':{
         type:[String],
@@ -162,7 +191,12 @@ export const campaignAutoTable = new AutoTable({
         },
         {
             key: 'parents.0.firstName',
-            label: 'First name',
+            label: 'Parent 1',
+            operator: '$regex'
+        },
+        {
+            key: 'parents.1.firstName',
+            label: 'Parent 2',
             operator: '$regex'
         },
         {

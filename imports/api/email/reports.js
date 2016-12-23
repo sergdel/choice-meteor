@@ -50,7 +50,17 @@ const reportFilterSchema = new SimpleSchema({
     },
     sentAt: {
         type: Date,
-        optional: true
+        optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     notes: {
         type: String,
@@ -78,7 +88,17 @@ const reportFilterSchema = new SimpleSchema({
 
     loggedAt: {
         type: Date,
-        optional: true
+        optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
 
 })

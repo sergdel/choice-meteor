@@ -209,6 +209,7 @@ const groupApplySchema = new SimpleSchema({
             rows: 4,
         }
     },
+
     status: {
         type: String,
         optional: true,
@@ -818,6 +819,16 @@ let groupFilterSchema = new SimpleSchema({
     "dates.$": {
         type: Date,
         optional: true,
+        autoform:{
+            type: "daterangepicker",
+            dateRangePickerOptions: {
+                singleDatePicker: true,
+                showDropdowns: true,
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            },
+        }
     },
     nights: {
         type: Number,
@@ -1176,6 +1187,15 @@ columnsFamilyApplied.push({
             return groupApply.minimum
         }
         return groupApply.minimum + ' to ' + groupApply.maximum
+    }
+})
+columnsFamilyApplied.push({
+    key: 'families.comments',
+    label: 'Comments',
+    render: function (val, path) {
+        const groupApply = _.findWhere(this.families, {familyId: FlowRouter.getParam('familyId') || Meteor.userId()})
+        if (!groupApply) return
+        return groupApply.comments
     }
 })
 columnsFamilyApplied.push(columnsKeys(['payments'])[0])

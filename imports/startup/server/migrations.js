@@ -15,6 +15,7 @@ import {Audit} from '/imports/api/audit/audit'
 import {Locations} from '/imports/api/location/location'
 import {updateDistance} from "/imports/api/location/methods";
 import {Distances} from "/imports/api/location/location";
+import {Tags} from "/imports/api/tags/tags";
 Migrations.config({
     log: true
 });
@@ -657,6 +658,18 @@ Migrations.add({
     up: function () {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         Groups.updateBySelector({},{$set:{enabled: true}},{multi:true})
+    }
+})
+
+
+Migrations.add({
+    version: 19 ,
+    name: 'update tags count',
+    up: function () {
+        Tags.find({}).forEach((tag) => {
+            const count = Families.find({"office.tags": tag._id}).count()
+            Tags.update(tag._id, {$set: {count}})
+        })
     }
 })
 
