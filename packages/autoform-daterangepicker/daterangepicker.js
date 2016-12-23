@@ -4,15 +4,7 @@ import DateRangePicker from './bootstrap-daterangepicker/daterangepicker'
 import {AutoForm} from 'meteor/aldeed:autoform'
 import {moment} from 'meteor/momentjs:moment'
 
-AutoForm.debug()
-AutoForm.hooks({
-    demo1: {
-        onSubmit: function (insertDoc, updateDoc, currentDoc) {
 
-            return false;
-        }
-    }
-});
 const stringToArray = function (val, format) {
     if (Array.isArray(val)) {
         return val
@@ -32,13 +24,15 @@ const stringToArray = function (val, format) {
 }
 const arrayToString = function (val, format) {
     if (Array.isArray(val) && val.length == 2) {
-        return moment(val[0]).format(format) + ' - ' + moment(val[1]).format(format)
+        return moment.utc(val[0]).format(format) + ' - ' + moment(val[1]).format(format)
     }
     if (Array.isArray(val) && val.length == 1) {
-        return moment(val[0]).format(format)
+        return moment.utc(val[0]).format(format)
     }
-    if (val instanceof Date)
-        return moment(val).format(format)
+    if (val instanceof Date){
+        const m=moment.utc(val)
+        if (m.isValid()) return m.format(format)
+    }
     return val + ''
 }
 AutoForm.addInputType('daterangepicker', {
@@ -51,9 +45,15 @@ AutoForm.addInputType('daterangepicker', {
         return ctx
     },
     valueIn: function (val, obj) {
+        console.log('daterangepicker valueIn',val,obj)
+
         const field = AutoForm.getSchemaForField(obj.name).autoform
         const format = field.dateRangePickerOptions && field.dateRangePickerOptions.locale && field.dateRangePickerOptions.locale.format || new DateRangePicker().locale.format
-        return arrayToString(val, format)
+        if (Array.isArray(val)){
+            return arrayToString(val, format)
+        }else{
+
+        }
     },
     valueConverters: {
         "date": function (val) {

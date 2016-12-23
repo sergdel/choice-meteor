@@ -36,16 +36,15 @@ const operators = [  // Optional Array works for option filter
 const columns = [
 
     {
-        key: 'parents.0.firstName',
-        label: 'Parent 1',
-        operator: '$regex'
+        key: 'parents.firstName',
+        label: 'Parents',
+        operator: '$regex',
+        render: function(val,path){
+            const parent2= (this.parents[1] &&  this.parents[1].firstName && (' - ' + this.parents[1].firstName)) || ''
+            return this.parents[0].firstName + parent2
+        }
     },
-    {
-        key: 'parents.1.firstName',
-        label: 'Parent 2',
-        operator: '$regex'
-    },
-    {key: 'parents.0.surname', operator: '$regex',},
+    {key: 'parents.surname', operator: '$regex',},
     {key: 'contact.address.city', operator: '$regex',},
     {key: 'contact.address.suburb', operator: '$regex',},
     {key: 'blueCardStatus', label: 'Blue cards', operator: '$in',},
@@ -80,6 +79,7 @@ const columns = [
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
     {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
     {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
+    {key: 'groupsCount.available', label: '', operator: '$eq', operators},
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
@@ -151,11 +151,7 @@ export const familyFilterSchema = new SimpleSchema({
         type: Number,
         optional: true,
     },
-    'groups.applied':{
-        type: Number,
-        optional: true,
-    },
-    'groups.confirmed':{
+    'groupsCount.available':{
         type: Number,
         optional: true,
     },
@@ -214,11 +210,11 @@ export const familyFilterSchema = new SimpleSchema({
             ]
         }
     },
-    "parents.$.firstName": {
+    "parents.firstName": {
         type: String,
         optional: true,
     },
-    'parents.$.surname': {
+    'parents.surname': {
         type: String,
         optional: true,
     },

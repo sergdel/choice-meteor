@@ -9,6 +9,7 @@ import {FlowRouter} from 'meteor/kadira:flow-router'
 import {Audit} from '/imports/api/audit/audit'
 import {Email} from 'meteor/email'
 import {_} from 'meteor/underscore'
+import {updateGroupCountForAllFamilies} from "../family/family";
 
 const custom = function () {
     if (this.isUpdate && (!this.isSet || !this.value)) {
@@ -25,6 +26,8 @@ const renderGuest = function () {
     return guestsFrom + ' to ' + guestsTo
 }
 
+
+
 class GroupCollection extends Mongo.Collection {
     find(selector, options) {
         if (_.isObject(selector) && !selector.status) {
@@ -36,12 +39,18 @@ class GroupCollection extends Mongo.Collection {
     insert(group, callback) {
         Groups.attachSchema(Groups.schemas.new, {replace: true})
         group.requirements = ["Share time and talk with guests each day", "Provide three quality meals and snacks each day", "Provide drop-off and pick-up to & from school each day", "Provide each guest with an individual comfortable bed (no bunks)", "Don't have other student of the same nationality in the home during their visit"]
-        return super.insert(group, callback);
+
+        const res= super.insert(group, callback);
+        updateGroupCountForAllFamilies()
+        return res
     }
 
     remove(groupId, callback) {
         Families.removeGroups(groupId)
-        return super.update(groupId, {$set: {status: "removed"}});
+
+        const res =super.update(groupId, {$set: {status: "removed"}});
+        updateGroupCountForAllFamilies()
+        return res
     }
 
     updateBySelector(selector, modifier, options) {
@@ -54,19 +63,26 @@ class GroupCollection extends Mongo.Collection {
         }
         Groups.attachSchema(Groups.schemas.edit)
         Groups.attachSchema(Groups.schemas.new)
-        const group = super.findOne(_id)
-        if (!group) {
+        const groupOld = super.findOne(_id)
+        if (!groupOld) {
             throw new Meteor.Error(404, 'Group not found!')
         }
         //calc modified group doc
-        LocalCollection._modify(group, modifier)
+        const groupNew=_.clone(groupOld)
+        LocalCollection._modify(groupNew, modifier)
         modifier.$set = modifier.$set || {}
         //calc nights
-        if (group.dates && Array.isArray(group.dates) && group.dates.length == 2) {
-            const date0 = moment(group.dates[0])
-            const date1 = moment(group.dates[1])
+        if (groupNew.dates && Array.isArray(groupNew.dates) && groupNew.dates.length == 2) {
+            const date0 = moment(groupNew.dates[0])
+            const date1 = moment(groupNew.dates[1])
             modifier.$set.nights = date1.diff(date0, 'days')
         }
+        if (!_.isEqual(groupOld.dates ||[],groupNew.dates||[])){
+            updateGroupCountForAllFamilies()
+
+        }
+
+
         return super.update(_id, modifier, options);
     }
 
@@ -721,7 +737,8 @@ const columns = [
     },
     {
         key: 'nights',
-        operator: '$regex',
+        operator: '$eq',
+        operators
 
     },
     {
@@ -1074,7 +1091,7 @@ Groups.autoTableFamilyAvailable = new AutoTable(
             let familyId = query && query.$and && query.$and[0] && query.$and[0]["families.familyId"] && query.$and[0]["families.familyId"].$ne
             if (!familyId) {
                 familyId = query && query["families.familyId"] && query["families.familyId"]["$ne"]
-                console.error('check this please publish !!', id, limit, query, sort)
+                console.error('check this please publish !!', id, query, 'familyId',familyId)
             }
             const publishGroups = []
             self.added('counts', 'atCounter' + id, {count: 0})

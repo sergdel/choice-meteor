@@ -21,6 +21,7 @@ import {Tags} from '/imports/api/tags/tags'
 import {updateDistance} from "/imports/api/location/methods";
 import {availabilitySchema} from "./availability";
 import {Locations} from "/imports/api/location/location";
+import {Groups} from "/imports/api/group/group";
 export const emailSchema = new SimpleSchema({
     email: {
         label: "E-mail address",
@@ -38,10 +39,16 @@ export const emailSchema = new SimpleSchema({
         }
     }
 })
-
-export const createAvailableQuery=function(confirmedGroups,unavailability){
+export const updateGroupCountForAllFamilies = function () {
+    const time = new Date()
+    Families.find({}).forEach((family) => {
+        updateGroupCount(family._id)
+    })
+    console.log('updateGroupCountForAllFamilies time: ', new Date() - time)
+}
+export const createAvailableQuery = function (confirmedGroups=[], unavailability=[], and = []) {
     confirmedGroups.forEach((confirmed) => {
-        if (confirmed.dates && confirmed.dates[0] && confirmed.dates[1] && confirmed.dates[0] instanceof Date && confirmed.dates[1] instanceof Date ) {
+        if (confirmed.dates && confirmed.dates[0] && confirmed.dates[1] && confirmed.dates[0] instanceof Date && confirmed.dates[1] instanceof Date) {
             and.push({
                 //dates0 and dates1 can not be between a confirmed group
                 "dates.0": {$not: {$gte: confirmed.dates[0], $lte: confirmed.dates[1]}},
@@ -54,9 +61,9 @@ export const createAvailableQuery=function(confirmedGroups,unavailability){
             })
         }
     })
-    unavailability.forEach((dates)=>{
-        dates= dates && dates.dates
-        if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date) ){
+    unavailability.forEach((dates) => {
+        dates = dates && dates.dates
+        if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date)) {
             and.push({
                 //dates0 and dates1 can not be between a confirmed group
                 "dates.0": {$not: {$gte: dates[0], $lte: dates[1]}},
@@ -69,6 +76,7 @@ export const createAvailableQuery=function(confirmedGroups,unavailability){
             })
         }
     })
+    and.push({enabled: true})
     return {$and: and}
 }
 
@@ -92,13 +100,16 @@ Families.updateNotes = function (blueCardId, notes) {
     BlueCard.update(blueCardId, {$set: {notes: notes}})
 }
 export const updateGroupCount = function (familyId) {
+    const time = new Date()
+
     const family = Families.findOne(familyId, {fields: {availability: 1, groups: 1}})
     const appliedCount = (family && family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
-    const confirmedCount = (family && family.groups && _.where(family.groups, {status: 'confirmed'}).length) || 0
-    const confirmedIds=_.pluck(family.groups,'groupId')
-    const confirmedGroups=Groups.find({_id: {$in: confirmedIds}},{dates:1}).fetch()
-    const availableQuery=createAvailableQuery(confirmedGroups,family.availability)
-    const available= Groups.find(availableQuery).count()
+    const confirmedGroups=_.where(family.groups, {status: 'confirmed'})
+    const confirmedCount = (family && family.groups && confirmedGroups.length) || 0
+    const confirmedIds = _.pluck(confirmedGroups, 'groupId')
+    const confirmedGroupsCollection = Groups.find({_id: {$in: confirmedIds}}, {dates: 1}).fetch()
+    const availableQuery = createAvailableQuery(confirmedGroupsCollection, family.availability)
+    const available = Groups.find(availableQuery).count()
     Meteor.users.update(familyId, {
         $set: {
             "groupsCount.applied": appliedCount,
@@ -108,6 +119,8 @@ export const updateGroupCount = function (familyId) {
     })
     BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
     Email.update({userId: familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
+
+    console.log('updateGroupCount time: ', new Date() - time)
 }
 /** when a groups is removed**/
 Families.removeGroups = function (groupId) {
@@ -152,7 +165,7 @@ Families.findOne = (_id, options) => {
 }
 Families.insert = function (email, options) {
     const familyId = Accounts.createUser({email})
-    Meteor.users.update(familyId, {$set: {roles: ['family'],"office.familyStatus":0, "parents": [{"email": email}]}})
+    Meteor.users.update(familyId, {$set: {roles: ['family'], "office.familyStatus": 0, "parents": [{"email": email}]}})
     Audit.insert({type: 'create', docId: familyId, userId: options.userId, familyId: familyId})
     return familyId
 }
@@ -178,7 +191,8 @@ Families.update = function (_id, modifier, options = {}, callback) {
     Meteor.users.update(_id, newDoc, options)
 
     //if avaliability change
-    if ( newDoc.availability && oldDoc.availability && !_.isEqual(newDoc.availability,oldDoc.availability)){
+    if (!_.isEqual(newDoc.availability || [], oldDoc.availability || [])) {
+        console.log('updateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCount')
         updateGroupCount(_id)
     }
 
@@ -219,7 +233,7 @@ export const familySchema = new SimpleSchema({
         optional: true,
         type: Date
     },
-    loggedAt:{
+    loggedAt: {
         optional: true,
         type: Date
     },
@@ -517,16 +531,16 @@ const mergeOldBlueCardInfo = function (oldDoc, modifier) {
             for (let i in modifier.$set[type]) {
                 if (modifier.$set[type][i] && modifier.$set[type][i].blueCard) {
                     const notesOld = (oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.notes)
-                    const notesNew=modifier.$set[type][i].blueCard.notes
-                    modifier.$set[type][i].blueCard.notes= notesNew ? notesNew : notesOld
+                    const notesNew = modifier.$set[type][i].blueCard.notes
+                    modifier.$set[type][i].blueCard.notes = notesNew ? notesNew : notesOld
 
                     const statusOld = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.status
-                    const statusNew=modifier.$set[type][i].blueCard.status
-                    modifier.$set[type][i].blueCard.status= statusNew ? statusNew : statusOld
+                    const statusNew = modifier.$set[type][i].blueCard.status
+                    modifier.$set[type][i].blueCard.status = statusNew ? statusNew : statusOld
 
                     const registeredOld = oldDoc && oldDoc[type] && oldDoc[type][i] && oldDoc[type][i].blueCard && oldDoc[type][i].blueCard.registered
-                    const registeredNew=modifier.$set[type][i].blueCard.registered
-                    modifier.$set[type][i].blueCard.registered= registeredNew ? registeredNew : registeredOld
+                    const registeredNew = modifier.$set[type][i].blueCard.registered
+                    modifier.$set[type][i].blueCard.registered = registeredNew ? registeredNew : registeredOld
                 }
             }
         }

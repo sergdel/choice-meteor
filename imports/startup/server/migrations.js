@@ -7,7 +7,7 @@ import {Groups} from '/imports/api/group/group'
 import {Meteor} from 'meteor/meteor'
 import {Email} from 'meteor/email'
 import {Migrations} from 'meteor/percolate:migrations'
-import {updateGroupCount} from '/imports/api/family/family'
+import {updateGroupCount,updateGroupCountForAllFamilies} from '/imports/api/family/family'
 import {insertBlueCards} from "/imports/api/family/family";
 import {emailTemplateFixtures} from "/imports/api/email/server/email-template-fixtures";
 import {EmailTemplates} from '/imports/api/email/templates'
@@ -397,6 +397,9 @@ Migrations.add({
     }
 })
 
+
+
+
 Migrations.add({
     version: 9,
     name: 'Updating Audi log" ',
@@ -635,7 +638,7 @@ Migrations.add({
             for (let type of ['parents', 'children', 'guests']) {
                 if (Array.isArray(family[type])) {
                     for (let i in family[type]) {
-                        const blueCard=family[type][i].blueCard
+                        const blueCard=family[type] && family[type][i] && family[type][i].blueCard
                         if (blueCard){
                             if (blueCard.number && blueCard.expiryDate &&  blueCard.expiryDate instanceof Date &&  blueCard.expiryDate >=new Date() && (blueCard.status == 'apply' && blueCard.status != 'n/a'  || !blueCard.status)){
                                 family[type][i].blueCard.status='approved'
@@ -673,6 +676,34 @@ Migrations.add({
     }
 })
 
+Migrations.add({
+    version: 20 ,
+    name: 'update potencial group count',
+    up: function () {
+        updateGroupCountForAllFamilies()
+    }
+})
+
+Migrations.add({
+    version: 21,
+    name: 'generate distances',
+    up: function () {
+        let limit = 9999999
+        if (Meteor.isDevelopment) {
+            limit = 10
+        }
+        Families.find({}, {limit}).forEach((fam) => {
+            if (Distances.find({familyId: fam._id}).count()==0){
+                Locations.find({}, {limit}).forEach((loc) => {
+                    if (Distances.find(fam._id + '|' + loc._id).count() == 0) {
+                        updateDistance(fam, loc)
+                    }
+                })
+            }
+
+        })
+    }
+})
 /*
  Migrations.add({
  version: 3,

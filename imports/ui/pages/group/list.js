@@ -35,7 +35,7 @@ Template.groupList.helpers({
 
             const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1}})
             console.log('confirmedGroups', confirmedGroups.fetch())
-            return createAvailableQuery(confirmedGroups,unavailability)
+            return createAvailableQuery(confirmedGroups,unavailability,and)
         }
     },
     customQueryApplied: function () {
