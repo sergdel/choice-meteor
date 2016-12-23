@@ -4,11 +4,6 @@ import {FlowRouter} from "meteor/kadira:flow-router"
 import {Groups} from "/imports/api/group/group"
 import {moment} from 'meteor/momentjs:moment'
 import {Families} from '/imports/api/family/family'
-import { ReactiveVar } from 'meteor/reactive-var'
-
-Template.groupList.onCreated(function () {
-    this.customQuery = new ReactiveVar( {} );
-});
 Template.groupList.onRendered(function () {
 
 });
@@ -88,11 +83,8 @@ Template.groupList.helpers({
         else
             return {"families": {$elemMatch: {status: "confirmed", familyId: Meteor.userId()}}}
     },
-    customQuery: function() {
-        var query = Template.instance().customQuery.get();
-        return query;
-    }
 });
+
 Template.bsModalPrompt.events({
     'click .groupCancelApply'(e, instance){
         Meteor.call('groupCancelApply', $(e.currentTarget).data('group-id'), $(e.currentTarget).data('family-id'), function (err, res) {
@@ -176,35 +168,5 @@ Template.groupList.events({
         });
     },
 
-    'change input[name="dates.0"]': function (evt, tpl){
-        evt.preventDefault();
-        var from_date = $('input[name="dates.0"]').val();
-        var customQuery = Template.instance().customQuery.get();
-        customQuery["dates.0"] = {"$gte": new Date(from_date)};
-        Template.instance().customQuery.set(customQuery);
-    },
-
-    'change input[name="dates.1"]': function (evt, tpl){
-        evt.preventDefault();
-        var from_date = $('input[name="dates.1"]').val();
-        var customQuery = Template.instance().customQuery.get();
-        customQuery["dates.1"] = {"$lte": new Date(from_date)};
-        Template.instance().customQuery.set(customQuery);
-    },
-
-    'click input[name="status"]' : function (evt, tpl) {
-        //evt.preventDefault();
-        var customQuery = Template.instance().customQuery.get();
-        var status_arr = [];
-        var inputs = $('input[name="status"]:checked');
-        for (i = 0; i < inputs.length; i++)
-        {
-            status_arr.push(inputs[i].value);
-        }
-        $('input[name="status_operator"]').val(JSON.stringify({"$in" : status_arr}));
-        customQuery["status"] = {"$in" : status_arr};
-        Template.instance().customQuery.set(customQuery);
-        console.log (customQuery);
-    }
 });
 
