@@ -14,10 +14,6 @@
             <div class="col-lg-1">
                 {{>afFieldInput name="distance" value=distance class="form-control"  }}
             </div>
-            <br>
-            <div class="col-lg-3">
-                {{> afFieldInput name="groupDuration" type="daterangepicker" class="form-control" placeholder="Available Duration"}}
-            </div>
         {{/autoForm}}
         {{#if isInRole 'admin'}}
             <!--div class="col-lg-1">

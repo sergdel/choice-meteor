@@ -23,58 +23,28 @@ Template.familyList.helpers({
     autoTable: () => familiesAutoTable,
     customQuery: function () {
         return () => {
-            let customQuery = [];
+            let customQuery = {};
             const address = Session.get('searchFamilyListForm.address')
             if (address) {
-                customQuery.push( {
+                customQuery = {
                     "contact.address.geometry": {
                         $near: {
                             $geometry: address.geometry,
                             $maxDistance: Session.get('searchFamilyListForm.distance')
                         }
                     }
-                });
+                };
             }
             const queryContact = Session.get('searchFamilyListForm.queryContact')
             if (queryContact) {
-                customQuery.push({$or : [
+                customQuery.$or = [
                     {"emails.address": {$regex: queryContact, $options: 'gi'}},
                     {"parents.email": {$regex: queryContact, $options: 'gi'}},
                     {"parents.mobilePhone": {$regex: queryContact, $options: 'gi'}},
                     {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
-                ]});
+                ];
             }
-            const availability = Session.get('searchFamilyListForm.availableDuration');
-            if (availability) {
-                customQuery.push(
-                    {"availability" :
-                        {
-                            $not : {
-                                $elemMatch: {
-                                    $or: [
-                                        {
-                                            $and: [
-                                                {"dates.0": {$gte: availability[0]}},
-                                                {"dates.0": {$lte: availability[1]}}
-                                            ]
-                                        },
-                                        {
-                                            $and: [
-                                                {"dates.1": {$gte: availability[0]}},
-                                                {"dates.1": {$lte: availability[1]}}
-                                            ]
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                );
-            }
-            if (customQuery.length)
-                return {$and:customQuery};
-            else
-                return {};
+            return customQuery;
         }
     }
 });
