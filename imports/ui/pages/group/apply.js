@@ -12,7 +12,10 @@ Template.groupApply.events({
         let familyId = this._id
         const group = Template.parentData(6).group
         let groupApply =  this.groups && this.groups[0] || {} //grops[0] allways will be the actual group bause we use $matchElem projection in custompublication  on autotable see imports/api/gropus/placement/families publish function
-        const cancelButton = !_.isEmpty(groupApply) ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + group._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
+        let cancelButton = !_.isEmpty(groupApply) ? '<button class="btn btn-danger btn-xs groupCancelApply" data-group-id="' + group._id + '" data-family-id="' + familyId + '">Cancel application <i class="fa fa-trash"></i></button>' : ''
+        // hidden cancelButton on confirmed page
+        if (this.groups && this.groups[0] && this.groups[0].status == "confirmed")
+            cancelButton = '';
 
         const moment1 = group.dates && group.dates[0] && moment(group.dates[0])
         const moment2 = group.dates && group.dates[1] && moment(group.dates[1])
@@ -20,6 +23,7 @@ Template.groupApply.events({
         const location = group.location ? `(Location: ${group.location})` : ""
         const title = `Welcome guests from ${group.name} group ${dates} ${location}`
         const content = (this.requirements || ' ') + (group.requirements && group.other ? ' <br>' : '') + (group.other || ' ')
+        let method_name;
         BootstrapModalPrompt.prompt({
             attachTo: instance.firstNode,
             title,
@@ -37,10 +41,14 @@ Template.groupApply.events({
             btnOkText: 'Save'
         }, (data) => {
             if (data) {
-                console.log( 'groupApply',group._id, familyId, data)
-                Meteor.call('groupApply', group._id, familyId, data, function (err, res) {
+                if (this.groups && this.groups[0] && this.groups[0].status == "confirmed")
+                    method_name = 'groupUpdate';
+                else
+                    method_name = 'groupApply';
+                console.log( method_name,group._id, familyId, data)
+                Meteor.call(method_name, group._id, familyId, data, function (err, res) {
                     if (err)
-                        console.error('groupApply', err)
+                        console.error(method_name, err)
                 })
             }
             else {

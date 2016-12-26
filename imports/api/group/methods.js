@@ -53,6 +53,21 @@ Meteor.methods({
         return Groups.apply(groupId, familyId, data, this.userId)
 
     },
+    groupUpdate: function (groupId, familyId, data) {
+        this.unblock()
+        if (!Roles.userIsInRole(this.userId, ['family', 'admin', 'staff'])) {
+            throw new Meteor.Error(403, 'Access denied!', 'Only logged users can apply to groups')
+        }
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            familyId = this.userId
+        }
+        data.familyId = familyId
+        check(data, Groups.schemas.apply)
+        check(groupId, String)
+
+        return Groups.updateData(groupId, familyId, data, this.userId)
+
+    },
     groupRemove:function(groupId){
         if (!Roles.userIsInRole(this.userId, ['admin'])) {
             throw new Meteor.Error(403, 'Access denied!', 'Only admin  can removes groups')

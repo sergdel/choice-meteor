@@ -134,6 +134,43 @@ class GroupCollection extends Mongo.Collection {
         return
     }
 
+    updateData(groupId, familyId, data, userId) {
+        //todo better performance, insted find ans update 3 times, use $inc
+        data.status = 'confirmed'
+        Groups.attachSchema(Groups.schemas.edit, {replace: true})
+        //update the data into family table
+        Families.applyGroup(familyId, groupId, data)
+        //look for the old group (if exist)
+        const groupOld = super.findOne({_id: groupId, "families.familyId": familyId}) || {}
+        const groupExists = !_.isEmpty(groupOld)
+        //if exists this is the info
+        const oldData = _.findWhere(groupOld.families || [], {familyId}) || {}
+        //remove the old data
+        super.update({
+            _id: groupId,
+            status: {$ne: "removed"}
+        }, {$pull: {"families": {familyId: {$eq: familyId}}}}, {filter: false})
+        //add the new data (is like update but works for edition and cretion
+        super.update({_id: groupId, status: {$ne: "removed"}}, {$addToSet: {families: data}}, {filter: false})
+        const groupNew = super.findOne(groupId, {fields: {families: 1, id: 1, name: 1}})
+        const applied = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'applied'}).length) || 0
+        const confirmed = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'confirmed'}).length) || 0
+        const canceled = (groupNew && groupNew.families && _.where(groupNew.families, {status: 'canceled'}).length) || 0
+        super.update(groupId, {$set: {applied, confirmed, canceled}}, {filter: false})
+        Audit.insert({
+            userId: userId,
+            type: groupExists ? 'update' : 'create',
+            docId: groupId,
+            description: groupNew.id + ' ' + groupNew.name,
+            familyId: familyId,
+            newDoc: data,
+            oldDoc: oldData,
+            where: 'groups'
+        })
+
+        return
+    }
+
     cancelApply(groupId, familyId, userId) {
         //todo better performance, insted find ans update 3 times, use $inc
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
