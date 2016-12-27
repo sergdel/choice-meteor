@@ -113,10 +113,9 @@ class GroupCollection extends Mongo.Collection {
         })
         //send the email
     }
-
-    apply(groupId, familyId, data, userId) {
+    apply(groupId, familyId, data, userId, status) {
         //todo better performance, insted find ans update 3 times, use $inc
-        data.status = 'applied'
+        data.status = status
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         //update the data into family table
         Families.applyGroup(familyId, groupId, data)

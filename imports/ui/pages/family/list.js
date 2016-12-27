@@ -27,23 +27,50 @@ Template.familyList.helpers({
             let customQuery = {};
             const address = Session.get('searchFamilyListForm.address')
             if (address) {
-                customQuery = {
+                customQuery = _.extend(customQuery, {
                     "contact.address.geometry": {
                         $near: {
                             $geometry: address.geometry,
                             $maxDistance: Session.get('searchFamilyListForm.distance')
                         }
                     }
-                };
+                });
             }
             const queryContact = Session.get('searchFamilyListForm.queryContact')
             if (queryContact) {
-                customQuery.$or = [
+                customQuery = _.extend(customQuery,{$or : [
                     {"emails.address": {$regex: queryContact, $options: 'gi'}},
                     {"parents.email": {$regex: queryContact, $options: 'gi'}},
                     {"parents.mobilePhone": {$regex: queryContact, $options: 'gi'}},
                     {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
-                ];
+                ]});
+            }
+            const availability = Session.get('searchFamilyListForm.availableDuration');
+            if (availability) {
+                customQuery = _.extend(customQuery,
+                    {"availability" :
+                        {
+                            $not : {
+                                $elemMatch: {
+                                    $or: [
+                                        {
+                                            $and: [
+                                                {"dates.0": {$gte: availability[0]}},
+                                                {"dates.0": {$lte: availability[1]}}
+                                            ]
+                                        },
+                                        {
+                                            $and: [
+                                                {"dates.1": {$gte: availability[0]}},
+                                                {"dates.1": {$lte: availability[1]}}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                );
             }
             const availability = Session.get('searchFamilyListForm.availableDuration');
             if (availability) {

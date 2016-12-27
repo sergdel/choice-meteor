@@ -26,6 +26,37 @@ AutoForm.hooks({
             if (search.groupDuration) {
                 customQuery = _.extend(customQuery,
                     {"availability" :
+                    {
+                        $not : {
+                            $elemMatch: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {"dates.0": {$gte: search.groupDuration[0]}},
+                                            {"dates.0": {$lte: search.groupDuration[1]}}
+                                        ]
+                                    },
+                                    {
+                                        $and: [
+                                            {"dates.1": {$gte: search.groupDuration[0]}},
+                                            {"dates.1": {$lte: search.groupDuration[1]}}
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                    }
+                );
+            }
+            if (Object.keys(customQuery).length)
+                Session.set('campaignList_customQuery',customQuery)
+            else
+            }
+
+            if (search.groupDuration) {
+                customQuery = _.extend(customQuery,
+                    {"availability" :
                         {
                             $not : {
                                 $elemMatch: {
