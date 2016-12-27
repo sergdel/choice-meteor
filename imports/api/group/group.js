@@ -114,11 +114,11 @@ class GroupCollection extends Mongo.Collection {
         //send the email
     }
     apply(groupId, familyId, data, userId, status) {
-        //todo better performance, insted find ans update 3 times, use $inc
+        //todo better performance, instead find ans update 3 times, use $inc
         data.status = status
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
         //update the data into family table
-        Families.applyGroup(familyId, groupId, data)
+        Families.applyGroup(familyId, groupId, data,status)
         //look for the old group (if exist)
         const groupOld = super.findOne({_id: groupId, "families.familyId": familyId}) || {}
         const groupExists = !_.isEmpty(groupOld)

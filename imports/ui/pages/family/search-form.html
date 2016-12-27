@@ -15,7 +15,7 @@
                 {{>afFieldInput name="queryContact" value=queryContact class="form-control"  placeholder="Email/Phone"}}
             </div>
             <div class="col-sm-4">
-                {{> afFieldInput name="availableDuration" type="daterangepicker" class="form-control" placeholder="Available Duration"}}
+                {{> afFieldInput name="availableDuration" type="daterangepicker" value=availableDuration class="form-control" placeholder="Available Duration"}}
             </div>
         {{/autoForm}}
         {{#if isInRole 'admin'}}

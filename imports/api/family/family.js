@@ -143,10 +143,10 @@ Families.updateGroupStatusTo = function (status, familyId, groupId) {
     Meteor.users.update({_id: familyId, "groups.groupId": groupId}, {$set: {"groups.$.status": status}})
     updateGroupCount(familyId)
 }
-Families.applyGroup = function (familyId, groupId, data) {
+Families.applyGroup = function (familyId, groupId, data,status) {
     const dataWithData = _.clone(data)
     dataWithData.groupId = groupId
-    dataWithData.status = 'applied'
+    dataWithData.status = status
     Meteor.users.update(familyId, {$pull: {"groups": {groupId}}})
     const result = Meteor.users.update(familyId, {
         $addToSet: {"groups": dataWithData}

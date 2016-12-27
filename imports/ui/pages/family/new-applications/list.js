@@ -43,7 +43,35 @@ Template.familyNewApplicationsList.helpers({
                     {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
                 ]
             }
+            const availability = Session.get('searchNewApplicationListForm.availableDuration');
+            if (availability) {
+                customQuery = _.extend(customQuery,
+                    {"availability" :
+                        {
+                            $not : {
+                                $elemMatch: {
+                                    $or: [
+                                        {
+                                            $and: [
+                                                {"dates.0": {$gte: availability[0]}},
+                                                {"dates.0": {$lte: availability[1]}}
+                                            ]
+                                        },
+                                        {
+                                            $and: [
+                                                {"dates.1": {$gte: availability[0]}},
+                                                {"dates.1": {$lte: availability[1]}}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                );
+            }
             return customQuery
+
         }
     }
 });
