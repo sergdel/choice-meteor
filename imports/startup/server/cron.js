@@ -34,14 +34,15 @@ const expireBlueCard = function () {
 }
 Meteor.startup(() => {
     const h1 = Meteor.setInterval(() => {
+        console.info('checking hour 0')
         const now = new Date()
         if (now.getHours() == 0) {
             console.info('************************************************* 24h expiring bluecards')
             Meteor.clearInterval(h1)
-            Meteor.setInterval(expireBlueCard, 12 * 60 * 60 * 1000)
+            Meteor.setInterval(expireBlueCard, 24 * 60 * 60 * 1000)
         }
-    })
-}, 999)
+    },1000*60*10) //ten minutes
+})
 
 
 

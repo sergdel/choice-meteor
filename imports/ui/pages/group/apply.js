@@ -46,7 +46,6 @@ Template.groupApply.events({
                     status = 'confirmed';
                 else
                     status = 'applied';
-                console.log( 'groupApply',group._id, familyId, data, status)
                 Meteor.call('groupApply', group._id, familyId, data, status, function (err, res) {
                     if (err)
                         console.error(method_name, err)

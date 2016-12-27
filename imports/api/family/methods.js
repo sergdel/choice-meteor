@@ -24,7 +24,6 @@ Meteor.methods({
         Families.update(familyId,{$set:{'office.firstVisit.staffId':staffId}})
     },
     updateFamilyFirstVisitTime:function(familyId,time){
-        console.log(time)
         check (familyId,String)
         check (time,Date)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update visits')
@@ -103,11 +102,7 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
-        console.log('familyEdit',familyId,modifier.$set.parents[0].blueCard)
-
         Families.update(familyId, modifier, {userId: this.userId})
-
-
     },
     emailExist: function (email, isNotThisFamilyId) {
         this.unblock()

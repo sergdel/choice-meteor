@@ -34,7 +34,6 @@ Template.groupList.helpers({
                 and.push({"families.familyId": {$ne: Meteor.userId()}})
 
             const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1}})
-            console.log('confirmedGroups', confirmedGroups.fetch())
             return createAvailableQuery(confirmedGroups,unavailability,and)
         }
     },

@@ -304,20 +304,20 @@ Migrations.add({
     version: 7,
     name: 'remove null parents" ',
     up: function () {
-        console.log('parents removed: ', Meteor.users.update({
+         Meteor.users.update({
             roles: 'family',
             parents: null
-        }, {$pull: {"parents": null}}, {multi: true}))
+        }, {$pull: {"parents": null}}, {multi: true})
 
-        console.log('children removed: ', Meteor.users.update({
+        'children removed: ', Meteor.users.update({
             roles: 'family',
             children: null
-        }, {$pull: {"children": null}}, {multi: true}))
+        }, {$pull: {"children": null}}, {multi: true})
 
-        console.log('guests removed: ', Meteor.users.update({
+        'guests removed: ', Meteor.users.update({
             roles: 'family',
             guests: null
-        }, {$pull: {"guests": null}}, {multi: true}))
+        }, {$pull: {"guests": null}}, {multi: true})
         return true
     },
 })
@@ -328,22 +328,12 @@ Migrations.add({
     up: function () {
         let notes
         notes = BlueCard.find({"notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue cards', notes.count())
-
         notes = Meteor.users.find({"parents.blueCard": {$exists: 1}, "parents.blueCard.id": {$exists: 0}})
-        console.log('cuantas parents with out id', notes.count())
         notes = Meteor.users.find({"children.blueCard": {$exists: 1}, "children.blueCard.id": {$exists: 0}})
-        console.log('cuantas children with out id', notes.count())
         notes = Meteor.users.find({"guests.blueCard": {$exists: 1}, "guests.blueCard.id": {$exists: 0}})
-        console.log('cuantas guests with out id', notes.count())
-
-
         notes = Meteor.users.find({"parents.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue parents', notes.count())
         notes = Meteor.users.find({"children.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue children', notes.count())
         notes = Meteor.users.find({"guests.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue guests', notes.count())
 
 
         let n = 0
@@ -365,13 +355,11 @@ Migrations.add({
                                     [blue.type + '.' + i + '.blueCard.notes']: blue.notes
                                 }
                             })
-                            console.log('i got it ', n, blue.familyId, blue._id, blue.notes != '', blue.type)
                         }
 
                     }
                 }
             } else {
-                console.log('not found', blue)
             }
         })
 
@@ -380,20 +368,13 @@ Migrations.add({
         })
 
         notes = Meteor.users.find({"parents.blueCard": {$exists: 1}, "parents.blueCard.id": {$exists: 0}})
-        console.log('cuantas parents with out id', notes.count())
         notes = Meteor.users.find({"children.blueCard": {$exists: 1}, "children.blueCard.id": {$exists: 0}})
-        console.log('cuantas children with out id', notes.count())
         notes = Meteor.users.find({"guests.blueCard": {$exists: 1}, "guests.blueCard.id": {$exists: 0}})
-        console.log('cuantas guests with out id', notes.count())
 
         notes = BlueCard.find({"notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue cards', notes.count())
         notes = Meteor.users.find({"parents.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue parents', notes.count())
         notes = Meteor.users.find({"children.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue children', notes.count())
         notes = Meteor.users.find({"guests.blueCard.notes": {$exists: 1, $ne: ''}})
-        console.log('cuantas notas hay en blue guests', notes.count())
     }
 })
 
@@ -480,7 +461,6 @@ Migrations.add({
             }
 
         })
-        console.log('no', no, 'si', si)
     }
 })
 
@@ -702,6 +682,16 @@ Migrations.add({
             }
 
         })
+    }
+})
+
+Migrations.add({
+    version: 22,
+    name: 'Groups count to 0',
+    up: function () {
+        Families.updateBySelector({"groupsCount.available": {$exists: false}},{$set: {"groupsCount.available":0 }},{multi: true})
+        Families.updateBySelector({"groupsCount.confirmed": {$exists: false}},{$set: {"groupsCount.confirmed":0 }},{multi: true})
+        Families.updateBySelector({"groupsCount.applied": {$exists: false}},{$set: {"groupsCount.applied":0 }},{multi: true})
     }
 })
 /*

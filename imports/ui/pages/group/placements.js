@@ -27,7 +27,6 @@ Template.groupPlacements.helpers({
 
     },
     potential:function(){
-        console.log('potential',this,Template.instance())
         const groupId=FlowRouter.getParam('groupId')
         const dates= this.group &&  this.group.dates
         const and=[]

@@ -37,8 +37,6 @@ Meteor.methods({
         const oldLng = (oldLocation && oldLocation.address && oldLocation.address.lng)
         const lat = modifier.$set['address.lat'] || oldLat
         const lng = modifier.$set['address.lng'] || oldLng
-
-        console.log('lat lng', lat, lng,lat != oldLat || lng != oldLng)
         Locations.update(locationId, modifier)
         const newLocation=Locations.findOne(locationId)
         this.unblock()
@@ -55,12 +53,10 @@ Meteor.methods({
 })
 
 export const updateDistance=function(family,location){
-    console.log(family.contact && family.contact.address && family.contact.address.lng && location && location.address && location.address.lat)
     if (family.contact && family.contact.address && family.contact.address.lng && location && location.address && location.address.lat) {
         const locationId=location._id
         const familyId = family._id
         const response = HTTP.get(`https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${location.address.lat},${location.address.lng}&origins=${family.contact.address.lat},${family.contact.address.lng}&key=AIzaSyDREfT4Rypm8BD2TqwK-8tAHvAQ46Nswbg`)
-        console.log('updateDistance',family._id)
         if (response.statusCode == 200) {
             const travel = response.data && response.data.rows && response.data.rows[0]  && response.data.rows[0].elements  && response.data.rows[0].elements[0]
             if (travel && travel.status == 'OK') {
@@ -68,7 +64,6 @@ export const updateDistance=function(family,location){
                 travel.duration.value=travel.duration.value/60
                 travel.distance.value=travel.duration.value/1000
                 Distances.upsert(family._id + '|' + locationId, {familyId, locationId, travel})
-                console.log(family._id + '|' + locationId)
             }else{
                 console.error('1updateDistance',familyId + '|' + locationId,response)
             }

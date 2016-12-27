@@ -46,7 +46,7 @@ export const updateGroupCountForAllFamilies = function () {
     })
     console.log('updateGroupCountForAllFamilies time: ', new Date() - time)
 }
-export const createAvailableQuery = function (confirmedGroups=[], unavailability=[], and = []) {
+export const createAvailableQuery = function (confirmedGroups = [], unavailability = [], and = []) {
     confirmedGroups.forEach((confirmed) => {
         if (confirmed.dates && confirmed.dates[0] && confirmed.dates[1] && confirmed.dates[0] instanceof Date && confirmed.dates[1] instanceof Date) {
             and.push({
@@ -104,7 +104,7 @@ export const updateGroupCount = function (familyId) {
 
     const family = Families.findOne(familyId, {fields: {availability: 1, groups: 1}})
     const appliedCount = (family && family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
-    const confirmedGroups=_.where(family.groups, {status: 'confirmed'})
+    const confirmedGroups = _.where(family.groups, {status: 'confirmed'})
     const confirmedCount = (family && family.groups && confirmedGroups.length) || 0
     const confirmedIds = _.pluck(confirmedGroups, 'groupId')
     const confirmedGroupsCollection = Groups.find({_id: {$in: confirmedIds}}, {dates: 1}).fetch()
@@ -119,8 +119,6 @@ export const updateGroupCount = function (familyId) {
     })
     BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
     Email.update({userId: familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
-
-    console.log('updateGroupCount time: ', new Date() - time)
 }
 /** when a groups is removed**/
 Families.removeGroups = function (groupId) {
@@ -143,7 +141,7 @@ Families.updateGroupStatusTo = function (status, familyId, groupId) {
     Meteor.users.update({_id: familyId, "groups.groupId": groupId}, {$set: {"groups.$.status": status}})
     updateGroupCount(familyId)
 }
-Families.applyGroup = function (familyId, groupId, data,status) {
+Families.applyGroup = function (familyId, groupId, data, status) {
     const dataWithData = _.clone(data)
     dataWithData.groupId = groupId
     dataWithData.status = status
@@ -165,11 +163,26 @@ Families.findOne = (_id, options) => {
 }
 Families.insert = function (email, options) {
     const familyId = Accounts.createUser({email})
-    Meteor.users.update(familyId, {$set: {roles: ['family'], "office.familyStatus": 0, "parents": [{"email": email}]}})
+    Meteor.users.update(familyId, {
+        $set: {
+            roles: ['family'],
+            "office.familyStatus": 0,
+            "parents": [{"email": email}],
+            "groupsCount.applied": 0,
+            "groupsCount.confirmed": 0,
+            "groupsCount.available": 0
+        }
+    })
     Audit.insert({type: 'create', docId: familyId, userId: options.userId, familyId: familyId})
     return familyId
 }
+Families.updateBySelector = function (selector, modifier, options) {
+    return Meteor.users.update(selector, modifier, options);
+}
 Families.update = function (_id, modifier, options = {}, callback) {
+    if (typeof _id != 'string') {
+        throw new Meteor.Error('Use only _id as selector for Families collection, otherwise use updateBySelector')
+    }
     const oldDoc = Meteor.users.findOne(_id)
 
     // in family profile there are no information about status, notes or geristered bluecards, then if a family role save the infomation
@@ -193,7 +206,6 @@ Families.update = function (_id, modifier, options = {}, callback) {
 
     //if avaliability change
     if (!_.isEqual(newDoc.availability || [], oldDoc.availability || [])) {
-        console.log('updateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCountupdateGroupCount')
         updateGroupCount(_id)
     }
 
@@ -421,6 +433,37 @@ export const familySchema = new SimpleSchema({
     "availability.$": {
         optional: true,
         type: availabilitySchema
+    },
+    groupsCount: {
+        type: Object,
+        optional: true,
+    },
+    "groupsCount.applied": {
+        optional: true,
+        type: String,
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        }
+    },
+    "groupsCount.confirmed": {
+        optional: true,
+        type: String,
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        }
+    },
+    "groupsCount.available": {
+        optional: true,
+        type: String,
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        }
     }
 });
 
@@ -435,7 +478,7 @@ export const setBlueCardStatus = function (family) {
     const map = ["n/a", "approved", "excempt", "send", "sent", "apply", "reapply", "expiring", "expired", "declined"];
     let min = 0
     for (let type of ['parents', 'children', 'guests']) {
-        if (Array.isArray(family[type])) {
+        if (family && Array.isArray(family[type])) {
             for (let i in family[type]) {
                 if (!(family && family[type] && family[type][i]))
                     continue
@@ -490,7 +533,6 @@ export const insertBlueCards = function (family) {
                     applied: (family.groups && _.where(family.groups, {status: 'applied'}).length) || undefined
 
                 }
-                //console.log(blueCard)
                 if (member.blueCard && member.blueCard.id) {
                     BlueCard.update(member.blueCard.id, {$set: blueCard})
                 } else {

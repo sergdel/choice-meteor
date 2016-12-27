@@ -36,7 +36,6 @@ import json2csv from 'json2csv'
 
 
  WebApp.connectHandlers.use("/exported/", function (req, res, next) {
- console.log(req.url)
  res.setHeader('Content-disposition', 'attachment; filename=families.csv');
  res.setHeader('Content-Type', 'text/csv');
  const path="./assets/app/exported" + req.url + ".csv"

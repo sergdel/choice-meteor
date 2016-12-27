@@ -25,11 +25,9 @@ Template.familyNeApplicationVisitTime.onRendered(function () {
             format: 'DD/MM/YYYY'
         },
     }, function (start, end, label) {
-        console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
     });
     $date.on('apply.daterangepicker', function (ev, picker) {
         $(this).val(picker.startDate.format('YYYY-MM-DDThh:mm'));
-        console.log(picker.startDate, picker.startDate.toDate())
         Meteor.call('updateFamilyFirstVisitTime', familyId, picker.startDate.toDate())
     });
 

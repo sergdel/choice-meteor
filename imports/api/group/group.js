@@ -331,7 +331,6 @@ const schemaObject = {
                 const locationId = this.field('locationId') && this.field('locationId').value
                 if (locationId) {
                     const location = Locations.findOne(locationId)
-                    console.log(this.field('locationId'), location)
                     return location && location.name
                 }
             }
@@ -1086,7 +1085,6 @@ Groups.autoTableFamilyAvailable = new AutoTable(
             }
             const self = this;
             //"families": {$elemMatch: {status:  "confirmed", familyId:
-            console.log('publish query', query)
             let familyId = query && query.$and && query.$and[0] && query.$and[0]["families.familyId"] && query.$and[0]["families.familyId"].$ne
             if (!familyId) {
                 familyId = query && query["families.familyId"] && query["families.familyId"]["$ne"]

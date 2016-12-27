@@ -34,7 +34,6 @@ Template.familyContact.events({
         }
         //this.userId || this._id ==>if is called from emailes reports use userId if if called from other else use _id
         const familyId = this.userId || this._id
-        console.log('familyId',this.userId ,familyId)
         if (!$button.data('created'))
             $button.html('<i class="fa fa-spinner fa-spin fa-fw"></i>')
             instance.subscribe('familyContactInfo', familyId, {

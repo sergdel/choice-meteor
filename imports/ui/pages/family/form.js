@@ -39,7 +39,6 @@ Template.familyForm.events({
 
 Template.familyForm.onCreated(function () {
     $('[name="office.tags"]').change((e, o) => {
-        console.log('data-select2-tag', e, o, this)
     })
     this.autorun(() => {
         if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff'])) {

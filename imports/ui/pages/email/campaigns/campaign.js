@@ -57,7 +57,6 @@ AutoForm.addHooks('campaignForm', {
         }
     },
     onSuccess: function (formType, result) {
-        console.log('onSuccess')
     },
 
 })

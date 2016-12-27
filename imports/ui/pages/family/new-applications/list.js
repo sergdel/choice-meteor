@@ -40,7 +40,7 @@ Template.familyNewApplicationsList.helpers({
                     {"emails.address": {$regex: queryContact, $options: 'gi'}},
                     {"parents.email": {$regex: queryContact, $options: 'gi'}},
                     {"parents.mobilePhone": {$regex: queryContact, $options: 'gi'}},
-                    {"emails.homePhone": {$regex: queryContact, $options: 'gi'}},
+                    {"contact.homePhone": {$regex: queryContact, $options: 'gi'}},
                 ]
             }
             const availability = Session.get('searchNewApplicationListForm.availableDuration');

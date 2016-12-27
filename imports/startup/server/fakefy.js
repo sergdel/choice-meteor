@@ -61,7 +61,6 @@ WebApp.connectHandlers.use("/fakefy", function (req, res, next) {
     Email.update({}, {$unset: {to: ''}}, {multi: 1})
 
     res.writeHead(200);
-    console.log(req.headers.host)
     res.end("Hello world from: " + Meteor.release);
 })
 ;

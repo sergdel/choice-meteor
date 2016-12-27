@@ -163,7 +163,6 @@ Meteor.methods({
                     if (count<=3){
                         options.to = 'c@imagenproactiva.com'
                         Email.send(options);
-                        console.log('email sent', options.to)
                     }else{
                         console.log('email NO sent (MORE THAN 3)', options.to)
                     }

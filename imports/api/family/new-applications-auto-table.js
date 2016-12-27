@@ -314,7 +314,7 @@ export const newFamilyFilterSchema = new SimpleSchema({
 
 export const newFamiliesAutoTable = new AutoTable(
     {
-        id: 'newFamiliesAutoTable',
+        id: 'newFamiliesListAutoTable',
         collection: Meteor.users,
         query: {roles: 'family', 'office.familyStatus': {$lt: 3}, 'groups.0': {$exists: 1}},
         publishExtraFields: ['roles', 'office', 'groups'],

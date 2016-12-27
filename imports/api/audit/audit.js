@@ -13,7 +13,6 @@ class AuditCollection extends Mongo.Collection {
     insert({userId, type, docId, newDoc, oldDoc, familyId, description, where = 'families'}) {
         const user = Meteor.users.findOne(userId)
         const family = Meteor.users.findOne(familyId, {fields: {'office.familyStatus': 1}})
-        console.log(family)
         const familyStatus = family && family.office && family.office.familyStatus
         const name = (user.firstName && user.surname) ? user.firstName + ' ' + user.surname : false || ((user.parents && user.parents[0] && user.parents[0].surname) + ' ' + (user.parents && user.parents[0] && user.parents[0].firstName))
         const role = user.roles.pop()
