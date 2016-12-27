@@ -132,7 +132,7 @@ Template.groupList.events({
         }, (data) => {
             const familyId = FlowRouter.getParam('familyId')
             if (data) {
-                Meteor.call('groupApply', this._id, familyId, data, function (err, res) {
+                Meteor.call('groupApply', this._id, familyId, data, 'applied', function (err, res) {
                     if (err)
                         console.error('groupApply', err)
                 })

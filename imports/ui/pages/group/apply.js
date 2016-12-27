@@ -41,12 +41,13 @@ Template.groupApply.events({
             btnOkText: 'Save'
         }, (data) => {
             if (data) {
+                let status;
                 if (this.groups && this.groups[0] && this.groups[0].status == "confirmed")
-                    method_name = 'groupUpdate';
+                    status = 'confirmed';
                 else
-                    method_name = 'groupApply';
-                console.log( method_name,group._id, familyId, data)
-                Meteor.call(method_name, group._id, familyId, data, function (err, res) {
+                    status = 'applied';
+                console.log( 'groupApply',group._id, familyId, data, status)
+                Meteor.call('groupApply', group._id, familyId, data, status, function (err, res) {
                     if (err)
                         console.error(method_name, err)
                 })
