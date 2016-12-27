@@ -103,6 +103,8 @@ Meteor.methods({
                 delete modifier.$set.office.familyStatusEmailTemplate
             }
         }
+        console.log('familyEdit',familyId,modifier.$set.parents[0].blueCard)
+
         Families.update(familyId, modifier, {userId: this.userId})
 
 

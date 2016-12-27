@@ -175,6 +175,7 @@ Families.update = function (_id, modifier, options = {}, callback) {
     // in family profile there are no information about status, notes or geristered bluecards, then if a family role save the infomation
     //will be lostr theses fields, Thats why we merge the old info in the modifier
 
+
     mergeOldBlueCardInfo(oldDoc, modifier);
 
 

@@ -29,9 +29,8 @@ const arrayToString = function (val, format) {
     if (Array.isArray(val) && val.length == 1) {
         return moment.utc(val[0]).format(format)
     }
-    if (val instanceof Date){
-        const m=moment.utc(val)
-        if (m.isValid()) return m.format(format)
+    if (val instanceof Date) {
+        return moment.utc(val).format(format)
     }
     return val + ''
 }
@@ -45,19 +44,15 @@ AutoForm.addInputType('daterangepicker', {
         return ctx
     },
     valueIn: function (val, obj) {
-        console.log('daterangepicker valueIn',val,obj)
+        console.log('daterangepicker valueIn', val, obj)
 
         const field = AutoForm.getSchemaForField(obj.name).autoform
         const format = field.dateRangePickerOptions && field.dateRangePickerOptions.locale && field.dateRangePickerOptions.locale.format || new DateRangePicker().locale.format
-        if (Array.isArray(val)){
-            return arrayToString(val, format)
-        }else{
-
-        }
+        return arrayToString(val, format)
     },
     valueConverters: {
         "date": function (val) {
-            console.log("date",val)
+            console.log("daterangepicker date", val)
             const daterangepicker = this.data('daterangepicker');
             if (typeof val === "string" && val.length > 0) {
                 return new moment.utc(val, daterangepicker.locale.format).toDate()
@@ -65,7 +60,7 @@ AutoForm.addInputType('daterangepicker', {
             return val;
         },
         "dateArray": function (val) {
-            console.log("dateArray",val)
+            console.log("daterangepicker dateArray", val)
             const daterangepicker = this.data('daterangepicker');
             console.log('function', daterangepicker)
             return stringToArray(val, daterangepicker.locale.format)
@@ -87,7 +82,6 @@ Template.afBSDateRangePicker.onRendered(function () {
     var $input = this.$('input');
     var options = this.data.atts.dateRangePickerOptions || {};
     const format = options.locale && options.locale.format || new DateRangePicker().locale.format
-    console.log(format)
     const val = this.data.value
     let startDate = options.startDate, endDate = options.endDate
     if (val) {
@@ -109,11 +103,11 @@ Template.afBSDateRangePicker.onRendered(function () {
     $input.daterangepicker(options);
     $input.on('apply.daterangepicker', function (ev, picker) {
         const format = picker.locale.format;
-        if (options.singleDatePicker){
+        if (options.singleDatePicker) {
             $(this).val(picker.startDate.format(format));
-        }else{
+        } else {
             $(this).val(picker.startDate.format(format) + ' - ' + picker.endDate.format(format));
-           $input.trigger('change')
+            $input.trigger('change')
         }
         $input.trigger('change')
     });
