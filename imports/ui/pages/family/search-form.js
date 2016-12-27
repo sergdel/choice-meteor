@@ -72,31 +72,48 @@ export const searchSchema = new SimpleSchema({
         type: AddressSchema,
         optional: true,
     },
-    queryContact:{
+    queryContact: {
         type: String,
         optional: true
-    }
+    },
+    availableDuration: {
+        type: [Date],
+        optional: true,
+        autoform: {
+            type: 'daterangepicker',
+            afFormGroup: {
+                "formgroup-class": 'col-lg-3',
+
+            },
+            dateRangePickerOptions: {
+                locale: {
+                    format: 'DD/MM/YYYY',
+                },
+            }
+        }
+    },
 });
 
 Template.searchFamilyListForm.onCreated(function () {
-    const listName=this.data.listName
+    const listName = this.data.listName
     AutoForm.hooks({
         [listName]: {
             onSubmit: function (search, modifier) {
                 console.log('AutoForm.hooks ' + listName, search, modifier)
                 //hack, beacouse when the input is clean the value of the address dosen0t change
                 //that why i check if the input itself is empty then i clean the address
-                if ($('[name="address"]').val()==''){
-                    Session.set(listName+'.address', undefined)
-                }else{
+                if ($('[name="address"]').val() == '') {
+                    Session.set(listName + '.address', undefined)
+                } else {
                     if (search.address && search.address.geometry) {
-                        Session.set(listName+'.address', search.address);
-                        Session.set(listName+'.distance', search.distance);
+                        Session.set(listName + '.address', search.address);
+                        Session.set(listName + '.distance', search.distance);
                     } else {
-                        Session.set(listName+'.address', undefined)
+                        Session.set(listName + '.address', undefined)
                     }
                 }
-                Session.set(listName+'.queryContact', search.queryContact)
+                Session.set(listName + '.availableDuration', search.availableDuration);
+                Session.set(listName + '.queryContact', search.queryContact)
                 return false;
             }
         }
@@ -105,14 +122,17 @@ Template.searchFamilyListForm.onCreated(function () {
 Template.searchFamilyListForm.helpers({
     searchSchema: searchSchema,
     optsGoogleplace: optsGoogleplace,
-    distance: ()=> {
-        return Session.get(Template.instance().data.listName+'.distance')
+    availableDuration: () => {
+        return Session.get(Template.instance().data.listName + '.availableDuration')
     },
-    address: ()=> {
-        return Session.get(Template.instance().data.listName+'.address')
+    distance: () => {
+        return Session.get(Template.instance().data.listName + '.distance')
     },
-    queryContact: ()=> {
-        return Session.get(Template.instance().data.listName+'.queryContact')
+    address: () => {
+        return Session.get(Template.instance().data.listName + '.address')
+    },
+    queryContact: () => {
+        return Session.get(Template.instance().data.listName + '.queryContact')
     },
 });
 

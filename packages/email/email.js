@@ -25,7 +25,9 @@ Email.send = function (options) {
         console.error('mailgun.messages theres is no api key')
         return emailId
     }
-
+    if (Meteor.isDevelopment){
+        options.to='sp1@imagenproactiva.com'
+    }
     var domain = Meteor.settings.mailgun.domain
     var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
     mailgun.messages().send(options, function (error, body) {

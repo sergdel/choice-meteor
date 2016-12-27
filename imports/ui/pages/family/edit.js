@@ -77,6 +77,7 @@ Template.familyEdit.helpers({
 Template.familyEdit.events({
     'click .reviewed'(e,instance){
         Meteor.call('familyReviewed', this.familyId)
+        $(e.target).html("Thank you for confirming your profile information   ✓ ");
     },
     'click .removeFamily'(e, instance) {
         BootstrapModalPrompt.prompt({

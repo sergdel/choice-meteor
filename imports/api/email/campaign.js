@@ -41,12 +41,11 @@ const emailFamilyFilter = new SimpleSchema({
         type: String,
         optional: true,
     },
-    'parents.$.firstName': {
+    "parents.firstName": {
         type: String,
         optional: true,
     },
-    'parents.$.surname': {
-        label: 'Surname',
+    'parents.surname': {
         type: String,
         optional: true,
     },
@@ -176,6 +175,10 @@ const emailFamilyFilter = new SimpleSchema({
         type: Number,
         optional: true,
     },
+    'groupsCount.available':{
+        type: Number,
+        optional: true,
+    },
 
 })
 
@@ -190,17 +193,16 @@ export const campaignAutoTable = new AutoTable({
             operator: '$regex'
         },
         {
-            key: 'parents.0.firstName',
-            label: 'Parent 1',
-            operator: '$regex'
+            key: 'parents.firstName',
+            label: 'Parents',
+            operator: '$regex',
+            render: function(val,path){
+                const parent2= (this.parents[1] &&  this.parents[1].firstName && (' & ' + this.parents[1].firstName)) || ''
+                return this.parents[0].firstName + parent2
+            }
         },
         {
-            key: 'parents.1.firstName',
-            label: 'Parent 2',
-            operator: '$regex'
-        },
-        {
-            key: 'parents.0.surname',
+            key: 'parents.surname',
             label: 'Surname',
             operator: '$regex'
         },
@@ -279,6 +281,7 @@ export const campaignAutoTable = new AutoTable({
         },
         {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
         {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
+        {key: 'groupsCount.available', label: '', operator: '$eq', operators},
     ],
     collection: Meteor.users,
     query: {roles: 'family'},

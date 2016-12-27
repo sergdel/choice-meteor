@@ -40,7 +40,7 @@ const columns = [
         label: 'Parents',
         operator: '$regex',
         render: function(val,path){
-            const parent2= (this.parents[1] &&  this.parents[1].firstName && (' - ' + this.parents[1].firstName)) || ''
+            const parent2= (this.parents[1] &&  this.parents[1].firstName && (' & ' + this.parents[1].firstName)) || ''
             return this.parents[0].firstName + parent2
         }
     },
