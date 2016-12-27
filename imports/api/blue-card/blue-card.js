@@ -66,6 +66,14 @@ BlueCard.filterSchema = new SimpleSchema({
         optional: true,
         type: Number,
     },
+    confirmed: {
+        optional: true,
+        type: Number,
+    },
+    available: {
+        optional: true,
+        type: Number,
+    },
     "status": {
         label: 'Status',
         optional: true,
@@ -163,6 +171,20 @@ BlueCard.autoTable = new AutoTable({
         },
         {
             key: 'applied',
+            label: 'Applied',
+            operator: '$eq',
+            operators
+
+        },
+        {
+            key: 'confirmed',
+            label: 'Applied',
+            operator: '$eq',
+            operators
+
+        },
+        {
+            key: 'available',
             label: 'Applied',
             operator: '$eq',
             operators
