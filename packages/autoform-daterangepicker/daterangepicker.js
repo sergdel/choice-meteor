@@ -40,29 +40,24 @@ AutoForm.addInputType('daterangepicker', {
         return this.val()
     },
     contextAdjust: function (ctx) {
-        ctx.schema = AutoForm.getSchemaForField(ctx.name)
+        //ctx.schema = AutoForm.getSchemaForField(ctx.name)
         return ctx
     },
     valueIn: function (val, obj) {
-        console.log('daterangepicker valueIn', val, obj)
-
         const field = AutoForm.getSchemaForField(obj.name).autoform
         const format = field.dateRangePickerOptions && field.dateRangePickerOptions.locale && field.dateRangePickerOptions.locale.format || new DateRangePicker().locale.format
         return arrayToString(val, format)
     },
     valueConverters: {
         "date": function (val) {
-            console.log("daterangepicker date", val)
             const daterangepicker = this.data('daterangepicker');
             if (typeof val === "string" && val.length > 0) {
-                return new moment.utc(val, daterangepicker.locale.format).toDate()
+                return moment.utc(val, daterangepicker.locale.format).toDate()
             }
             return val;
         },
         "dateArray": function (val) {
-            console.log("daterangepicker dateArray", val)
             const daterangepicker = this.data('daterangepicker');
-            console.log('function', daterangepicker)
             return stringToArray(val, daterangepicker.locale.format)
         }
 
@@ -78,6 +73,8 @@ Template.afBSDateRangePicker.helpers({
         return atts;
     }
 });
+Template.afBSDateRangePicker.onCreated(function () {
+})
 Template.afBSDateRangePicker.onRendered(function () {
     var $input = this.$('input');
     var options = this.data.atts.dateRangePickerOptions || {};
@@ -89,13 +86,26 @@ Template.afBSDateRangePicker.onRendered(function () {
             startDate = val[0]
             endDate = val[1]
         }
-        if (typeof val == "string") {
+        if (Array.isArray(val), val.length == 1) {
+            startDate = val[0]
+        }
+        if (val instanceof Date) {
             startDate = val
         }
-        options = _.extend(options, {
-            startDate,
-            endDate
-        })
+        if (typeof val == "string") {
+            const m = moment.utc(val)
+            startDate = m.isValid() ? m : undefined
+        }
+        if (startDate) {
+            options = _.extend(options, {
+                startDate,
+            })
+        }
+        if (endDate) {
+            options = _.extend(options, {
+                endDate,
+            })
+        }
     }
     options = _.extend(options, {
         autoUpdateInput: false,

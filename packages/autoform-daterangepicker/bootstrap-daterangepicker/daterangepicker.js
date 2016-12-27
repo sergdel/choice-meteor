@@ -9,7 +9,6 @@
 // Follow the UMD template https://github.com/umdjs/umd/blob/master/templates/returnExportsGlobal.js
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        console.log(1);
         // AMD. Make globaly available as well
         define(['moment', 'jquery'], function (moment, jquery) {
             return (root.daterangepicker = factory(moment, jquery));
@@ -24,8 +23,6 @@
         }
         module.exports = factory(moment ? moment : require('moment'), jQuery);
     } else {
-        console.log(3);
-
         // Browser globals
         root.daterangepicker = factory(root.moment, root.jQuery);
     }
