@@ -31,7 +31,10 @@ const operators = [  // Optional Array works for option filter
         shortLabel: '≤',
         operator: '$lte',
     },
+
 ]
+
+
 
 const columns = [
 
@@ -109,12 +112,10 @@ const columns = [
         },
     },
     {
-        key: 'availability',
+        key: 'unavailabilityCount',
         label: 'Unavailability',
-        render: function(val){
-            if (Array.isArray(val))
-                return val.length
-        }
+        operator: '$eq',
+        operators
     },
     {
         key: 'other.contactDate',
@@ -143,6 +144,10 @@ const columns = [
 ]
 
 export const familyFilterSchema = new SimpleSchema({
+    unavailabilityCount:{
+        type: Number,
+        optional: true,
+    },
     'groupsCount.applied':{
         type: Number,
         optional: true,

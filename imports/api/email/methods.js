@@ -20,8 +20,8 @@ Meteor.methods({
         return _id
     },
     updateEmailsCampaignReportNote: function (emailId, notes) {
-        check (emailId,String)
-        check (notes,String)
+        check(emailId, String)
+        check(notes, String)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update notes')
         return Email.update(emailId, {$set: {notes: notes}})
     },
@@ -92,7 +92,7 @@ Meteor.methods({
 
         const emailTemplate = EmailTemplates.findOne(doc.template)
         if (emailTemplate.campaign == true) {
-           let count=0
+            let count = 0
             families.forEach((user) => {
                 const userId = user._id
                 const familyId = user._id
@@ -159,14 +159,10 @@ Meteor.methods({
                 count++
                 if (Meteor.isProduction) {
                     Email.send(options);
-                } else {
-                    if (count<=3){
-                        options.to = 'c@imagenproactiva.com'
-                        Email.send(options);
-                    }else{
-                        console.log('email NO sent (MORE THAN 3)', options.to)
-                    }
-
+                } else if (count <= 3) {
+                    Email.send(options);
+                }else{
+                    console.log('You can\'t send more than 3 email from dev environment ')
                 }
             })
         }

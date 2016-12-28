@@ -12,6 +12,7 @@ Email.allow({
     update:()=>false,
     remove:()=>false,
 })
+Meteor.startup(()=>console.log("Meteor.absoluteUrl()",Meteor.absoluteUrl()))
 Email.send = function (options) {
     options.sentAt = new Date()
     const emailId = Email.insert(options)
@@ -22,11 +23,13 @@ Email.send = function (options) {
     options["o:tracking-clicks"]="yes"
     var api_key = Meteor.settings && Meteor.settings.mailgun && Meteor.settings.mailgun.api_key
     if (!api_key){
-        console.error('mailgun.messages theres is no api key')
+        console.error('Email no sent: there is no mail gun api key')
         return emailId
     }
-    if (Meteor.isDevelopment){
-        options.to='sp1@imagenproactiva.com'
+
+    if (Meteor.isDevelopment || Meteor.absoluteUrl()=='http://dev.choicehomestay.com.au/'){
+        console.log('email sent to ', Meteor.user().emails[0].address)
+        options.to=Meteor.user().emails[0].address
     }
     var domain = Meteor.settings.mailgun.domain
     var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});

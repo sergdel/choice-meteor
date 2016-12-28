@@ -7,7 +7,7 @@ import {Groups} from '/imports/api/group/group'
 import {Meteor} from 'meteor/meteor'
 import {Email} from 'meteor/email'
 import {Migrations} from 'meteor/percolate:migrations'
-import {updateGroupCount,updateGroupCountForAllFamilies} from '/imports/api/family/family'
+import {updateGroupCount, updateGroupCountForAllFamilies} from '/imports/api/family/family'
 import {insertBlueCards} from "/imports/api/family/family";
 import {emailTemplateFixtures} from "/imports/api/email/server/email-template-fixtures";
 import {EmailTemplates} from '/imports/api/email/templates'
@@ -304,7 +304,7 @@ Migrations.add({
     version: 7,
     name: 'remove null parents" ',
     up: function () {
-         Meteor.users.update({
+        Meteor.users.update({
             roles: 'family',
             parents: null
         }, {$pull: {"parents": null}}, {multi: true})
@@ -377,8 +377,6 @@ Migrations.add({
         notes = Meteor.users.find({"guests.blueCard.notes": {$exists: 1, $ne: ''}})
     }
 })
-
-
 
 
 Migrations.add({
@@ -614,39 +612,39 @@ Migrations.add({
     name: 'update blue card status',
     up: function () {
         Families.find({}).forEach((family) => {
-            let changed=false
+            let changed = false
             for (let type of ['parents', 'children', 'guests']) {
                 if (Array.isArray(family[type])) {
                     for (let i in family[type]) {
-                        const blueCard=family[type] && family[type][i] && family[type][i].blueCard
-                        if (blueCard){
-                            if (blueCard.number && blueCard.expiryDate &&  blueCard.expiryDate instanceof Date &&  blueCard.expiryDate >=new Date() && (blueCard.status == 'apply' && blueCard.status != 'n/a'  || !blueCard.status)){
-                                family[type][i].blueCard.status='approved'
-                                changed=true
+                        const blueCard = family[type] && family[type][i] && family[type][i].blueCard
+                        if (blueCard) {
+                            if (blueCard.number && blueCard.expiryDate && blueCard.expiryDate instanceof Date && blueCard.expiryDate >= new Date() && (blueCard.status == 'apply' && blueCard.status != 'n/a' || !blueCard.status)) {
+                                family[type][i].blueCard.status = 'approved'
+                                changed = true
                             }
                         }
                     }
                 }
             }
-            if (changed){
-                Families.update(family._id,{$set: family})
+            if (changed) {
+                Families.update(family._id, {$set: family})
             }
 
         })
     }
 })
 Migrations.add({
-    version: 18 ,
+    version: 18,
     name: 'update substatus enabled to all groups',
     up: function () {
         Groups.attachSchema(Groups.schemas.edit, {replace: true})
-        Groups.updateBySelector({},{$set:{enabled: true}},{multi:true})
+        Groups.updateBySelector({}, {$set: {enabled: true}}, {multi: true})
     }
 })
 
 
 Migrations.add({
-    version: 19 ,
+    version: 19,
     name: 'update tags count',
     up: function () {
         Tags.find({}).forEach((tag) => {
@@ -657,7 +655,7 @@ Migrations.add({
 })
 
 Migrations.add({
-    version: 20 ,
+    version: 20,
     name: 'update potencial group count',
     up: function () {
         updateGroupCountForAllFamilies()
@@ -673,7 +671,7 @@ Migrations.add({
             limit = 10
         }
         Families.find({}, {limit}).forEach((fam) => {
-            if (Distances.find({familyId: fam._id}).count()==0){
+            if (Distances.find({familyId: fam._id}).count() == 0) {
                 Locations.find({}, {limit}).forEach((loc) => {
                     if (Distances.find(fam._id + '|' + loc._id).count() == 0) {
                         updateDistance(fam, loc)
@@ -689,9 +687,20 @@ Migrations.add({
     version: 22,
     name: 'Groups count to 0',
     up: function () {
-        Families.updateBySelector({"groupsCount.available": {$exists: false}},{$set: {"groupsCount.available":0 }},{multi: true})
-        Families.updateBySelector({"groupsCount.confirmed": {$exists: false}},{$set: {"groupsCount.confirmed":0 }},{multi: true})
-        Families.updateBySelector({"groupsCount.applied": {$exists: false}},{$set: {"groupsCount.applied":0 }},{multi: true})
+        Families.updateBySelector({"groupsCount.available": {$exists: false}}, {$set: {"groupsCount.available": 0}}, {multi: true})
+        Families.updateBySelector({"groupsCount.confirmed": {$exists: false}}, {$set: {"groupsCount.confirmed": 0}}, {multi: true})
+        Families.updateBySelector({"groupsCount.applied": {$exists: false}}, {$set: {"groupsCount.applied": 0}}, {multi: true})
+    }
+})
+Migrations.add({
+    version: 23,
+    name: 'update unavailability count',
+    up: function () {
+        Families.find().forEach((family) => {
+            const unavailabilityCount = (family.availability && family.availability.length) || 0
+            Families.updateBySelector(family._id, {$set: {unavailabilityCount}})
+        })
+
     }
 })
 /*

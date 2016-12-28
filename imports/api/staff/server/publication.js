@@ -4,7 +4,7 @@
 
 
 Meteor.publish('staffs', function () {
-    if (!Roles.userIsInRole(this.userId, 'admin'))
+    if (!Roles.userIsInRole(this.userId, ['admin','staff']))
         return this.ready();
     return Meteor.users.find({roles: 'staff'})
 });

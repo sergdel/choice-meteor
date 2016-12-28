@@ -202,6 +202,7 @@ Families.update = function (_id, modifier, options = {}, callback) {
 
     setBlueCardStatus(newDoc)
     insertBlueCards(newDoc)
+    newDoc.unavailabilityCount=(newDoc.availability && newDoc.availability.length) || 0
     Meteor.users.update(_id, newDoc, options)
 
     //if avaliability change
@@ -459,6 +460,15 @@ export const familySchema = new SimpleSchema({
     "groupsCount.available": {
         optional: true,
         type: String,
+        autoValue: function () {
+            if (this.isInsert) {
+                return 0
+            }
+        }
+    },
+    unavailabilityCount:{
+        optional: true,
+        type: Number,
         autoValue: function () {
             if (this.isInsert) {
                 return 0

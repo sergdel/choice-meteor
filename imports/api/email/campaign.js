@@ -33,6 +33,7 @@ const operators = [  // Optional Array works for option filter
         shortLabel: '≤',
         operator: '$lte',
     },
+
 ]
 
 const emailFamilyFilter = new SimpleSchema({
@@ -179,6 +180,10 @@ const emailFamilyFilter = new SimpleSchema({
         type: Number,
         optional: true,
     },
+    unavailabilityCount:{
+        type: Number,
+        optional: true,
+    },
 
 })
 
@@ -231,12 +236,10 @@ export const campaignAutoTable = new AutoTable({
             },
         },
         {
-            key: 'availability',
+            key: 'unavailabilityCount',
             label: 'Unavailability',
-            render: function(val){
-                if (Array.isArray(val))
-                    return val.length
-            }
+            operator: '$eq',
+            operators,
         },
         {
             key: 'other.contactDate',
