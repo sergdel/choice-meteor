@@ -162,6 +162,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     'blueCardStatus': {
         type: [String],
         optional: true,
+        label:"Status",
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
@@ -214,6 +215,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     'office.familyStatus': {
         type: [Number],
         optional: true,
+        label:"Status",
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: function () {
@@ -226,6 +228,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     'office.familySubStatus': {
         type: [String],
         optional: true,
+        label:"Status",
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
@@ -238,6 +241,7 @@ export const familyPlacementFilterSchema = new SimpleSchema({
     'other.preferredGender': {
         type: [String],
         optional: true,
+        label:"Gender",
         autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
