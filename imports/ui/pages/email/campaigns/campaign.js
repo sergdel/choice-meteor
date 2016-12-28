@@ -5,6 +5,7 @@ import './campign.html'
 import './search-form'
 import {Template} from 'meteor/templating'
 import {campaignSchema} from '/imports/api/email/campaign'
+import {Match} from 'meteor/check'
 
 Template.emailsCampaign.onCreated(function () {
     this.subscribe('EmailTemplates')
@@ -15,8 +16,9 @@ Template.emailsCampaign.helpers({
 })
 
 AutoForm.addHooks('campaignForm', {
-    before: {
+   before: {
         method: function (doc) {
+            if (!Match.test(doc, this.ss))   return doc
             const customQuery = Session.get('campaignList_customQuery')
             doc.query=doc.query || {}
             if (!_.isEmpty(customQuery)){
@@ -51,12 +53,20 @@ AutoForm.addHooks('campaignForm', {
             //this.result(false); (asynchronous, cancel)
         }
     },
+    onSubmit: function(insertDoc, updateDoc, currentDoc) {
+        console.log('onSubmit',insertDoc, updateDoc, currentDoc)
+        // You must call this.done()!
+        this.done(); // submitted successfully, call onSuccess
+        //this.done(new Error('foo')); // failed to submit, call onError with the provided error
+        //this.done(null, "foo"); // submitted successfully, call onSuccess with `result` arg set to "foo"
+    },
     after: {
         method: function (error, result) {
-
+            console.log('after',error, result)
         }
     },
     onSuccess: function (formType, result) {
+        console.log('onSuccess',formType,result)
     },
 
 })

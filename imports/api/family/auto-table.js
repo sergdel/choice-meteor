@@ -3,8 +3,8 @@
  */
 import {AutoTable} from "meteor/cesarve:auto-table";
 import {familyStatus} from "./family-status";
+import {Groups} from "/imports/api/group/group";
 import {Tags} from "/imports/api/tags/tags";
-
 const operators = [  // Optional Array works for option filter
     {
         label: 'Equal',
@@ -34,7 +34,23 @@ const operators = [  // Optional Array works for option filter
 
 ]
 
+const operatorsExist=operators.concat([{
+    label: 'No value',
+    shortLabel: '∃',
+    operator: '$exists',
+    options: [{label: 'Yes', value: 1},{ label: 'No', value: 0 }]
+}])
 
+const renderGroup= function (groups,type) {
+
+    let body = ''
+    groups.forEach((group) => {
+        const date0 = group.dates && group.dates[0] && group.dates[0] instanceof Date ? moment(group.dates[0]).format('DD MMM YY') : ''
+        const date1 = group.dates && group.dates[1] && group.dates[1] instanceof Date ? moment(group.dates[1]).format('DD MMM YY') : ''
+        body += `<nobr>${group.name}</nobr><br><nobr>(${date0} - ${date1})</nobr><hr style="margin: 0">`
+    })
+    return body.substr(0, body.length - 4)
+}
 
 const columns = [
 
@@ -55,7 +71,7 @@ const columns = [
         key: 'office.score', operator: '$eq', operators
     },
     {
-        key: 'parentsCount', label: '# parents', operator: '$eq', operators
+        key: 'parentsCount', label: '# parents', operator: '$eq', operators,
     },
     {
         key: 'childrenCount', label: '# children', operator: '$eq', operators
@@ -77,12 +93,40 @@ const columns = [
         const status = _.findWhere(familyStatus, {id: val})
         return status && status.label || ''
     }
+
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
     {key: 'other.preferredGender', label: 'Gender pref', operator: '$in',},
-    {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
-    {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
-    {key: 'groupsCount.available', label: '', operator: '$eq', operators},
+
+
+    {key: 'groupsCount.applied', label: '# Applied', operator: '$eq', operators},
+    {key: 'groupsCount.confirmed', label: '# Confirmed', operator: '$eq', operators},
+    {key: 'groupsCount.available', label: '# Potential', operator: '$eq', operators},
+
+    {key: 'groupsApplied', label: '# Applied',
+        render: function(){
+            const groupIds = _.pluck(_.where(this.groups,{status: 'applied'}), 'groupId')
+            const groups = Groups.find({_id: {$in: groupIds}}, {fields: {name: 1, dates: 1}})
+            return renderGroup(groups)
+        }
+    },
+    {key: 'groupsConfirmed', label: '# Confirmed',
+        render: function(){
+            const groupIds = _.pluck(_.where(this.groups,{status: 'confirmed'}), 'groupId')
+            const groups = Groups.find({_id: {$in: groupIds}}, {fields: {name: 1, dates: 1}})
+            return renderGroup(groups)
+        }
+    },
+    /*{key: 'groupsAvailable', label: '# Potential',
+        render: function(){
+            const groupIds1 = _.pluck(_.where(this.groups,{status: 'applied'}), 'groupId')
+            const groupIds2 = _.pluck(_.where(this.groups,{status: 'confirmed'}), 'groupId')
+            const groups = Groups.find({_id: {$nin: groupIds1.concat(groupIds2)}}, {fields: {name: 1, dates: 1}})
+            return renderGroup(groups)
+        }
+    },*/
+
+
     {
         key: 'contactInfo', label: 'Contact',
         template: 'familyContact',
@@ -96,6 +140,9 @@ const columns = [
             if (!val) return ''
             const m = moment(val)
             if (!m.isValid()) return val
+            if (m<=new Date(2012,1,1)){
+                return 'never'
+            }
             return m.format('Do MMM YYYY')
         },
     },
@@ -348,7 +395,7 @@ export const familiesAutoTable = new AutoTable(
         id: 'familyList',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles','emails'],
+        publishExtraFields: ['roles','emails','groups'],
         columns,
         schema: familyFilterSchema,
         publish: function () {

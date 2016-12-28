@@ -8,10 +8,10 @@ import {emailSchema} from "/imports/api/family/family"
 import "/imports/ui/componets/autoform/select-multi-checkbox-combo/select-multi-checkbox-combo"
 
 Template.familyList.onCreated(function () {
-
+    this.subscribe('groups')
+    this.subscribe('tags')
 });
 Template.familyList.onRendered(function () {
-    this.subscribe('tags')
 
 });
 

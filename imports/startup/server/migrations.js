@@ -703,6 +703,15 @@ Migrations.add({
 
     }
 })
+
+Migrations.add({
+    version: 24,
+    name: 'update loggedAt  2012,1,1',
+    up: function () {
+        const res=Families.updateBySelector({$or: [{loggedAt: null},{loggedAt: {$exists: false}}]}, {$set: {loggedAt: new Date(2001, 1, 1)}},{multi: true})
+        console.log('loggedAt',res)
+    }
+})
 /*
  Migrations.add({
  version: 3,
