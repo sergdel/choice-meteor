@@ -25,27 +25,16 @@ AutoForm.hooks({
 
             if (search.groupDuration) {
                 customQuery = _.extend(customQuery,
-                    {"availability" :
-                        {
-                            $not : {
-                                $elemMatch: {
-                                    $or: [
-                                        {
-                                            $and: [
-                                                {"dates.0": {$gte: search.groupDuration[0]}},
-                                                {"dates.0": {$lte: search.groupDuration[1]}}
-                                            ]
-                                        },
-                                        {
-                                            $and: [
-                                                {"dates.1": {$gte: search.groupDuration[0]}},
-                                                {"dates.1": {$lte: search.groupDuration[1]}}
-                                            ]
-                                        }
-                                    ]
+                    {
+                        "$or" : [
+                            {"groupDuration": { "$exists" : false}},
+                            {
+                                "groupDuration":{
+                                    "from": search.groupDuration[0],
+                                    "to": search.groupDuration[1]
                                 }
                             }
-                        }
+                        ]
                     }
                 );
             }

@@ -6,6 +6,7 @@ import {AutoTable} from 'meteor/cesarve:auto-table'
 import {SimpleSchema} from 'meteor/aldeed:simple-schema'
 import {EmailTemplates} from '/imports/api/email/templates'
 import {familyStatus} from "/imports/api/family/family-status";
+import {Groups} from '/imports/api/group/group';
 
 const operators = [  // Optional Array works for option filter
     {
@@ -309,9 +310,65 @@ export const campaignAutoTable = new AutoTable({
             showing: true,
         }
     },
-    publish: function () {
-        return Roles.userIsInRole(this.userId, 'admin')
-    }
+    publish: function (id, limit, query, sort) {
+        //return Roles.userIsInRole(this.userId, 'admin');
+
+        if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) {
+            return this.ready()
+        }
+        const self = this;
+        const publishGroups = []
+        const groupDuration = query["$or"] && query["$or"][1] ? query["$or"][1].groupDuration : null;
+        let count = 0
+
+        self.added('counts', 'atCounter' + id, {count})
+        if (groupDuration)
+            delete query['groupDuration'];
+
+        var handle = Meteor.users.find(query).observeChanges({
+            added: function (userId, user) {
+                let available = true;
+                if (groupDuration) {
+                    user.groups.forEach(function (group_info) {
+                        if (group_info.status != "confirmed")
+                            return;
+                        let group = Groups.findOne({"_id": group_info.groupId});
+                        const dates = group.dates
+                        if (dates && dates[0] && dates[1] && (dates[0] instanceof Date) && (dates[1] instanceof Date)) {
+                            if ((dates[0] >= groupDuration.from && dates[0] <= groupDuration.to) ||
+                                (dates[1] >= groupDuration.from && dates[1] <= groupDuration.to))
+                            {
+                                available = false;
+                                return ;
+                            }
+                        }
+                    });
+                }
+                if (available) {
+                    count++
+                    self.changed('counts', 'atCounter' + id, {count})
+                    self.added("users", userId, user);
+                }
+            },
+            changed: function (userId, user) {
+                count++
+                self.changed('counts', 'atCounter' + id, {count})
+                self.added("users", userId, user);
+
+            }
+            ,
+            removed: function (userId) {
+                count--
+                self.removed("users", userId);
+                self.changed('counts', 'atCounter' + id, {count})
+            }
+        });
+        self.ready();
+        self.onStop(function () {
+            handle.stop();
+        });
+        return false;
+    },
 
 })
 

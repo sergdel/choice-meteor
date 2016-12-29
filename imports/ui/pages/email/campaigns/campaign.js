@@ -9,6 +9,7 @@ import {Match} from 'meteor/check'
 
 Template.emailsCampaign.onCreated(function () {
     this.subscribe('EmailTemplates')
+    this.subscribe('groups')
 })
 Template.emailsCampaign.helpers({
     campaignSchema: campaignSchema,
