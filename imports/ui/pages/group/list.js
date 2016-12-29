@@ -33,7 +33,7 @@ Template.groupList.helpers({
                 and.push({"families.familyId": {$ne: FlowRouter.getParam('familyId')}})
             else
                 and.push({"families.familyId": {$ne: Meteor.userId()}})
-*/º
+*/
             const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1,enabled: 1}})
             return createAvailableQuery(confirmedGroups,unavailability,and)
         }
