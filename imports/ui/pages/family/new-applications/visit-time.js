@@ -16,7 +16,7 @@ Template.familyNeApplicationVisitTime.onRendered(function () {
         //startDate:  startMoment,
         singleDatePicker: true,
         timePicker: true,
-        timePicker24Hour: false,
+        timePicker24Hour: true,
         timePickerIncrement: 5,
         linkedCalendars: false,
         autoUpdateInput: false,
@@ -26,8 +26,13 @@ Template.familyNeApplicationVisitTime.onRendered(function () {
         },
     }, function (start, end, label) {
     });
+    $date.on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+        Meteor.call('updateFamilyFirstVisitTime', familyId, undefined)
+    });
     $date.on('apply.daterangepicker', function (ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DDThh:mm'));
+        console.log(picker.startDate)
+        $(this).val(picker.startDate.format('YYYY-MM-DDTHH:mm'));
         Meteor.call('updateFamilyFirstVisitTime', familyId, picker.startDate.toDate())
     });
 
@@ -40,7 +45,7 @@ Template.familyNeApplicationVisitTime.onRendered(function () {
 Template.familyNeApplicationVisitTime.helpers({
     value: function () {
         const instance = Template.instance()
-        return instance.data && instance.data.office && instance.data.office.firstVisit && instance.data.office.firstVisit.time instanceof Date && moment(instance.data.office.firstVisit.time).format('YYYY-MM-DDThh:mm')
+        return instance.data && instance.data.office && instance.data.office.firstVisit && instance.data.office.firstVisit.time instanceof Date && moment(instance.data.office.firstVisit.time).format('YYYY-MM-DDTHH:mm')
     }
 })
 Template.familyNeApplicationVisitTime.events({

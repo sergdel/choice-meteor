@@ -35,7 +35,7 @@ const operators = [  // Optional Array works for option filter
 ]
 
 const operatorsExist = operators.concat([{
-    label: 'No value',
+    label: 'Has value',
     shortLabel: '∃',
     operator: '$exists',
     options: [{label: 'Yes', value: 1}, {label: 'No', value: 0}]

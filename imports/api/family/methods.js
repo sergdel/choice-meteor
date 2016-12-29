@@ -21,12 +21,14 @@ Meteor.methods({
         check (familyId,String)
         check (staffId,String)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update visits')
+        if (!staffId) return  Families.update(familyId,{$set:{'office.firstVisit.staffId': '-'}})
         Families.update(familyId,{$set:{'office.firstVisit.staffId':staffId}})
     },
     updateFamilyFirstVisitTime:function(familyId,time){
         check (familyId,String)
         check (time,Date)
         if (!Roles.userIsInRole(this.userId, ['admin', 'staff'])) throw new Meteor.Error('Access denied', 'Only admin or staff can update visits')
+        if (!time) return  Families.update(familyId,{$unset:{'office.firstVisit.time':true}})
         Families.update(familyId,{$set:{'office.firstVisit.time':time}})
     },
     updateFamilySearchNotes:function(familyId,notes){
