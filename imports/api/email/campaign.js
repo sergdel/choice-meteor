@@ -36,7 +36,18 @@ const operators = [  // Optional Array works for option filter
 
 ]
 
+
+
+
+const operatorsExist=operators.concat([{
+    label: 'No value',
+    shortLabel: '∃',
+    operator: '$exists',
+    schemaFilter: 'trueFalse',
+}])
+
 const emailFamilyFilter = new SimpleSchema({
+
     'emails.$.address': {
         label: 'Email',
         type: String,
@@ -215,7 +226,7 @@ export const campaignAutoTable = new AutoTable({
             key: 'loggedAt',
             label: 'Last Login',
             operator: '$gte',
-            operators,
+            operators: operators,
             render: function (val) {
                 if (!val) return ''
                 const m = moment(val)
