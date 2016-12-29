@@ -28,12 +28,10 @@ Template.groupList.helpers({
             const unavailability=family.availability || []
             const confirmedGroupIds = (family && family.groups && _.pluck(_.where(family.groups, {status: 'confirmed'}), 'groupId')) || []
             const and = []
-            /*
             if (Roles.userIsInRole(Meteor.userId(), ['admin', 'staff']))
-                and.push({"families.familyId": {$ne: FlowRouter.getParam('familyId')}})
+                and.push({"familyId": {$ne: FlowRouter.getParam('familyId')}})
             else
-                and.push({"families.familyId": {$ne: Meteor.userId()}})
-*/
+                and.push({"familyId": {$ne: Meteor.userId()}})
             const confirmedGroups = Groups.find({_id: {$in: confirmedGroupIds}}, {fields: {dates: 1,enabled: 1}})
             return createAvailableQuery(confirmedGroups,unavailability,and)
         }

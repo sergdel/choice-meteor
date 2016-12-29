@@ -1078,16 +1078,14 @@ Groups.autoTableFamilyAvailable = new AutoTable(
             }
         },
         publish: function (id, limit, query, sort) {
-
-
             if (!Roles.userIsInRole(this.userId, ['admin', 'staff', 'family'])) {
                 return this.ready()
             }
             const self = this;
             //"families": {$elemMatch: {status:  "confirmed", familyId:
-            let familyId = query && query.$and && query.$and[0] && query.$and[0]["families.familyId"] && query.$and[0]["families.familyId"].$ne
+            let familyId = query && query.$and && query.$and[0] && query.$and[0]["familyId"] && query.$and[0]["familyId"].$ne
             if (!familyId) {
-                familyId = query && query["families.familyId"] && query["families.familyId"]["$ne"]
+                familyId = query && query["familyId"] && query["familyId"]["$ne"]
                 console.error('check this please publish !!', id, query, 'familyId',familyId)
             }
             const publishGroups = []
