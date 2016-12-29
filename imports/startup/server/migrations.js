@@ -712,6 +712,15 @@ Migrations.add({
         console.log('loggedAt',res)
     }
 })
+
+Migrations.add({
+    version: 25,
+    name: 'office.firstVisit.staffId to -',
+    up: function () {
+        Families.updateBySelector({"office.firstVisit.staffId": {$exists: false}}, {$set: {"office.firstVisit.staffId":'-'}}, {multi: true})
+    }
+})
+
 /*
  Migrations.add({
  version: 3,

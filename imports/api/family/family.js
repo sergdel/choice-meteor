@@ -89,7 +89,8 @@ Families.findContact = function (familyId, userId) {
             "emails.address": 1,
             "contact.homePhone'": 1,
             "parents.mobilePhone": 1,
-            "roles": 1
+            "roles": 1,
+
         }
     })
 }
@@ -163,16 +164,18 @@ Families.findOne = (_id, options) => {
 }
 Families.insert = function (email, options) {
     const familyId = Accounts.createUser({email})
-    Meteor.users.update(familyId, {
+    Families.updateBySelector(familyId, {
         $set: {
             roles: ['family'],
             "office.familyStatus": 0,
+            "office.firstVisit.staffId": '-',
             "parents": [{"email": email}],
             "groupsCount.applied": 0,
             "groupsCount.confirmed": 0,
-            "groupsCount.available": 0
+            "groupsCount.available": 0,
         }
     })
+
     Audit.insert({type: 'create', docId: familyId, userId: options.userId, familyId: familyId})
     return familyId
 }

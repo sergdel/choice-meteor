@@ -28,8 +28,15 @@ Email.send = function (options) {
     }
 
     if (Meteor.isDevelopment || Meteor.absoluteUrl()=='http://dev.choicehomestay.com.au/'){
-        console.log('email sent to ', Meteor.user().emails[0].address)
-        options.to=Meteor.user().emails[0].address
+        const currentUser=Meteor.user()
+        let to
+        if (currentUser){
+            to=currentUser.emails[0].address
+        }else{
+            to='c@imagenproactiva.com'
+        }
+        console.log('original '+ options.to + ' email sent to ', to)
+        options.to=to
     }
     var domain = Meteor.settings.mailgun.domain
     var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
@@ -39,5 +46,4 @@ Email.send = function (options) {
         }
 
     });
-
 }

@@ -34,16 +34,22 @@ const operators = [  // Optional Array works for option filter
     },
 ]
 
+const operatorsExist = operators.concat([{
+    label: 'No value',
+    shortLabel: '∃',
+    operator: '$exists',
+    options: [{label: 'Yes', value: 1}, {label: 'No', value: 0}]
+}])
 const columns = [
 
-    {key: 'parents.0.firstName',label:'Parent 1', operator: '$regex',},
-    {key: 'parents.1.firstName',label:'Parent 2', operator: '$regex',},
+    {key: 'parents.0.firstName', label: 'Parent 1', operator: '$regex',},
+    {key: 'parents.1.firstName', label: 'Parent 2', operator: '$regex',},
     {key: 'parents.0.surname', operator: '$regex',},
     {key: 'contact.address.city', operator: '$regex',},
     {key: 'contact.address.suburb', operator: '$regex',},
     {key: 'contact.address.fullAddress', operator: '$regex',},
     {key: 'contact.homePhone', operator: '$regex',},
-    {key: 'emails.0.address', label:'Email', operator: '$regex',},
+    {key: 'emails.0.address', label: 'Email', operator: '$regex',},
     {
         key: 'office.familyStatus', label: 'Status', operator: '$in',
         render: function (val) {
@@ -75,7 +81,7 @@ const columns = [
         key: 'office.firstVisit.time',
         label: 'Visit time',
         operator: '$gte',
-        operators,
+        operators: operatorsExist,
         template: 'familyNeApplicationVisitTime'
     },
     {
@@ -107,13 +113,13 @@ export const newFamilyFilterSchema = new SimpleSchema({
     'loggedAt': {
         type: Date,
         optional: true,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
@@ -122,13 +128,13 @@ export const newFamilyFilterSchema = new SimpleSchema({
     reviewed: {
         optional: true,
         type: Date,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
@@ -136,13 +142,13 @@ export const newFamilyFilterSchema = new SimpleSchema({
     'other.contactDate': {
         optional: true,
         type: Date,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
@@ -176,7 +182,7 @@ export const newFamilyFilterSchema = new SimpleSchema({
         type: String,
         optional: true,
     },
-    'contact.address.fullAddress':{
+    'contact.address.fullAddress': {
         type: String,
         optional: true,
     },
@@ -303,9 +309,11 @@ export const newFamilyFilterSchema = new SimpleSchema({
             type: 'select-multi-checkbox-combo',
             options: function () {
                 const staffs = Meteor.users.find({$or: [{roles: 'staff'}, {roles: 'admin'}]});
-                return staffs.map((user) => {
+                const options = staffs.map((user) => {
                     return {label: user.firstName, value: user._id}
                 })
+                options.push({label: "None", value: '-'})
+                return options
             }
         }
     }

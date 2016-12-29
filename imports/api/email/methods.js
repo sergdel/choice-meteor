@@ -139,8 +139,12 @@ Meteor.methods({
 
 
                 const text = htmlToText.fromString(body)
+
+                const email1 = user.emails && user.emails[0] && user.emails[0].address
+                const email2 = user.emails && user.emails[1] && user.emails[1].address
+                const emails = email2 ? email1 + ',' + email2 : email1
                 const options = {
-                    to: email,
+                    to: emails,
                     from: `${emailTemplate.fromName} <${emailTemplate.from}>`,
                     subject: subject,
                     "parent1": user.parents && user.parents[0] && user.parents[0].firstName,
@@ -161,7 +165,7 @@ Meteor.methods({
                     Email.send(options);
                 } else if (count <= 3) {
                     Email.send(options);
-                }else{
+                } else {
                     console.log('You can\'t send more than 3 email from dev environment ')
                 }
             })

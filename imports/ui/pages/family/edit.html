@@ -21,9 +21,10 @@
                                                         data-toggle="tab">Groups</a></li>
                     <li role="presentation" class=""><a href="#availability" aria-controls="profile" role="tab"
                                                         data-toggle="tab">Unavailablity</a></li>
+                    <li role="presentation" class=""><a href="#accounts" aria-controls="profile" role="tab"
+                                                        data-toggle="tab">Accounts</a></li>
                     {{#if isInRole 'family'}}
-                        <li role="presentation" class=""><a href="#accounts" aria-controls="profile" role="tab"
-                                                            data-toggle="tab">Accounts</a></li>
+
                         <li role="presentation" class=""><a href="#qa" aria-controls="profile" role="tab"
                                                             data-toggle="tab"> Questions & Answers</a></li>
                         <li role="presentation" class=""><a href="#contactTab" aria-controls="profile" role="tab"
@@ -75,24 +76,26 @@
                     </div>
                     <div role="tabpanel" class="tab-pane " id="availability">
                         <h3>Unavailablity</h3>
-                        Please identify any dates when you're not available to welcome guests. This data will be used to avoid presenting you with groups that you're not available to welcome.
+                        Please identify any dates when you're not available to welcome guests. This data will be used to
+                        avoid presenting you with groups that you're not available to welcome.
                         <div class="no-panel-heading">
-                        {{#autoForm schema=familySchema doc=family id="familyAvailability"  doc=family
-                                    type="method-update"
-                                    meteormethod="familyEdit"
-                                    resetOnSuccess=false}}
-                            {{>afQuickField name="availability"}}
-                            {{>buttonSubmit new=false edit=true}}
-                        {{/autoForm}}
+                            {{#autoForm schema=familySchema doc=family id="familyAvailability"  doc=family
+                                        type="method-update"
+                                        meteormethod="familyEdit"
+                                        resetOnSuccess=false}}
+                                {{>afQuickField name="availability"}}
+                                {{>buttonSubmit new=false edit=true}}
+                            {{/autoForm}}
                         </div>
                     </div>
 
+
+                    <div role="tabpanel" class="tab-pane " id="accounts">
+                        <h3>Accounts</h3>
+                        {{>accountList}}
+                    </div>
                     {{#if isInRole 'family'}}
 
-                        <div role="tabpanel" class="tab-pane " id="accounts">
-                            <h3>Accounts</h3>
-                            {{>accountList}}
-                        </div>
                         <div role="tabpanel" class="tab-pane " id="qa">
                             <h3>Questions & Answers</h3>
 

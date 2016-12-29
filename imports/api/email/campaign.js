@@ -293,9 +293,9 @@ export const campaignAutoTable = new AutoTable({
             label: 'Suburb',
             operator: '$regex'
         },
-        {key: 'groupsCount.applied', label: 'Applied', operator: '$eq', operators},
-        {key: 'groupsCount.confirmed', label: 'Confirmed', operator: '$eq', operators},
-        {key: 'groupsCount.available', label: '', operator: '$eq', operators},
+        {key: 'groupsCount.applied', label: '# Applied', operator: '$eq', operators},
+        {key: 'groupsCount.confirmed', label: '# Confirmed', operator: '$eq', operators},
+        {key: 'groupsCount.available', label: '# Available', operator: '$eq', operators},
     ],
     collection: Meteor.users,
     query: {roles: 'family'},

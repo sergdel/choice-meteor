@@ -16,7 +16,7 @@ Template.familyNeApplicationVisitTime.onRendered(function () {
         //startDate:  startMoment,
         singleDatePicker: true,
         timePicker: true,
-        timePicker24Hour: true,
+        timePicker24Hour: false,
         timePickerIncrement: 5,
         linkedCalendars: false,
         autoUpdateInput: false,

@@ -33,6 +33,7 @@ class GroupCollection extends Mongo.Collection {
         if (_.isObject(selector) && !selector.status) {
             selector = _.extend(selector, {status: {$ne: "removed"}})
         }
+        console.log('selector-->',selector)
         return super.find(selector, options);
     }
 
@@ -618,7 +619,7 @@ Groups.schemas = {
 Groups.fields = {
     staff: {},
     family: {
-        id: true,
+        /*id: true,
         name: true,
         nationality: true,
         dates: true,
@@ -630,6 +631,7 @@ Groups.fields = {
         adults: true,
         guestsFrom: true,
         guestsTo: true,
+        enabled: true,*/
     }
 }
 Groups.attachSchema(Groups.schemas.new);

@@ -5,6 +5,7 @@ import {AutoTable} from "meteor/cesarve:auto-table";
 import {familyStatus} from "./family-status";
 import {Groups} from "/imports/api/group/group";
 import {Tags} from "/imports/api/tags/tags";
+import {createAvailableQuery} from "./family";
 const operators = [  // Optional Array works for option filter
     {
         label: 'Equal',
@@ -34,22 +35,16 @@ const operators = [  // Optional Array works for option filter
 
 ]
 
-const operatorsExist=operators.concat([{
-    label: 'No value',
-    shortLabel: '∃',
-    operator: '$exists',
-    options: [{label: 'Yes', value: 1},{ label: 'No', value: 0 }]
-}])
 
-const renderGroup= function (groups,type) {
+const renderGroup = function (groups, type) {
 
-    let body = ''
+    let body = '<div style="max-height: 200px; overflow: auto">'
     groups.forEach((group) => {
         const date0 = group.dates && group.dates[0] && group.dates[0] instanceof Date ? moment(group.dates[0]).format('DD MMM YY') : ''
         const date1 = group.dates && group.dates[1] && group.dates[1] instanceof Date ? moment(group.dates[1]).format('DD MMM YY') : ''
         body += `<nobr>${group.name}</nobr><br><nobr>(${date0} - ${date1})</nobr><hr style="margin: 0">`
     })
-    return body.substr(0, body.length - 4)
+    return body.substr(0, body.length - 4) + '</div>'
 }
 
 const columns = [
@@ -58,12 +53,17 @@ const columns = [
         key: 'parents.firstName',
         label: 'Parents',
         operator: '$regex',
-        render: function(val,path){
-            const parent2= (this.parents[1] &&  this.parents[1].firstName && (' & ' + this.parents[1].firstName)) || ''
+        render: function (val, path) {
+            const parent2 = (this.parents[1] && this.parents[1].firstName && (' & ' + this.parents[1].firstName)) || ''
             return this.parents[0].firstName + parent2
         }
     },
-    {key: 'parents.surname', operator: '$regex',},
+    {
+        key: 'parents.surname', operator: '$regex',
+        render: function (val, path) {
+            return this.parents[0].surname
+        }
+    },
     {key: 'contact.address.city', operator: '$regex',},
     {key: 'contact.address.suburb', operator: '$regex',},
     {key: 'blueCardStatus', label: 'Blue cards', operator: '$in',},
@@ -90,9 +90,9 @@ const columns = [
     {
         key: 'office.familyStatus', label: 'Status', operator: '$in',
         render: function (val) {
-        const status = _.findWhere(familyStatus, {id: val})
-        return status && status.label || ''
-    }
+            const status = _.findWhere(familyStatus, {id: val})
+            return status && status.label || ''
+        }
 
     },
     {key: 'office.familySubStatus', label: 'Sub-status', operator: '$in',},
@@ -101,30 +101,42 @@ const columns = [
 
     {key: 'groupsCount.applied', label: '# Applied', operator: '$eq', operators},
     {key: 'groupsCount.confirmed', label: '# Confirmed', operator: '$eq', operators},
-    {key: 'groupsCount.available', label: '# Potential', operator: '$eq', operators},
+    {key: 'groupsCount.available', label: '# Available', operator: '$eq', operators},
 
-    {key: 'groupsApplied', label: '# Applied',
-        render: function(){
-            const groupIds = _.pluck(_.where(this.groups,{status: 'applied'}), 'groupId')
+    {
+        key: 'groupsApplied', label: 'Applied',
+        render: function () {
+            const groupIds = _.pluck(_.where(this.groups, {status: 'applied'}), 'groupId')
             const groups = Groups.find({_id: {$in: groupIds}}, {fields: {name: 1, dates: 1}})
             return renderGroup(groups)
         }
     },
-    {key: 'groupsConfirmed', label: '# Confirmed',
-        render: function(){
-            const groupIds = _.pluck(_.where(this.groups,{status: 'confirmed'}), 'groupId')
+    {
+        key: 'groupsConfirmed', label: 'Confirmed',
+        render: function () {
+            const groupIds = _.pluck(_.where(this.groups, {status: 'confirmed'}), 'groupId')
             const groups = Groups.find({_id: {$in: groupIds}}, {fields: {name: 1, dates: 1}})
             return renderGroup(groups)
         }
     },
-    /*{key: 'groupsAvailable', label: '# Potential',
-        render: function(){
-            const groupIds1 = _.pluck(_.where(this.groups,{status: 'applied'}), 'groupId')
-            const groupIds2 = _.pluck(_.where(this.groups,{status: 'confirmed'}), 'groupId')
-            const groups = Groups.find({_id: {$nin: groupIds1.concat(groupIds2)}}, {fields: {name: 1, dates: 1}})
-            return renderGroup(groups)
+    {
+        key: 'groupsAvailable', label: 'Available',
+        render: function () {
+            const confirmedGroupsIds = _.pluck(_.where(this.groups, {status: 'confirmed'}), 'groupId')
+            console.log('confirmedGroupsIds',confirmedGroupsIds)
+            const confirmedGroups= Groups.find({_id: {$in: confirmedGroupsIds}})
+            console.log('confirmedGroups',confirmedGroups.fetch())
+            console.log(' this.availability', this.availability)
+
+            const query = createAvailableQuery(confirmedGroups, this.availability || [])
+            console.log('query',query)
+
+            const groupsAvailable = Groups.find(query, {fields: {name: 1, dates: 1}})
+            console.log('groups',groupsAvailable.fetch(),Groups.find({}).count())
+
+            return renderGroup(groupsAvailable)
         }
-    },*/
+    },
 
 
     {
@@ -140,7 +152,7 @@ const columns = [
             if (!val) return ''
             const m = moment(val)
             if (!m.isValid()) return val
-            if (m<=new Date(2012,1,1)){
+            if (m <= new Date(2012, 1, 1)) {
                 return 'never'
             }
             return m.format('Do MMM YYYY')
@@ -191,32 +203,32 @@ const columns = [
 ]
 
 export const familyFilterSchema = new SimpleSchema({
-    unavailabilityCount:{
+    unavailabilityCount: {
         type: Number,
         optional: true,
     },
-    'groupsCount.applied':{
+    'groupsCount.applied': {
         type: Number,
         optional: true,
     },
-    'groupsCount.confirmed':{
+    'groupsCount.confirmed': {
         type: Number,
         optional: true,
     },
-    'groupsCount.available':{
+    'groupsCount.available': {
         type: Number,
         optional: true,
     },
-    'loggedAt':{
+    'loggedAt': {
         type: Date,
         optional: true,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
@@ -225,13 +237,13 @@ export const familyFilterSchema = new SimpleSchema({
     reviewed: {
         optional: true,
         type: Date,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
@@ -239,21 +251,21 @@ export const familyFilterSchema = new SimpleSchema({
     'other.contactDate': {
         optional: true,
         type: Date,
-        autoform:{
+        autoform: {
             type: "daterangepicker",
             dateRangePickerOptions: {
                 singleDatePicker: true,
                 showDropdowns: true,
                 locale: {
-                    format:  'DD/MM/YYYY',
+                    format: 'DD/MM/YYYY',
                 },
             },
         }
     },
-    'other.drive':{
-        type:[String],
+    'other.drive': {
+        type: [String],
         optional: true,
-        autoform:{
+        autoform: {
             type: 'select-multi-checkbox-combo',
             options: [
                 {label: 'Yes', value: 'Yes',},
@@ -395,11 +407,11 @@ export const familiesAutoTable = new AutoTable(
         id: 'familyList',
         collection: Meteor.users,
         query: {roles: 'family'},
-        publishExtraFields: ['roles','emails','groups'],
+        publishExtraFields: ['roles', 'emails', 'groups','availability'],
         columns,
         schema: familyFilterSchema,
         publish: function () {
-            return Roles.userIsInRole(this.userId, ['admin','staff'])
+            return Roles.userIsInRole(this.userId, ['admin', 'staff'])
         },
         settings: {
             options: {
