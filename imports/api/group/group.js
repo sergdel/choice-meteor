@@ -33,16 +33,14 @@ class GroupCollection extends Mongo.Collection {
         if (_.isObject(selector) && !selector.status) {
             selector = _.extend(selector, {status: {$ne: "removed"}})
         }
-        console.log('selector-->',selector)
         return super.find(selector, options);
     }
 
     insert(group, callback) {
         Groups.attachSchema(Groups.schemas.new, {replace: true})
         group.requirements = ["Share time and talk with guests each day", "Provide three quality meals and snacks each day", "Provide drop-off and pick-up to & from school each day", "Provide each guest with an individual comfortable bed (no bunks)", "Don't have other student of the same nationality in the home during their visit"]
-
+        group.enabled=false
         const res= super.insert(group, callback);
-        updateGroupCountForAllFamilies()
         return res
     }
 

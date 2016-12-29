@@ -101,7 +101,7 @@ Families.updateNotes = function (blueCardId, notes) {
     BlueCard.update(blueCardId, {$set: {notes: notes}})
 }
 export const updateGroupCount = function (familyId) {
-    const time = new Date()
+    //let time = new Date()
 
     const family = Families.findOne(familyId, {fields: {availability: 1, groups: 1}})
     const appliedCount = (family && family.groups && _.where(family.groups, {status: 'applied'}).length) || 0
@@ -118,8 +118,13 @@ export const updateGroupCount = function (familyId) {
             "groupsCount.available": available
         }
     })
-    BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
-    Email.update({userId: familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount}}, {multi: true})
+    //console.log('users time: ', new Date() - time)
+    time = new Date()
+    BlueCard.update({familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount, available}}, {multi: true})
+    //console.log('BlueCard time: ', new Date() - time)
+    time = new Date()
+    Email.update({userId: familyId}, {$set: {applied: appliedCount, confirmed: confirmedCount, available}}, {multi: true})
+    //console.log('Email time: ', new Date() - time)
 }
 /** when a groups is removed**/
 Families.removeGroups = function (groupId) {

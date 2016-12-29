@@ -2,6 +2,7 @@
  * Created by cesar on 27/9/16.
  */
 
+import "./indexes";
 import "./startup";
 import "./redirect";
 
