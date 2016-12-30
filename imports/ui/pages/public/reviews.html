@@ -1,0 +1,18 @@
+<template name="reviews">
+    {{#if isActiveRoute 'home'}}
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <h2>Customer Reviews</h2>
+            <span class="center-line"></span>
+            <p></p>
+        </div>
+    </div>
+    {{/if}}
+    {{#each reviews_arr}}
+        <div class="row">
+            <h3>{{name}}</h3>
+            <img src="{{photo}}" width="200px">
+            <p>{{content}}</p>
+        </div>
+    {{/each}}
+</template>
