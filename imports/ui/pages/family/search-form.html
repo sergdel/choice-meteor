@@ -17,6 +17,13 @@
             <div class="col-sm-4">
                 {{> afFieldInput name="availableDuration" type="daterangepicker" value=availableDuration class="form-control" placeholder="Available Duration"}}
             </div>
+            <div class="row text-right">
+                <div class="col-xs-12">
+                    <button type="button" class="btn btn-primary pull-right btn-lg" id="clear_filter">
+                        Clear Filter
+                    </button>
+                </div>
+            </div>
         {{/autoForm}}
         {{#if isInRole 'admin'}}
             <!--div class="col-lg-1">

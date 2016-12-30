@@ -149,5 +149,10 @@ Template.searchFamilyListForm.events({
             else {
             }
         });
+    },
+
+    'click #clear_filter'(e,inst){
+        $('#searchFamilyListForm input').val('');
+        $('#searchFamilyListForm').submit();
     }
 });
