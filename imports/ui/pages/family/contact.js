@@ -6,7 +6,15 @@ Template.familyContact.onCreated(function () {
 
 Template.familyContact.onRendered(function () {
     $('[data-toggle="popover"]').popover()
-
+     $(document).on('click', event => {
+            event.preventDefault();
+            if (!$(event.target).closest(".contactInfo").length  && !$(event.target).closest(".popover").length) {
+                    if($(".popover").length){
+                          $(".popover").popover('hide')
+                          event.stopImmediatePropagation()
+                    }
+            }
+        });
 });
 
 Template.familyContact.onDestroyed(function () {
@@ -25,11 +33,13 @@ Template.familyContact.helpers({
 
 Template.familyContact.events({
     'click .contactInfo'(e, instance){
+        if($(".popover").length)
+                $(".popover").popover('hide');
         const $button = $(e.currentTarget)
         const options = {
             placement: "left",
             html: true,
-            trigger: 'click',
+            trigger: 'manual',
             title: "Contact Information",
         }
         //this.userId || this._id ==>if is called from emailes reports use userId if if called from other else use _id
