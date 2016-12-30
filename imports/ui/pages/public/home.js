@@ -1,5 +1,6 @@
 import './home.html'
 import './contact'
+import './reviews'
 Template.home.helpers({
     //add you helpers here
 });
