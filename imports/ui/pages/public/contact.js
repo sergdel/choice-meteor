@@ -5,7 +5,7 @@ import './contact.html'
 const contactSchema = new SimpleSchema({
     name: {
         type: String,
-        optional: true,
+        //optional: true,
         autoform: {
             placeholder: 'Your name',
             afFormGroup: {
@@ -24,7 +24,7 @@ const contactSchema = new SimpleSchema({
     },
     phone: {
         type: String,
-        optional: true,
+        //optional: true,
         autoform: {
             firstOption: '-- Please select --',
             placeholder: 'Your phone number',
@@ -35,7 +35,7 @@ const contactSchema = new SimpleSchema({
     },
     suburb: {
         type: String,
-        optional: true,
+        //optional: true,
         autoform: {
             firstOption: '-- Please select --',
             placeholder: 'Your suburb',
@@ -83,7 +83,7 @@ const contactSchema = new SimpleSchema({
         }
     },
     copy: {
-        label: 'Also send a copy of this message to my email address',
+        label: 'Do you want a copy of this message sent to your email?  [ No  /  Yes \/ ] ',
         type: Boolean,
         defaultValue: false,
         autoform: {
