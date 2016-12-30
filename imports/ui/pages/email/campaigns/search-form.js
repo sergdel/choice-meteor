@@ -23,6 +23,33 @@ AutoForm.hooks({
                 }
             }
 
+            if (search.available) {
+                customQuery = _.extend(customQuery,
+                    {"availability" :
+                    {
+                        $not : {
+                            $elemMatch: {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {"dates.0": {$gte: search.available[0]}},
+                                            {"dates.0": {$lte: search.available[1]}}
+                                        ]
+                                    },
+                                    {
+                                        $and: [
+                                            {"dates.1": {$gte: search.available[0]}},
+                                            {"dates.1": {$lte: search.available[1]}}
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                    }
+                );
+            }
+
             if (search.groupDuration) {
                 customQuery = _.extend(customQuery,
                     {
@@ -38,6 +65,10 @@ AutoForm.hooks({
                     }
                 );
             }
+            Session.set('searchCampaignListForm.groupDuration', search.available);
+            Session.set('searchCampaignListForm.groupDuration', search.groupDuration);
+            Session.set('searchCampaignListForm.distance', search.distance);
+            Session.set('searchCampaignListForm.address', search.address);
             if (Object.keys(customQuery).length)
                 Session.set('campaignList_customQuery',customQuery)
             else
@@ -113,6 +144,22 @@ export const searchSchema = new SimpleSchema({
         type: AddressSchema,
         optional: true,
     },
+    available: {
+        type: [Date],
+        optional: true,
+        autoform:{
+            type: 'daterangepicker',
+            afFormGroup: {
+                "formgroup-class": 'col-lg-3',
+
+            },
+            dateRangePickerOptions: {
+                locale: {
+                    format:  'DD/MM/YYYY',
+                },
+            }
+        }
+    },
     groupDuration: {
         type: [Date],
         optional: true,
@@ -138,6 +185,9 @@ Template.searchCampaignListForm.helpers({
     searchSchema: searchSchema,
     optsGoogleplace: optsGoogleplace,
     groupDuration:()=>{
+        return Session.get('searchCampaignListForm.groupDuration')
+    },
+    available:()=>{
         return Session.get('searchCampaignListForm.groupDuration')
     },
     distance: ()=> {
